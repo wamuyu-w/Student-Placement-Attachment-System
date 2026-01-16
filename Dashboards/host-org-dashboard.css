@@ -1,0 +1,19 @@
+/* Host Organization Dashboard specific styles */
+.header {
+    background-color: #e5e7eb;
+    color: #1f2937;
+}
+
+.logout-btn {
+    background-color: #1f2937;
+    color: white;
+    border: none;
+}
+
+.logout-btn:hover {
+    background-color: #374151;
+}
+
+.info-card h3 {
+    color: #1f2937;
+}

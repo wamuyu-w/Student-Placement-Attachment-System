@@ -1,0 +1,19 @@
+/* Staff Dashboard specific styles */
+.header {
+    background-color: #7888a3;
+    color: white;
+}
+
+.logout-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid white;
+}
+
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.info-card h3 {
+    color: #7888a3;
+}

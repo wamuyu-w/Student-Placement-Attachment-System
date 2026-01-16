@@ -1,0 +1,28 @@
+# PHP
+*.log
+*.cache
+.htpasswd
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment
+.env
+config/local.php
+
+# Uploads (if any)
+uploads/*
+!uploads/.gitkeep
+
+# Temporary files
+tmp/
+temp/
