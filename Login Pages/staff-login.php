@@ -18,7 +18,7 @@
             </div>
             <div class="login-form-section">
                 <h2 class="login-heading">Staff Login</h2>
-                <form class="login-form" id="loginForm">
+                <form class="login-form" id="loginForm" method="POST">
                     <div class="form-group">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" required>

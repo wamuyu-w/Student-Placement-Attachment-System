@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Online Attachment Logbook (Themed)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#DC2626",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-10 py-3 bg-white dark:bg-background-dark/50 sticky top-0 z-10 backdrop-blur-sm">
+<div class="flex items-center gap-4 text-slate-800 dark:text-slate-200">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path>
+</svg>
+</div>
+<h2 class="text-slate-800 dark:text-slate-200 text-lg font-bold leading-tight tracking-[-0.015em]">CUEA Attachment System</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium leading-normal hover:text-primary" href="#">Dashboard</a>
+<a class="text-primary dark:text-primary text-sm font-medium leading-normal" href="#">Logbook</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium leading-normal hover:text-primary" href="#">Reports</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium leading-normal hover:text-primary" href="#">Profile</a>
+</div>
+<div class="flex gap-2">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-xl">help</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Profile picture of a student" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCzPitYYOgHm4HV2cApeFlTevvc9ghJpdl895U95Zed3HHk-lJisgMN1HWIycSvZz_SChFJ2pwmcffa8BXSApzvYqnazSn53aRiMBIuQibvH1vgOF4Fx6YmyYtWkMP1w0vnbfr7MRrD_xtVtcwS0vHY1S6tmuLCMzEmVqAHyxDBWiCJr1IA8PL_RFIGOqIqyRQh2dOG0MNJhqXwjztfuxtPDUm0Zp9s09sYQzQrIpF1E4dJMVbftWlbBsTZIASuhOd87Dd_uUehCLo");'></div>
+</div>
+</header>
+<div class="flex flex-1">
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark/50 p-4">
+<div class="flex h-full min-h-[700px] flex-col justify-between">
+<div class="flex flex-col gap-4">
+<div class="flex gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Student's profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBGGw5RYzXUJbmmlvZYXhDh1hhwbxx3Fic1NIh__brmJh1yt9Dkdx0-irVVY6pE6hDldJ-GzcoGMU8PokeKWZ1EOPFXTxA1FfZo6D5FHVnPLf26z7kxpQVYQvymo37bppq4PcyQs51BLPCq4zi9Y3VapzrKs4pBQVlccKV9c6oeTbFvuJ45tc7sm-mARBy9SSzKQ71n4LaNL2tlsgAAQaHxQ0PIyaJ3LpV2oi97KgK7gC3KmdH4vk-XggcQDyPO8psmE6CirZPg6CI");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-800 dark:text-slate-200 text-base font-medium leading-normal">John Doe</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">ID: 123456</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<p class="text-sm font-medium leading-normal">Logbook</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-xl">bar_chart</span>
+<p class="text-sm font-medium leading-normal">Reports</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-xl">person</span>
+<p class="text-sm font-medium leading-normal">My Supervisor</p>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-xl">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</div>
+</aside>
+<main class="flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-wrap justify-between items-center gap-3 pb-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex min-w-72 flex-col gap-1">
+<h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Online Attachment Logbook</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Record your daily and weekly activities for your industrial attachment.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+<div class="lg:col-span-1 flex flex-col gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<h2 class="text-slate-800 dark:text-slate-200 text-xl font-bold leading-tight tracking-[-0.015em]">Log a New Activity</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1 mb-4">Select a date and describe your tasks.</p>
+<div class="flex flex-col gap-4">
+<div class="flex min-w-72 max-w-full flex-1 flex-col gap-0.5">
+<div class="flex items-center p-1 justify-between">
+<button class="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined flex size-10 items-center justify-center text-lg">chevron_left</span>
+</button>
+<p class="text-primary dark:text-primary-light text-base font-bold leading-tight flex-1 text-center">October 2023</p>
+<button class="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined flex size-10 items-center justify-center text-lg">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-7">
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">S</p>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">M</p>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">T</p>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">W</p>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">T</p>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">F</p>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center pb-0.5">S</p>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 col-start-1 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">1</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">2</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">3</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">4</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">5</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">6</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">7</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">8</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">9</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">10</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">11</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">12</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">13</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">14</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">15</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">16</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">17</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">18</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">19</div></button>
+<button class="h-10 w-full text-white text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full bg-primary">20</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">21</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">22</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">23</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">24</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">25</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">26</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">27</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">28</div></button>
+<button class="h-10 w-full text-slate-400 dark:text-slate-500 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">29</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">30</div></button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">31</div></button>
+</div>
+</div>
+<div>
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300" for="activity-description">Activity Description</label>
+<textarea class="mt-1 block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 shadow-sm focus:border-primary focus:ring-primary text-sm" id="activity-description" placeholder="Describe your tasks and activities for the day..." rows="5"></textarea>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-primary hover:bg-primary/90 text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] px-4">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+<span>Add Daily Entry</span>
+</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-2 flex flex-col gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-center mb-4">
+<div>
+<h2 class="text-slate-800 dark:text-slate-200 text-xl font-bold leading-tight tracking-[-0.015em]">This Week's Log</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Week of Oct 16 - Oct 20, 2023</p>
+</div>
+<div class="flex items-center gap-2">
+<p class="text-sm text-slate-500 dark:text-slate-400">Status:</p>
+<span class="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/50 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300">In Progress</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-slate-800 dark:text-slate-200">Monday, Oct 16</p>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Attended the project kickoff meeting and helped set up the new development environment. Started initial research on the user authentication module.</p>
+</div>
+<div class="flex gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</div>
+</div>
+<div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-slate-800 dark:text-slate-200">Tuesday, Oct 17</p>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Continued working on the authentication module, focusing on database schema design and API endpoint creation. Paired with a senior developer to review code.</p>
+</div>
+<div class="flex gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</div>
+</div>
+<div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-slate-800 dark:text-slate-200">Wednesday, Oct 18</p>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Implemented the user registration and login functionality. Wrote unit tests to ensure the core features were working as expected.</p>
+</div>
+<div class="flex gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-slate-200 dark:border-slate-800">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300" for="weekly-summary">Weekly Summary</label>
+<textarea class="mt-1 block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 shadow-sm focus:border-primary focus:ring-primary text-sm" id="weekly-summary" placeholder="Summarize your week's activities, lessons learned, and any challenges faced..." rows="4"></textarea>
+</div>
+<div class="flex justify-end pt-2">
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-primary hover:bg-primary/90 text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] px-4">
+<span>Submit Week for Review</span>
+<span class="material-symbols-outlined text-xl">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</body></html>

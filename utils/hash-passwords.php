@@ -1,18 +1,18 @@
 <?php
 /**
- * Utility script to hash existing plain text passwords in the database
+ * One-time script to hash all the plain text passwords in the database
  * 
- * WARNING: This script will update all passwords in the database.
- * Only run this once if you have plain text passwords that need to be hashed.
+ * WARNING: This will update passwords in your database!
+ * Only run this once when migrating from plain text to hashed passwords.
  * 
- * Usage: Run this script from command line or via browser (remove after use for security)
- * php hash-passwords.php
+ * Run it from command line: php hash-passwords.php
+ * Or via browser (but delete this file after for security)
  */
 
 require_once '../config.php';
 
-// Security check - uncomment this line to require authentication
-// requireLogin('staff'); // Only allow staff to run this
+// Uncomment this if you want to lock it down to staff only
+// requireLogin('staff');
 
 echo "Password Hashing Utility\n";
 echo "=======================\n\n";
@@ -21,14 +21,14 @@ $conn = getDBConnection();
 $updated = 0;
 $skipped = 0;
 
-// Hash passwords in students table
+// Go through students and hash their passwords
 echo "Processing students table...\n";
 $result = $conn->query("SELECT id, username, password FROM students");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Check if password is already hashed (bcrypt hashes start with $2y$)
+        // Bcrypt hashes start with $2y$, $2a$, or $2b$
         if (!preg_match('/^\$2[ayb]\$.{56}$/', $row['password'])) {
-            // Password appears to be plain text, hash it
+            // Looks like plain text, hash it
             $hashedPassword = hashPassword($row['password']);
             $stmt = $conn->prepare("UPDATE students SET password = ? WHERE id = ?");
             $stmt->bind_param("si", $hashedPassword, $row['id']);
@@ -45,12 +45,11 @@ if ($result) {
     $result->close();
 }
 
-// Hash passwords in staff table
+// Same thing for staff
 echo "\nProcessing staff table...\n";
 $result = $conn->query("SELECT id, username, password FROM staff");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Check if password is already hashed
         if (!preg_match('/^\$2[ayb]\$.{56}$/', $row['password'])) {
             $hashedPassword = hashPassword($row['password']);
             $stmt = $conn->prepare("UPDATE staff SET password = ? WHERE id = ?");
@@ -68,12 +67,11 @@ if ($result) {
     $result->close();
 }
 
-// Hash passwords in host_organizations table
+// And host organizations too
 echo "\nProcessing host_organizations table...\n";
 $result = $conn->query("SELECT id, username, password FROM host_organizations");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Check if password is already hashed
         if (!preg_match('/^\$2[ayb]\$.{56}$/', $row['password'])) {
             $hashedPassword = hashPassword($row['password']);
             $stmt = $conn->prepare("UPDATE host_organizations SET password = ? WHERE id = ?");

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Administrator Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#991b1b", // Muted Red
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<div class="flex min-h-screen">
+<aside class="flex h-screen min-h-screen w-64 flex-col justify-between border-r border-gray-200 dark:border-gray-800 bg-primary dark:bg-primary p-4">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-2 px-3 text-white">
+<span class="material-symbols-outlined text-3xl">hub</span>
+<h1 class="text-xl font-bold">CUEA Placements</h1>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/20 text-white" href="#">
+<span class="material-symbols-outlined !fill-1">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg" href="#">
+<span class="material-symbols-outlined">description</span>
+<p class="text-sm font-medium leading-normal">Applications</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg" href="#">
+<span class="material-symbols-outlined">work</span>
+<p class="text-sm font-medium leading-normal">Opportunities</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg" href="#">
+<span class="material-symbols-outlined">supervisor_account</span>
+<p class="text-sm font-medium leading-normal">Supervisors</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg" href="#">
+<span class="material-symbols-outlined">school</span>
+<p class="text-sm font-medium leading-normal">Students</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-sm font-medium leading-normal">Reports</p>
+</a>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1 border-t border-white/20 pt-4">
+<div class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-white/10 rounded-lg">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark px-6 py-4 sticky top-0 z-10">
+<div class="flex items-center gap-8">
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Administrator Dashboard</h2>
+</div>
+<div class="flex flex-1 justify-end items-center gap-4">
+<label class="relative flex-col min-w-40 !h-10 max-w-64 hidden sm:flex">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</span>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary border-none bg-gray-100 dark:bg-gray-800 focus:border-none h-full placeholder:text-gray-500 dark:placeholder:text-gray-400 pl-10 pr-4 text-sm font-normal leading-normal" placeholder="Search..." value=""/>
+</label>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Coordinator Jane Doe profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCSrFRAgsHgvtpk5flJzjrAr1Mou4CxBQLprSS_QAMYJVffseID7nkSPI6GwnMH3bWwpdll_oC_HfLkHfy7O2Ku762R_R5AAu2QlK6G98ryCdC3KKEFacmSWfiMFRcc6v1OOTBw7ytpMcUMg6TB7Ye9_XZz8Fr16p1ycLPjLbiJu-gn7HHZBdli9XsOwg0nKodvqHt-IlGTLDo_r9aeB99wn16lW0tJ-EZEmRdDc-M-0z4aZjAW01cTY9P34kLzEA4YusqhEI4Vu6c");'></div>
+<div class="flex-col hidden md:flex">
+<h3 class="text-gray-900 dark:text-white text-sm font-medium leading-normal">Jane Doe</h3>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">Coordinator</p>
+</div>
+</div>
+</div>
+</header>
+<div class="p-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="flex flex-1 flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+<p class="text-gray-600 dark:text-gray-300 text-sm font-medium leading-normal">Pending Applications</p>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold leading-tight">72</p>
+</div>
+<div class="flex flex-1 flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+<p class="text-gray-600 dark:text-gray-300 text-sm font-medium leading-normal">Active Placements</p>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold leading-tight">150</p>
+</div>
+<div class="flex flex-1 flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+<p class="text-gray-600 dark:text-gray-300 text-sm font-medium leading-normal">Available Opportunities</p>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold leading-tight">45</p>
+</div>
+<div class="flex flex-1 flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+<p class="text-gray-600 dark:text-gray-300 text-sm font-medium leading-normal">Unassigned Students</p>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold leading-tight">12</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+<div class="lg:col-span-2 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight">Recent Activity</h2>
+<button class="text-sm font-medium text-primary hover:underline">View All</button>
+</div>
+<div class="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-lg divide-y divide-gray-200 dark:divide-gray-800">
+<div class="flex items-center gap-4 px-4 py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10" data-alt="Student John Doe profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJF2fIuMKqUEBauTg7ntActUl8GA49FIl80ZnRtAI7ctBcofsTYE8W9_vjzSs0W43eFcKVo1hwo2FQw3_BUydsh2d66K9ISdo9PyVNHBxNsA6s_tKHZtjprnupP6xHWvri3Jjo3pCOE-3bqcQMgKD0LIgy-l0fX7CH9-Ty7w6SiOP3bm1JjSFv1sio5vUimvSeV0zstu8tydwJZGxjiEm1JDddVQ3tQ-gH-2-NDz547HjHGgzyHtvykuJgPktqpc_6LXNJvq_SUp4");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-sm font-medium leading-normal">New Application from John Doe</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">Applied to Tech Solutions Inc.</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">2m ago</p>
+</div>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10" data-alt="Company Innovate Corp logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA0vVTqqTvSTFx0sBGVCzmbf3LFMuJ71vqe8yxW0omb6kVYNcQvZpkTGSUtbidAAsUy6lWWamxFLfqM_SpCPqaMm8WOv_qt5GA4TcmHGtNhTgPEFSFURIvYmNH1T-x6RHFE1iSCWTHpQM6cF_cTlDGdV5YSbL6TcwMgPwl_bKmxOsOurZ_5Q5P4oeYo_5eVVynC6gDT2FBr4Y2yYxiOvKSll1eihP2bxpfT99_dE1aOm7xhxfzUhN0QWMP1cujMHzg98lW2GJCrTDk");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-sm font-medium leading-normal">Innovate Corp posted a new opportunity</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">Software Engineering Intern</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">1h ago</p>
+</div>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10" data-alt="Student Emily White profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQJ4CEJS_9neOyrZh_23pkvGooBvEN7F9ze0URQKLAsF1wRBlLDpBJCdNsC3YIksjqxEtWv0pub3tyLgNZfvCUQj-zVcAAQLVBhJAE8eP_ca-Joi7ljMJNu46jzt7EGX64QUqHba6hNvRFrT-3Mg2FLPqsrTNIvIEGGjEqS6dYnCzfGLsByi_SBdGfv4JhpROcW1LVwnfoyooE49NSLx3ZyuP_kFPZg2VNklxCuvHFbdbFWvaEg_3nJllXdC28RGz8CR9fuhUJxYE");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-sm font-medium leading-normal">Emily White completed placement</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">At Data Dynamics Ltd.</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">3h ago</p>
+</div>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10" data-alt="Student Michael Brown profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBnnTMqUHFClwJQdPNzxMoWI-P_b0Y3Ph0sHkvVWVd4BnJQxnA3tpYmgF14aBK0xUs1_gmYmGuTTWzmXCrU3aN5j4Qi-K0Y2XpQica-BGu9cLdZWbmU92ez-eGdODlAwrobqM-EeUJvkpK3kRfhZaESJEp2Zp38MLtcHpJfaeCGtfBL-6H66sAxYdtwU1zLZVDzJbM2i0fQkXV_qZWMxjMAzJuG6lclNMGy4soJpxVFhq8xySaipa45bhLPdTFvhUPI97aQ7HLp4Bc");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-sm font-medium leading-normal">Supervisor assigned to Michael Brown</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">Dr. Alan Grant</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal">1d ago</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col">
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight mb-4">Quick Actions</h2>
+<div class="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-lg p-4 flex flex-col gap-3">
+<button class="w-full flex items-center justify-center gap-2 rounded-lg bg-primary text-white h-10 text-sm font-bold hover:bg-primary/90">
+<span class="material-symbols-outlined">add_circle</span> Add New Opportunity
+                                </button>
+<button class="w-full flex items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 h-10 text-sm font-bold hover:bg-gray-300 dark:hover:bg-gray-600">
+<span class="material-symbols-outlined">summarize</span> Generate Weekly Report
+                                </button>
+<button class="w-full flex items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 h-10 text-sm font-bold hover:bg-gray-300 dark:hover:bg-gray-600">
+<span class="material-symbols-outlined">person_add</span> Assign Supervisor
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

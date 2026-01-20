@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Host Organization Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#991b1b", // red-800
+            "background-light": "#f3f4f6", // gray-100
+            "background-dark": "#1f2937", // gray-800
+          },
+          fontFamily: {
+            display: ["'Inter', sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.5rem", // 8px
+          },
+        },
+      },
+    };
+  </script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display flex items-center justify-center min-h-screen">
+<div class="w-full max-w-sm p-8 space-y-6 bg-white dark:bg-gray-700 shadow-lg rounded-lg border border-gray-200 dark:border-gray-600">
+<div class="text-center">
+<img alt="University Logo" class="w-16 h-16 mx-auto mb-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJT_8Zi__Pq5vKT28x7nApBx_kIySnl_Ut-7JqNQvYx3Z-HqfTyZL1AfqpmI8YAtopz7v77r4x9yW14tlTVCQDNQfwP4KKqLa9nEyXgK_pHhdpMsLU3aCgICL6r328SdZnVwTfx7xvKTjS8SjX6hYudmh6fxb5LhcDeI9zrogoJbCu1fR6VoNZSWvroaQUTSHoHySSV2TpHMB82swb3P0_jqRsmi7V_IgOA8yUw-qo75vyGmnP84nwgaTFK2-nLtd05EgicB4Sd08"/>
+<h1 class="text-xl font-bold text-gray-800 dark:text-white">
+        THE CATHOLIC UNIVERSITY<br/>OF EASTERN AFRICA (CUEA)
+      </h1>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Consecrate Them in the Truth</p>
+<h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mt-6">Host Organization Login</h2>
+</div>
+<form class="space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="username">Username</label>
+<div class="mt-1">
+<input class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" id="username" name="username" required="" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="password">Password</label>
+<div class="mt-1">
+<input class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" id="password" name="password" required="" type="password"/>
+</div>
+</div>
+<div>
+<button class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 dark:bg-gray-900 dark:hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition-colors" type="submit">
+          Sign In
+        </button>
+</div>
+</form>
+</div>
+
+</body></html>

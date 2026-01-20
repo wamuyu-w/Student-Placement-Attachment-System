@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Application Review (Admin) - CUEA Placement Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": {
+                DEFAULT: "#B91C1C", // Red-700
+                "50": "#FEF2F2",
+                "100": "#FEE2E2",
+                "200": "#FECACA",
+                "300": "#FCA5A5",
+                "400": "#F87171",
+                "500": "#EF4444",
+                "600": "#DC2626",
+                "700": "#B91C1C",
+                "800": "#991B1B",
+                "900": "#7F1D1D",
+                "950": "#450A0A"
+              },
+              "background-light": "#fef2f2",
+              "background-dark": "#1f2937",
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-red-200 dark:border-gray-700 px-6 md:px-10 py-3 bg-primary dark:bg-gray-900 text-white sticky top-0 z-20">
+<div class="flex items-center gap-4">
+<div class="size-8">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold tracking-[-0.015em]">CUEA Placement Portal</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-center gap-8">
+<div class="flex items-center gap-9">
+<a class="text-sm font-medium leading-normal text-red-200 dark:text-gray-300 hover:text-white dark:hover:text-white" href="#">Dashboard</a>
+<a class="text-sm font-bold leading-normal text-white dark:text-white underline" href="#">Applications</a>
+<a class="text-sm font-medium leading-normal text-red-200 dark:text-gray-300 hover:text-white dark:hover:text-white" href="#">Students</a>
+<a class="text-sm font-medium leading-normal text-red-200 dark:text-gray-300 hover:text-white dark:hover:text-white" href="#">Companies</a>
+<a class="text-sm font-medium leading-normal text-red-200 dark:text-gray-300 hover:text-white dark:hover:text-white" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-red-800 dark:bg-gray-800 text-red-100 dark:text-gray-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Administrator profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBLsWWJbXJcAM_9SRjkjPOi0kM9HskIKq8VG8-F7rMCPmrcEaTWA49Yd7C4ou2ZDmkrPQAOYYzJKxo7z_jNCa1YeN6FJNy-uBbKZHMoaBfWGW06oWtoK3zmymDhslEIq-ltMmZYUiIH7jtwn0S_JS3tnjb9AAh8A1HEl6ZT3Q6nnfYWdJD6xNxNy5OFLB6dF3_gv5WP2Pm7D11MitF6SVNfjpdGRIv6wOoc7qDmJCAFsr7EodghQOLOTEybe4bUWFEBZ_Y2jGlYWc8");'></div>
+</div>
+</header>
+<main class="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-7 flex flex-col gap-6">
+<div class="flex flex-wrap justify-between items-center gap-4">
+<div class="flex flex-col gap-1">
+<p class="text-3xl font-black leading-tight tracking-[-0.033em] text-gray-900 dark:text-white">Application Review</p>
+<p class="text-base font-normal leading-normal text-gray-600 dark:text-gray-400">Review and manage student attachment applications.</p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<div class="flex-grow">
+<label class="flex flex-col h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-gray-500 flex bg-white dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border border-r-0 border-gray-200 dark:border-gray-700">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-l-0 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 h-full placeholder:text-gray-500 dark:placeholder:text-gray-400 px-4 rounded-l-none pl-2 text-base font-normal leading-normal" placeholder="Search by student name or ID..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex gap-3">
+<button class="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary text-white border border-primary-700 dark:border-primary-600 px-4 hover:bg-primary-800 transition-colors">
+<p class="text-sm font-medium leading-normal">Filter by Program</p>
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+<button class="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary text-white border border-primary-700 dark:border-primary-600 px-4 hover:bg-primary-800 transition-colors">
+<p class="text-sm font-medium leading-normal">Filter by Date</p>
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<div class="flex overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+<thead class="bg-gray-50 dark:bg-gray-900/50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Company</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date Submitted</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+<th class="relative px-6 py-3"><span class="sr-only">Action</span></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+<tr class="hover:bg-primary-50 dark:hover:bg-primary-950/30">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Olivia Martin</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">Computer Science</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Tech Solutions Inc.</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-10-26</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-300">Pending</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<a class="text-primary hover:text-primary-600" href="#">View Details</a>
+</td>
+</tr>
+<tr class="hover:bg-primary-50 dark:hover:bg-primary-950/30">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Benjamin Carter</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">Business Administration</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Innovate Corp</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-10-25</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-300">Pending</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<a class="text-primary hover:text-primary-600" href="#">View Details</a>
+</td>
+</tr>
+<tr class="bg-primary-100/50 dark:bg-primary-950/40">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Sophia Rodriguez</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">Marketing</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">MarketBoost Agency</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-10-25</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/50 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-300">Approved</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<a class="text-primary hover:text-primary-600" href="#">View Details</a>
+</td>
+</tr>
+<tr class="hover:bg-primary-50 dark:hover:bg-primary-950/30">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Liam Goldberg</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">Information Technology</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Data Systems Ltd.</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-10-24</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/50 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-300">Rejected</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<a class="text-primary hover:text-primary-600" href="#">View Details</a>
+</td>
+</tr>
+<tr class="hover:bg-primary-50 dark:hover:bg-primary-950/30">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Ava Nguyen</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">Computer Science</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Cybernetics Co.</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-10-23</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-300">Pending</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<a class="text-primary hover:text-primary-600" href="#">View Details</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5">
+<div class="sticky top-28 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 flex flex-col gap-8">
+<div class="flex items-center justify-between">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white">Application Details</h3>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-base font-semibold text-primary dark:text-primary-300 border-b border-gray-200 dark:border-gray-700 pb-2">Student Information</h4>
+<div class="flex items-center gap-4">
+<img alt="Student profile picture Sophia Rodriguez" class="h-16 w-16 rounded-full object-cover" data-alt="Student profile picture Sophia Rodriguez" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO9xPzfQ9BbGkxhbAF3EghR0uZqxVm2saZgeK1EyZ4GFgcfGtC3DVQCOwNH3kOnk9VRQ3i6WauECpuvwr1Rt5aLfvfcsIDBzRbSTKDoBPCG9MsIcfeAkxEO_09QbOyTolSUz9AXjxcxFyqkcnBUPGz19YZp4qosqMCJTYaUw2t9RxobwUE40tuv0MEKEGrjkcwD9k4Gp_OTX1I2oI0j7_VKZPJu1j4o_Q1XT67_nzmSaecQw0sr2LDDQFisXuDeOCgdUDR-71iDEQ"/>
+<div>
+<p class="font-bold text-lg text-gray-900 dark:text-white">Sophia Rodriguez</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">Student ID: 45822</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 text-sm">
+<div>
+<p class="text-gray-500 dark:text-gray-400">Program</p>
+<p class="font-medium text-gray-800 dark:text-gray-200">Marketing</p>
+</div>
+<div>
+<p class="text-gray-500 dark:text-gray-400">Year of Study</p>
+<p class="font-medium text-gray-800 dark:text-gray-200">3rd Year</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-base font-semibold text-primary dark:text-primary-300 border-b border-gray-200 dark:border-gray-700 pb-2">Placement Details</h4>
+<div class="grid grid-cols-2 gap-4 text-sm">
+<div>
+<p class="text-gray-500 dark:text-gray-400">Company</p>
+<p class="font-medium text-gray-800 dark:text-gray-200">MarketBoost Agency</p>
+</div>
+<div>
+<p class="text-gray-500 dark:text-gray-400">Supervisor</p>
+<p class="font-medium text-gray-800 dark:text-gray-200">Mr. John Doe</p>
+</div>
+<div>
+<p class="text-gray-500 dark:text-gray-400">Start Date</p>
+<p class="font-medium text-gray-800 dark:text-gray-200">2024-01-15</p>
+</div>
+<div>
+<p class="text-gray-500 dark:text-gray-400">End Date</p>
+<p class="font-medium text-gray-800 dark:text-gray-200">2024-04-15</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-base font-semibold text-primary dark:text-primary-300 border-b border-gray-200 dark:border-gray-700 pb-2">Attached Documents</h4>
+<ul class="space-y-3">
+<li class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="text-sm font-medium text-gray-700 dark:text-gray-300">CV_Sophia_Rodriguez.pdf</span>
+</div>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">download</span></a>
+</li>
+<li class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Cover_Letter.docx</span>
+</div>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">download</span></a>
+</li>
+</ul>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+<button class="flex-1 flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-primary-700 text-white font-bold text-sm hover:bg-primary-800 transition-colors">
+<span class="material-symbols-outlined">thumb_down</span>
+<span>Reject</span>
+</button>
+<button class="flex-1 flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-gray-800 text-white font-bold text-sm hover:bg-gray-900 transition-colors dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-white">
+<span class="material-symbols-outlined">thumb_up</span>
+<span>Approve</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Assessment (Lecturer Portal)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#C8102E",
+              "primary-dark": "#A30D24",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-10 py-3 bg-white dark:bg-background-dark w-full fixed top-0 left-0 right-0 z-10">
+<div class="flex items-center gap-4 text-slate-800 dark:text-slate-200">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.08V7.92l5.02 4.08L11 16.08z"></path></svg>
+</div>
+<h2 class="text-slate-800 dark:text-slate-200 text-lg font-bold leading-tight tracking-[-0.015em]">CUEA Portal</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-background-light dark:bg-slate-800 text-slate-800 dark:text-slate-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="lecturer's profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8Lsb0o2pE9i7gwhatgKzsVlzGWG8BeJkaoTHuH7MEDXt2QckCM2VzqIdAmozTG-TC-KjYgMgwW6VPGOuGQsiSHw6ihTemy2UunKZz30R3kl3LYnt9K8TtXBxuF5bYyt7sudzPgx5l5zyQA254uxBOOw5K1oEMPK-ZkFVMu40kIBQnMmJmDl-vMwTmsCQO_cNtENZRB_HwmcIW75wGJ7Ac8wJzWpQsILUtXrjSDIzyH1ZX6ocVrdtNVMs2gCXdlaZ3LSAOgG70HE4");'></div>
+</div>
+</header>
+<main class="flex flex-1 justify-center pt-24 pb-10 px-4 sm:px-6 lg:px-8">
+<div class="layout-content-container flex flex-col w-full max-w-4xl flex-1 gap-6">
+<div class="flex flex-wrap gap-2">
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal" href="#">Dashboard</a>
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal">/</span>
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal" href="#">My Students</a>
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal">/</span>
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal" href="#">Jane Doe</a>
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal">/</span>
+<span class="text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal">Assessment</span>
+</div>
+<div class="flex flex-wrap justify-between items-baseline gap-3">
+<h1 class="text-primary dark:text-red-400 text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Student Assessment</h1>
+</div>
+<div class="flex items-stretch justify-between gap-6 rounded-xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col gap-2 flex-1">
+<p class="text-slate-800 dark:text-slate-200 text-xl font-bold leading-tight">Jane Doe</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Student ID: CUEA-12345</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Company: Tech Solutions Inc.</p>
+</div>
+<div class="w-24 h-24 bg-center bg-no-repeat aspect-square bg-cover rounded-full flex-shrink-0" data-alt="profile picture of student Jane Doe" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDATnfJfv2AXFe13tfFzwusaGwEutypKPKkmJwdgzkgwZYewIbT_G-71gp0V0Mshiq6G9iZvRolu3VLFaoaiH_F9UQPc9fF7ZfXR3kThHUCZceWLZRKW_Jcl1-t5aMFrI2uzZ7dkyKat2NOHs75n5ASm3Shq-vKSxYVsB5nc-3dprmpRqNWD5VtR-mEotVyaBKlGE2SI3yOoTADE6ptOIgqU5rN6ac7tHzT5HXy50QgFwzggQymbE1XPBm-0u6R8hAYD4Ymh2G2ijE");'></div>
+</div>
+<div class="flex flex-col gap-6 p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+<p class="text-slate-600 dark:text-slate-300 text-base font-normal leading-normal">Please assess the student based on the following criteria. Each criterion is scored out of 10.</p>
+<div class="flex flex-col -mx-6 border-y border-slate-200 dark:border-slate-800">
+<div class="flex items-center px-6 py-3 bg-slate-50 dark:bg-slate-800/50">
+<div class="w-2/5"><p class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Criterion</p></div>
+<div class="w-3/5"><p class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Marks (out of 10)</p></div>
+</div>
+<div class="flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+<div class="flex items-center px-6 py-4">
+<div class="w-2/5"><p class="text-sm font-medium text-primary dark:text-red-400">Punctuality &amp; Attendance</p></div>
+<div class="w-3/5"><input class="w-20 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" max="10" min="0" placeholder="0" type="number"/></div>
+</div>
+<div class="flex items-center px-6 py-4">
+<div class="w-2/5"><p class="text-sm font-medium text-primary dark:text-red-400">Communication Skills</p></div>
+<div class="w-3/5"><input class="w-20 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" max="10" min="0" placeholder="0" type="number"/></div>
+</div>
+<div class="flex items-center px-6 py-4">
+<div class="w-2/5"><p class="text-sm font-medium text-primary dark:text-red-400">Teamwork &amp; Collaboration</p></div>
+<div class="w-3/5"><input class="w-20 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" max="10" min="0" placeholder="0" type="number"/></div>
+</div>
+<div class="flex items-center px-6 py-4">
+<div class="w-2/5"><p class="text-sm font-medium text-primary dark:text-red-400">Problem-Solving Ability</p></div>
+<div class="w-3/5"><input class="w-20 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" max="10" min="0" placeholder="0" type="number"/></div>
+</div>
+<div class="flex items-center px-6 py-4">
+<div class="w-2/5"><p class="text-sm font-medium text-primary dark:text-red-400">Technical Proficiency</p></div>
+<div class="w-3/5"><input class="w-20 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" max="10" min="0" placeholder="0" type="number"/></div>
+</div>
+<div class="flex items-center px-6 py-4">
+<div class="w-2/5"><p class="text-sm font-medium text-primary dark:text-red-400">Initiative &amp; Proactiveness</p></div>
+<div class="w-3/5"><input class="w-20 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" max="10" min="0" placeholder="0" type="number"/></div>
+</div>
+</div>
+<div class="flex items-center justify-end px-6 py-4 bg-slate-50 dark:bg-slate-800/50">
+<p class="text-base font-bold text-slate-800 dark:text-slate-200">Total: <span class="text-primary dark:text-red-400">0 / 60</span></p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="comments">Overall Comments</label>
+<textarea class="w-full rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-primary" id="comments" name="comments" placeholder="Provide detailed qualitative feedback here..." rows="5"></textarea>
+</div>
+</div>
+<div class="flex justify-end gap-4 mt-2">
+<button class="flex items-center justify-center rounded-lg h-12 px-6 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-base font-bold leading-normal hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Save as Draft</button>
+<button class="flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-white text-base font-bold leading-normal hover:bg-primary-dark transition-colors">Submit Assessment</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

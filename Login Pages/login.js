@@ -5,21 +5,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const submitButton = document.querySelector('.sign-in-button');
     
-    // Determine user type from current page
-    const currentPage = window.location.pathname;
+    // Determine user type from current page URL
+    const currentPage = window.location.pathname.toLowerCase();
+    const currentDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
     let userType = '';
     let loginEndpoint = '';
     
+    console.log('=== LOGIN PAGE DEBUG ===');
+    console.log('Current pathname:', window.location.pathname);
+    console.log('Current directory:', currentDir);
+    console.log('Lowercased pathname:', currentPage);
+    
+    // Determine endpoint based on current page
     if (currentPage.includes('student-login')) {
         userType = 'student';
-        loginEndpoint = 'login-student.php';
+        loginEndpoint = currentDir + '/login-student.php';
+        console.log('Detected: Student login');
     } else if (currentPage.includes('staff-login')) {
         userType = 'staff';
-        loginEndpoint = 'login-staff.php';
-    } else if (currentPage.includes('host-organization-login')) {
+        loginEndpoint = currentDir + '/login-staff.php';
+        console.log('Detected: Staff login');
+    } else if (currentPage.includes('host-organization-login') || currentPage.includes('host%20organization')) {
         userType = 'host_org';
-        loginEndpoint = 'login-host-org.php';
+        loginEndpoint = currentDir + '/login-host-org.php';
+        console.log('Detected: Host organization login');
     }
+    
+    
+    console.log('Final loginEndpoint:', loginEndpoint);
+    console.log('Final userType:', userType);
     
     // Real-time validation
     usernameInput.addEventListener('blur', validateUsername);
@@ -66,12 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('password', 'Password is required');
             return false;
         }
-        
-        if (password.length < 6) {
-            showError('password', 'Password must be at least 6 characters');
-            return false;
-        }
-        
+    
         // Remove error if valid
         if (passwordError) {
             passwordError.remove();
@@ -130,17 +139,22 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
+            console.log('Response data:', data);
+            console.log('Redirect URL:', data.redirect);
+            
             if (data.success) {
                 // Show success message
                 showSuccessMessage(data.message);
                 
                 // Redirect after short delay
                 setTimeout(() => {
+                    console.log('Redirecting to:', data.redirect);
                     window.location.href = data.redirect;
-                }, 1000);
+                }, 500);
             } else {
                 // Show error message
                 showErrorMessage(data.message || 'Login failed. Please try again.');
+
                 
                 // Re-enable submit button
                 submitButton.disabled = false;

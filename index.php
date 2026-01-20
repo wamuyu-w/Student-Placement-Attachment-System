@@ -26,7 +26,7 @@
         <div class="heading-1-margin">
           <div class="heading-1">
             <div class="attachment-management-system">
-              Attachment
+              CUEA Attachment
               <br />
               Management System
             </div>
@@ -37,27 +37,23 @@
             <div
               class="Information-text"
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              <br />
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque
-              <br />
-              aliquam vestibulum morbi blandit cursus risus at ultrices mi.
+              Managing the CUEA Industrial Attachments and Student Placement Process Effectively and Efficiently.
             </div>
           </div>
         </div>
         <div class="container6">
           <div class="student-login">
-            <a href="Login Pages/student-login.html">
+            <a href="Login Pages/student-login.php">
               <button class="button">Student Login</button>
             </a>
           </div>
           <div class="staff-login">
-            <a href="Login Pages/staff-login.html">
+            <a href="Login Pages/staff-login.php">
               <button class="button2">Staff Login</button>
             </a>
           </div>
           <div class="host-organization-login">
-            <a href="Login Pages/host-organization-login.html">
+            <a href="Login Pages/host-organization-login.php">
               <button class="button3">Host Organization Login</button>
             </a>
           </div>

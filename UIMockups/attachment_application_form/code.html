@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Attachment Application Form</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#c00000",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            "display": ["Lexend", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-[#111418] dark:text-gray-200">
+<div class="relative flex min-h-screen w-full flex-col items-center group/design-root overflow-x-hidden">
+<div class="w-full max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-2 text-center">
+<h1 class="text-4xl font-bold leading-tight tracking-tighter text-primary dark:text-primary">Attachment Application Form</h1>
+<p class="text-base text-gray-500 dark:text-gray-400">Fill in the details below to apply for your industrial attachment.</p>
+</div>
+<div class="flex flex-col gap-10 bg-white dark:bg-gray-900 p-6 sm:p-10 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+<div class="flex flex-col gap-6">
+<h2 class="text-2xl font-semibold leading-tight tracking-tight text-primary dark:text-primary border-b border-gray-200 dark:border-gray-700 pb-4">Personal Details</h2>
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Full Name</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 placeholder:text-gray-400 focus:border-primary focus:ring-primary" placeholder="Enter your full name" value=""/>
+</label>
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Student ID Number</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 placeholder:text-gray-400 focus:border-primary focus:ring-primary" placeholder="Enter your student ID" value=""/>
+</label>
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">University Email</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 placeholder:text-gray-400 focus:border-primary focus:ring-primary" placeholder="Enter your university email" type="email" value=""/>
+</label>
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Phone Number</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 placeholder:text-gray-400 focus:border-primary focus:ring-primary" placeholder="e.g., +254 712 345 678" type="tel" value=""/>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<h2 class="text-2xl font-semibold leading-tight tracking-tight text-primary dark:text-primary border-b border-gray-200 dark:border-gray-700 pb-4">Academic Information</h2>
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Faculty / Department</p>
+<select class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 focus:border-primary focus:ring-primary">
+<option>Select your faculty</option>
+<option>Faculty of Science</option>
+<option>Faculty of Arts and Social Sciences</option>
+<option>Faculty of Law</option>
+<option>School of Business</option>
+</select>
+</label>
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Course / Program of Study</p>
+<select class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 focus:border-primary focus:ring-primary">
+<option>Select your course</option>
+<option>BSc. Computer Science</option>
+<option>Bachelor of Commerce</option>
+<option>Bachelor of Laws</option>
+</select>
+</label>
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Current Year of Study</p>
+<select class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 focus:border-primary focus:ring-primary">
+<option>Select year</option>
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+<option>4th Year</option>
+</select>
+</label>
+<label class="flex flex-col">
+<p class="text-base font-medium pb-2 text-gray-800 dark:text-gray-300">Current GPA / Average Score</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-14 p-4 text-base font-normal leading-normal text-gray-900 dark:text-gray-200 placeholder:text-gray-400 focus:border-primary focus:ring-primary" placeholder="e.g., 3.8" value=""/>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<h2 class="text-2xl font-semibold leading-tight tracking-tight text-primary dark:text-primary border-b border-gray-200 dark:border-gray-700 pb-4">Attachment Preferences</h2>
+<div class="flex flex-col gap-4">
+<p class="text-base font-medium text-gray-800 dark:text-gray-300">Preferred Attachment Areas</p>
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+<label class="flex items-center gap-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 has-[:checked]:text-primary dark:has-[:checked]:text-primary-300">
+<input class="form-checkbox h-5 w-5 rounded text-primary focus:ring-primary/50 border-gray-300 dark:border-gray-600 dark:bg-gray-700" type="checkbox"/><span>IT / Software</span>
+</label>
+<label class="flex items-center gap-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 has-[:checked]:text-primary dark:has-[:checked]:text-primary-300">
+<input class="form-checkbox h-5 w-5 rounded text-primary focus:ring-primary/50 border-gray-300 dark:border-gray-600 dark:bg-gray-700" type="checkbox"/><span>Finance</span>
+</label>
+<label class="flex items-center gap-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 has-[:checked]:text-primary dark:has-[:checked]:text-primary-300">
+<input class="form-checkbox h-5 w-5 rounded text-primary focus:ring-primary/50 border-gray-300 dark:border-gray-600 dark:bg-gray-700" type="checkbox"/><span>Marketing</span>
+</label>
+<label class="flex items-center gap-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 has-[:checked]:text-primary dark:has-[:checked]:text-primary-300">
+<input class="form-checkbox h-5 w-5 rounded text-primary focus:ring-primary/50 border-gray-300 dark:border-gray-600 dark:bg-gray-700" type="checkbox"/><span>Human Resources</span>
+</label>
+<label class="flex items-center gap-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 has-[:checked]:text-primary dark:has-[:checked]:text-primary-300">
+<input class="form-checkbox h-5 w-5 rounded text-primary focus:ring-primary/50 border-gray-300 dark:border-gray-600 dark:bg-gray-700" type="checkbox"/><span>Legal</span>
+</label>
+<label class="flex items-center gap-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 has-[:checked]:text-primary dark:has-[:checked]:text-primary-300">
+<input class="form-checkbox h-5 w-5 rounded text-primary focus:ring-primary/50 border-gray-300 dark:border-gray-600 dark:bg-gray-700" type="checkbox"/><span>Research</span>
+</label>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<h2 class="text-2xl font-semibold leading-tight tracking-tight text-primary dark:text-primary border-b border-gray-200 dark:border-gray-700 pb-4">Upload Documents</h2>
+<div class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-8 text-center">
+<span class="material-symbols-outlined text-5xl text-gray-400 dark:text-gray-500">upload_file</span>
+<p class="mt-4 text-base font-medium text-gray-800 dark:text-gray-300">Drag &amp; drop your Resume/CV here</p>
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">or</p>
+<button class="mt-4 rounded-lg bg-primary/10 px-5 py-2.5 text-base font-semibold text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30" type="button">Browse Files</button>
+<p class="mt-4 text-xs text-gray-400 dark:text-gray-500">PDF, DOC, DOCX up to 5MB</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 pt-6 sm:flex-row sm:justify-end">
+<button class="flex h-12 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 px-6 text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600" type="button">Save as Draft</button>
+<button class="flex h-12 items-center justify-center rounded-lg bg-primary px-6 text-base font-semibold text-white hover:bg-primary/90" type="submit">Submit Application</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

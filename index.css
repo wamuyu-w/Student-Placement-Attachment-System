@@ -1,15 +1,13 @@
-._1920-w-light, ._1920-w-light * {
-  box-sizing: border-box;
-}
+
 .Landing-Page-Container {
   background: var(--color-white-solid, #ffffff);
-  padding: 312px 16px 312px 16px;
+  padding: 100px 16px 100px 16px;
   display: flex;
   flex-direction: row;
   gap: 0px;
   align-items: center;
   justify-content: center;
-  min-height: var(--height-1200, 1200px);
+  min-height: var(--height-900, 900px);
   position: relative;
 }
 .container {
@@ -20,7 +18,7 @@
   justify-content: flex-start;
   flex-shrink: 0;
   width: 1000px;
-  max-width: 1000px;
+  max-width: 1500px;
   position: relative;
 }
 .background-shadow {

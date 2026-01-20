@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="login.css">
-    <title>Host Organization Login - CUEA</title>
+    <title>Student Login - CUEA</title>
 </head>
 <body>
     <div class="login-container">
@@ -17,8 +17,8 @@
                 <p class="university-motto">Consecrate Them in the Truth</p>
             </div>
             <div class="login-form-section">
-                <h2 class="login-heading">Host Organization Login</h2>
-                <form class="login-form" id="loginForm">
+                <h2 class="login-heading">Student Login</h2>
+                <form class="login-form" id="loginForm" method="POST">
                     <div class="form-group">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" required>
@@ -28,6 +28,9 @@
                         <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
                     </div>
                     <button type="submit" class="sign-in-button">Sign In</button>
+                    <div class="signup-link">
+                        Don't have an account? <a href="../Sign-up%20Pages/signup-student.php">Sign Up</a>
+                    </div>
                 </form>
             </div>
         </div>

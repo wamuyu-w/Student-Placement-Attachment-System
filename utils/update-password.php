@@ -1,7 +1,7 @@
 <?php
 /**
- * Utility script to update a single user's password
- * Useful for resetting passwords or creating new accounts
+ * Quick script to change a single user's password
+ * Handy for password resets or setting up new accounts
  * 
  * Usage: php update-password.php <table> <username> <new_password>
  * Example: php update-password.php students student1 newpassword123
@@ -9,12 +9,12 @@
 
 require_once '../config.php';
 
-// Get command line arguments
+// Grab the command line args
 $table = $argv[1] ?? '';
 $username = $argv[2] ?? '';
 $newPassword = $argv[3] ?? '';
 
-// Validate arguments
+// Make sure they gave us everything we need
 if (empty($table) || empty($username) || empty($newPassword)) {
     echo "Usage: php update-password.php <table> <username> <new_password>\n";
     echo "Tables: students, staff, host_organizations\n";
@@ -22,14 +22,14 @@ if (empty($table) || empty($username) || empty($newPassword)) {
     exit(1);
 }
 
-// Validate table name
+// Check that the table name is valid (security thing)
 $validTables = ['students', 'staff', 'host_organizations'];
 if (!in_array($table, $validTables)) {
     echo "Error: Invalid table name. Must be one of: " . implode(', ', $validTables) . "\n";
     exit(1);
 }
 
-// Validate password length
+// Password needs to be at least 6 characters
 if (strlen($newPassword) < 6) {
     echo "Error: Password must be at least 6 characters long.\n";
     exit(1);
@@ -37,7 +37,7 @@ if (strlen($newPassword) < 6) {
 
 $conn = getDBConnection();
 
-// Check if user exists
+// See if the user actually exists
 $stmt = $conn->prepare("SELECT id FROM $table WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -52,10 +52,10 @@ if ($result->num_rows === 0) {
 
 $stmt->close();
 
-// Hash the new password
+// Hash it up
 $hashedPassword = hashPassword($newPassword);
 
-// Update password
+// Update the password
 $stmt = $conn->prepare("UPDATE $table SET password = ? WHERE username = ?");
 $stmt->bind_param("ss", $hashedPassword, $username);
 
