@@ -9,8 +9,17 @@ if (session_status() === PHP_SESSION_NONE) {
 header('Content-Type: application/json');
 
 // Only accept POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+$method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
+
+// Debug logging
+file_put_contents('debug_signup.txt', date('Y-m-d H:i:s') . " - Request Method: " . $method . "\n", FILE_APPEND);
+
+if ($method !== 'POST') {
+    //  ensure all methods used are POST in nature
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Invalid request method: ' . $method
+    ]);
     exit();
 }
 

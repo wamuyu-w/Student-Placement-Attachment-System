@@ -72,20 +72,19 @@ $conn->close();
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="host-org-opportunities-management.php" class="nav-item">
+            <a href="../Opportunities/host-management-opportunities.php" class="nav-item">
                 <i class="fas fa-briefcase"></i>
                 <span>Opportunities</span>
             </a>
-            <!-- The following are not implemented, so keep as # or alert -->
-            <a href="#" class="nav-item">
+            <a href="../Applications/host-org-applications.php" class="nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>Applications</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Students/host-org-students.php" class="nav-item">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Students</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Reports/host-org-reports.php" class="nav-item">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
@@ -207,13 +206,13 @@ $conn->close();
             window.location.href = 'host-org-opportunities-management.php';
         }
         function handleViewApplications() {
-            alert('View Applications - Coming soon');
+            window.location.href = '../Applications/host-org-applications.php';
         }
         function handleManageStudents() {
-            alert('Manage Students - Coming soon');
+            window.location.href = '../Students/host-org-students.php';
         }
         function handleViewReports() {
-            alert('View Reports - Coming soon');
+            window.location.href = '../Reports/host-org-reports.php';
         }
     </script>
 </body>

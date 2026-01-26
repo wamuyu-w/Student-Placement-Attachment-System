@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="login.css?v=<?php echo time(); ?>">
     <title>Host Organization Login - CUEA</title>
 </head>
 <body>
@@ -29,7 +29,7 @@
                     </div>
                     <button type="submit" class="sign-in-button">Sign In</button>
                     <div class="signup-link">
-                        Don't have an account? <a href="../Signup Pages/signup-host-org.php">Sign Up</a>
+                        Don't have an account? <a href="../Sign-up%20Pages/signup-host-org.php">Sign Up</a>
                     </div>
                 </form>
             </div>

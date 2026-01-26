@@ -22,7 +22,7 @@ try {
         throw new Exception('Missing required fields');
     }
 
-    // Validate motivation length
+    // Ensure all necessary form fields are present before proceeding
     if (strlen($motivation) > 500) {
         throw new Exception('Motivation statement exceeds 500 characters');
     }
@@ -47,7 +47,7 @@ try {
             throw new Exception('Error uploading file');
         }
 
-        if ($fileSize > 5 * 1024 * 1024) {
+        // Check if file size is within the 5MB limit
             throw new Exception('File size exceeds 5MB limit');
         }
 
@@ -58,13 +58,13 @@ try {
             throw new Exception('Only PDF and DOCX files are allowed');
         }
 
-        // Create uploads directory if it doesn't exist
+        // Create the directory for resumes if it doesn't already exist
         $uploadsDir = '../assets/uploads/resumes/';
         if (!is_dir($uploadsDir)) {
             mkdir($uploadsDir, 0755, true);
         }
 
-        // Generate unique filename
+        // Generate a unique filename to prevent overwriting existing files
         $resumeFileName = 'resume_' . $studentId . '_' . $opportunityId . '_' . time() . '.' . $fileExtension;
         $filePath = $uploadsDir . $resumeFileName;
 
@@ -74,8 +74,7 @@ try {
         }
     }
     
-    // Verify opportunity exists and is still active
-    // Verify opportunity exists and is still active, and get HostOrgID
+    // Check if the opportunity exists and extract the Host Organization ID
     $oppStmt = $conn->prepare("
         SELECT OpportunityID, ApplicationEndDate, HostOrgID
         FROM attachmentopportunity
@@ -98,7 +97,7 @@ try {
 
     $hostOrgId = $opportunity['HostOrgID'];
 
-    // Check if student already applied (jobapplication table)
+    // Prevent duplicate applications from the same student for this opportunity
     $checkStmt = $conn->prepare("
         SELECT * FROM jobapplication
         WHERE StudentID = ? AND OpportunityID = ?
@@ -112,10 +111,10 @@ try {
     $checkStmt->close();
     
 
-    // Insert application into jobapplication table
+    // Save the application details to the database
     $insertStmt = $conn->prepare("
-        INSERT INTO jobapplication (OpportunityID, HostOrgID, StudentID, ApplicationDate, Status, ResumePath, ResumeLink)
-        VALUES (?, ?, ?, NOW(), 'Pending', ?, ?)
+        INSERT INTO jobapplication (OpportunityID, HostOrgID, StudentID, ApplicationDate, Status, ResumePath, ResumeLink, Motivation)
+        VALUES (?, ?, ?, NOW(), 'Pending', ?, ?, ?)
     ");
     if (!$insertStmt) {
         if ($resumeFileName) unlink($filePath);
@@ -123,20 +122,22 @@ try {
     }
     $resumePathToStore = $resumeFileName ? $resumeFileName : null;
     $resumeLinkToStore = $hasLink ? $resumeLink : null;
-    $insertStmt->bind_param("iiisss", $opportunityId, $hostOrgId, $studentId, $resumePathToStore, $resumeLinkToStore);
+    
+    $insertStmt->bind_param("iiisss", $opportunityId, $hostOrgId, $studentId, $resumePathToStore, $resumeLinkToStore, $motivation);
+    
     if (!$insertStmt->execute()) {
         if ($resumeFileName) unlink($filePath);
         throw new Exception('Failed to submit application: ' . $insertStmt->error);
     }
     $insertStmt->close();
-
+try{
     $response['success'] = true;
     $response['message'] = 'Application submitted successfully! You will receive updates via email.';
-    
-} catch (Exception $e) {
+    }
+    catch (Exception $e) {
     $response['success'] = false;
     $response['message'] = 'Error: ' . $e->getMessage();
-} finally {
+    } finally {
     if (isset($conn)) {
         $conn->close();
     }

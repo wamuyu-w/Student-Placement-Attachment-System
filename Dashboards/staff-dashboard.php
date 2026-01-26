@@ -99,19 +99,19 @@ $conn->close();
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Students/staff-students.php" class="nav-item">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Students</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Logbook/staff-logbook.php" class="nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>Logbooks</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Reports/staff-reports.php" class="nav-item">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Settings/staff-settings.php" class="nav-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
@@ -225,18 +225,20 @@ $conn->close();
     </div>
 
     <script src="staff-dashboard.js"></script>
+  
     <script>
         function handleReviewLogbook() {
-            alert('Review Logbooks - Coming soon');
+            window.location.href = '../Logbook/staff-logbook.php';
         }
         function handleViewStudents() {
-            alert('View Students - Coming soon');
+            window.location.href = '../Students/staff-students.php';
         }
         function handleGenerateReport() {
-            alert('Generate Report - Coming soon');
+            window.location.href = '../Reports/staff-reports.php';
         }
         function handleViewAttachments() {
-            alert('View Attachments - Coming soon');
+            // Assuming attachments view overlaps with students view or a separate page
+             window.location.href = '../Students/staff-students.php';
         }
     </script>
 </body>

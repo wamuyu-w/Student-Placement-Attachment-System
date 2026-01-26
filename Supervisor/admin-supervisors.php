@@ -1,0 +1,173 @@
+<?php
+require_once '../config.php';
+requireLogin('admin');
+$conn = getDBConnection();
+
+// Fetch supervisors
+$sql = "SELECT l.Name, l.Department, l.Faculty, u.Status 
+        FROM lecturer l 
+        JOIN users u ON l.UserID = u.UserID 
+        WHERE l.Role = 'Supervisor'";
+$result = $conn->query($sql);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Supervisors - Admin</title>
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    
+    <!-- Admin Dashboard Styles -->
+    <link rel="stylesheet" href="../Dashboards/Admin/admin-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="../assets/cuea-logo.png" height="20px" width="20px" alt="cuea logo">
+            </div>
+            <h1>CUEA Attachment System</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../Dashboards/Admin/admin-dashboard.php" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="../Applications/admin-applications.php" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Applications</span>
+            </a>
+            <a href="../Opportunities/admin-opportunities-management.php" class="nav-item">
+                <i class="fas fa-lightbulb"></i>
+                <span>Opportunities</span>
+            </a>
+            <a href="admin-supervisors.php" class="nav-item active">
+                <i class="fas fa-users"></i>
+                <span>Supervisors</span>
+            </a>
+            <a href="../Students/admin-students.php" class="nav-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Students</span>
+            </a>
+            <a href="../Reports/admin-reports.php" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+             <a href="../Settings/admin-settings.php" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="../Login Pages/logout.php" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    <div class="main-content">
+        <header class="main-header">
+            <h1 class="page-title">Manage Supervisors</h1>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search supervisors..." id="searchInput">
+                </div>
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['name'] ?? 'Admin'); ?>&background=8B1538&color=fff&size=128" alt="Profile" class="profile-img">
+                    <div class="profile-info">
+                        <div class="profile-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'Admin'); ?></div>
+                        <div class="profile-role">Coordinator</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="content-grid">
+            
+            <!-- Assignment Form Section -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Assign Supervisor to Student</h2>
+                <form action="process-assign-supervisor.php" method="POST" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;">
+                    <div>
+                        <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Select Student (Ongoing Attachment)</label>
+                        <select name="attachment_id" required style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            <option value="">-- Choose Student --</option>
+                            <?php
+                            // Fetch students with active attachments needing supervision
+                            $studSql = "SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName 
+                                        FROM attachment a 
+                                        JOIN student s ON a.StudentID = s.StudentID 
+                                        JOIN hostorganization h ON a.HostOrgID = h.HostOrgID
+                                        LEFT JOIN supervision sup ON a.AttachmentID = sup.AttachmentID
+                                        WHERE a.AttachmentStatus = 'Ongoing' AND sup.SupervisionID IS NULL";
+                            $studRes = $conn->query($studSql);
+                            if ($studRes->num_rows > 0) {
+                                while($row = $studRes->fetch_assoc()) {
+                                    echo "<option value='" . $row['AttachmentID'] . "'>" . htmlspecialchars($row['FirstName'] . " " . $row['LastName'] . " (" . $row['OrganizationName'] . ")") . "</option>";
+                                }
+                            } else {
+                                echo "<option value='' disabled>No students pending assignment</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Select Supervisor</label>
+                        <select name="lecturer_id" required style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            <option value="">-- Choose Lecturer --</option>
+                            <?php
+                            // Fetch Supervisors
+                            $lecSql = "SELECT LecturerID, Name FROM lecturer WHERE Role = 'Supervisor' OR Role = 'Admin'";
+                            $lecRes = $conn->query($lecSql);
+                            while($row = $lecRes->fetch_assoc()) {
+                                echo "<option value='" . $row['LecturerID'] . "'>" . htmlspecialchars($row['Name']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <button type="submit" style="background-color: #8B1538; color: white; padding: 0.5rem 1.5rem; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer;">
+                        Assign
+                    </button>
+                </form>
+            </div>
+
+            <div class="table-container">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Supervisor List</h2>
+            <table border="1" cellpadding="10" cellspacing="0" style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Faculty</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    // Reset pointer or re-query if needed, but here we just list them
+                    // Note: The previous query result pointer is at the end. We need to re-fetch or effectively use data_seek(0)
+                    $result->data_seek(0);
+                    if ($result->num_rows > 0): ?>
+                        <?php while($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['Name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['Department']); ?></td>
+                                <td><?php echo htmlspecialchars($row['Faculty']); ?></td>
+                                <td><?php echo htmlspecialchars($row['Status']); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr><td colspan="4">No supervisors found.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<?php $conn->close(); ?>

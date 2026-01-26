@@ -201,6 +201,10 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - CUEA Placements</title>
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="student-dashboard.css">
 
@@ -223,26 +227,26 @@ $conn->close();
                 <i class="fas fa-briefcase"></i>
                 <span>Opportunities</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Applications/student-applications.php" class="nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>My Applications</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Logbook/student-logbook.php" class="nav-item">
                 <i class="fas fa-book"></i>
                 <span>Logbook</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Reports/student-reports.php" class="nav-item">
                 <i class="fas fa-file-pdf"></i>
                 <span>Reports</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Supervisor/student-supervisor.php" class="nav-item">
                 <i class="fas fa-user-tie"></i>
                 <span>Supervisor</span>
             </a>
         </nav>
         
         <div class="sidebar-footer">
-            <a href="#" class="nav-item">
+            <a href="../Settings/student-settings.php" class="nav-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
@@ -351,15 +355,15 @@ $conn->close();
             <div class="quick-actions-section">
                 <h2>Quick Actions</h2>
                 <div class="quick-actions">
-                    <button class="action-btn primary" onclick="handleBrowseOpportunities()">
+                    <button class="action-btn primary" onclick="window.location.href='../Opportunities/student-opportunities.php'">
                         <i class="fas fa-search"></i>
                         <span>Browse Opportunities</span>
                     </button>
-                    <button class="action-btn" onclick="handleViewApplications()">
+                    <button class="action-btn" onclick="window.location.href='../Applications/student-applications.php'">
                         <i class="fas fa-file-alt"></i>
                         <span>View My Applications</span>
                     </button>
-                    <button class="action-btn" onclick="handleViewLogbook()">
+                    <button class="action-btn" onclick="window.location.href='../Logbook/student-logbook.php'">
                         <i class="fas fa-book"></i>
                         <span>View Logbook</span>
                     </button>

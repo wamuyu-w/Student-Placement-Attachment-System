@@ -81,7 +81,7 @@ if ($result->num_rows === 1) {
         
         // Route to admin dashboard if admin, else staff dashboard
         if ($isAdmin) {
-            $redirectUrl = $basePath . '/Dashboards/admin-dashboard.php';
+            $redirectUrl = $basePath . '/Dashboards/Admin/admin-dashboard.php';
         } else {
             $redirectUrl = $basePath . '/Dashboards/staff-dashboard.php';
         }

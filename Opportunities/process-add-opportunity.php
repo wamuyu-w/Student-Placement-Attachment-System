@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-require_once '../../config.php';
+require_once '../config.php';
 
 // Session Initialization
 if (session_status() === PHP_SESSION_NONE) {
@@ -80,7 +80,7 @@ try {
         }
     } else if ($_SESSION['user_type'] === 'admin') {
 
-        // Admin can add opportunities for any organization - get from request or use a default; they will have to get from the list of host org for this
+        // Admin can add opportunities for any organization - get from request or use a default
         $hostOrgId = intval($_POST['host_org_id'] ?? 0);
         if ($hostOrgId === 0) {
             $_SESSION['error'] = 'Organization must be selected';

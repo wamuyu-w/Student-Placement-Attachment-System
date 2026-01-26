@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+    <!-- Page Specific Styles -->
     <link rel="stylesheet" href="index.css">
     <title>Student Placement and Attachment System - CUEA </title>
 </head>

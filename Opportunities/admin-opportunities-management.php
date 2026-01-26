@@ -37,7 +37,12 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Opportunities - CUEA</title>
-    <link rel="stylesheet" href="../Dashboards/admin-dashboard.css">
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    
+    <!-- Admin Dashboard Styles -->
+    <link rel="stylesheet" href="../Dashboards/Admin/admin-dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -51,11 +56,11 @@ $conn->close();
         </div>
         
         <nav class="sidebar-nav">
-            <a href="../Dashboards/admin-dashboard.php" class="nav-item">
+            <a href="../Dashboards/Admin/admin-dashboard.php" class="nav-item">
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Applications/admin-applications.php" class="nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>Applications</span>
             </a>
@@ -63,15 +68,15 @@ $conn->close();
                 <i class="fas fa-lightbulb"></i>
                 <span>Opportunities</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Supervisor/admin-supervisors.php" class="nav-item">
                 <i class="fas fa-users"></i>
                 <span>Supervisors</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Students/admin-students.php" class="nav-item">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Students</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Reports/admin-reports.php" class="nav-item">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>

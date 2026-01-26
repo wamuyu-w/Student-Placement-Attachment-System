@@ -1,16 +1,16 @@
 // Student Dashboard JavaScript
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Search functionality
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', handleSearch);
     }
-    
+
     // Notification click handler
     const notificationIcon = document.querySelector('.notification-icon');
     if (notificationIcon) {
-        notificationIcon.addEventListener('click', function() {
+        notificationIcon.addEventListener('click', function () {
             alert('You have pending tasks! Check your logbook and reports.');
         });
     }
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Handle search input
 function handleSearch(event) {
     const searchTerm = event.target.value.trim();
-    
+
     if (searchTerm.length > 2) {
         // Implement search functionality
         console.log('Searching for:', searchTerm);
@@ -29,19 +29,13 @@ function handleSearch(event) {
 
 // Quick Action Handlers
 function handleBrowseOpportunities() {
-    // Redirect to opportunities page
-    alert('Browse Opportunities feature - Redirecting to opportunities page...');
-    // window.location.href = 'opportunities.php';
+    window.location.href = '../Opportunities/student-opportunities.php';
 }
 
 function handleViewApplications() {
-    // Redirect to applications page
-    alert('View My Applications feature - Redirecting to applications page...');
-    // window.location.href = 'my-applications.php';
+    window.location.href = '../Applications/student-applications.php';
 }
 
 function handleViewLogbook() {
-    // Redirect to logbook page
-    alert('View Logbook feature - Redirecting to logbook page...');
-    // window.location.href = 'logbook.php';
+    window.location.href = '../Logbook/student-logbook.php';
 }

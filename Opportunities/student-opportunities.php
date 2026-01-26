@@ -65,21 +65,29 @@ $conn->close();
                 <i class="fas fa-briefcase"></i>
                 <span>Opportunities</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Applications/student-applications.php" class="nav-item">
                 <i class="fas fa-file-alt"></i>
-                <span>Applications</span>
+                <span>My Applications</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../Logbook/student-logbook.php" class="nav-item">
                 <i class="fas fa-book"></i>
                 <span>Logbook</span>
             </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-chart-bar"></i>
+            <a href="../Reports/student-reports.php" class="nav-item">
+                <i class="fas fa-file-pdf"></i>
                 <span>Reports</span>
+            </a>
+            <a href="../Supervisor/student-supervisor.php" class="nav-item">
+                <i class="fas fa-user-tie"></i>
+                <span>Supervisor</span>
             </a>
         </nav>
         
         <div class="sidebar-footer">
+            <a href="../Settings/student-settings.php" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
             <a href="../Login Pages/logout.php" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
