@@ -6,7 +6,7 @@ $conn = getDBConnection();
 $studentId = $_SESSION['student_id'] ?? null;
 
 // Get Active Attachment and Supervisor
-$sql = "SELECT l.Name, l.Department, l.Faculty, l.Role, u.Username as Email
+$sql = "SELECT l.Name, l.Department, l.Faculty, l.Role, u.Username as Email, a.AttachmentID
         FROM supervision s
         JOIN attachment a ON s.AttachmentID = a.AttachmentID
         JOIN lecturer l ON s.LecturerID = l.LecturerID
@@ -200,6 +200,56 @@ $supervisor = $result->fetch_assoc();
                             </div>
                         </div>
                     </div>
+                </div>
+                </div>
+
+                <!-- Assessments Section -->
+                <?php
+                // Fetch Assessments
+                $assessSql = "SELECT AssessmentDate, AssessmentType, Remarks, Marks 
+                              FROM assessment 
+                              WHERE AttachmentID = ?";
+                $assessStmt = $conn->prepare($assessSql);
+                $assessStmt->bind_param("i", $supervisor['AttachmentID']); // Need to fetch AttachmentID in the first query
+                $assessStmt->execute();
+                $assessments = $assessStmt->get_result();
+                ?>
+
+                <div class="mt-8" style="margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 1rem;">Scheduled Assessments</h3>
+                    
+                    <?php if ($assessments->num_rows > 0): ?>
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+                            <?php while($row = $assessments->fetch_assoc()): ?>
+                                <div style="padding: 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; align-items: flex-start;">
+                                    <div style="background: #fdf2f8; color: #8B1538; width: 50px; height: 50px; border-radius: 8px; display: flex; flexDirection: column; align-items: center; justify-content: center; margin-right: 1rem; flex-shrink: 0;">
+                                        <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;"><?php echo date('M', strtotime($row['AssessmentDate'])); ?></div>
+                                        <div style="font-size: 1.25rem; font-weight: 700;"><?php echo date('d', strtotime($row['AssessmentDate'])); ?></div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                            <h4 style="font-weight: 600; color: #111827;"><?php echo htmlspecialchars($row['AssessmentType']); ?></h4>
+                                            <?php if ($row['Marks']): ?>
+                                                <span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
+                                                    Score: <?php echo htmlspecialchars($row['Marks']); ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span style="background: #f3f4f6; color: #4b5563; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
+                                                    Scheduled
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;"><?php echo htmlspecialchars($row['Remarks'] ? $row['Remarks'] : 'No remarks yet.'); ?></p>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php else: ?>
+                        <div style="background: #f9fafb; padding: 2rem; text-align: center; border-radius: 8px; color: #6b7280;">
+                            <i class="fas fa-calendar-times" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                            No assessments scheduled yet.
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>

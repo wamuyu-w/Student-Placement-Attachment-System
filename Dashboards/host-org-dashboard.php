@@ -15,10 +15,10 @@ if (!$hostOrgId) {
 $statsStmt = $conn->prepare("
     SELECT 
         (SELECT COUNT(*) FROM attachmentopportunity WHERE HostOrgID = ?) as active_placements,
-        (SELECT COUNT(*) FROM attachment WHERE HostOrgID = ? AND AttachmentStatus = 'Active') as students_attached,
-        (SELECT COUNT(*) FROM attachment a 
-         INNER JOIN logbook l ON a.AttachmentID = l.LogbookID 
-         WHERE a.HostOrgID = ? AND l.Status = 'Pending') as pending_logbooks
+        (SELECT COUNT(*) FROM attachment WHERE HostOrgID = ? AND AttachmentStatus IN ('Active', 'Ongoing')) as students_attached,
+         (SELECT COUNT(*) FROM attachment a 
+          INNER JOIN logbook l ON a.AttachmentID = l.AttachmentID 
+          WHERE a.HostOrgID = ? AND l.Status = 'Pending') as pending_logbooks
 ");
 
 $statsStmt->bind_param("iii", $hostOrgId, $hostOrgId, $hostOrgId);
@@ -26,18 +26,23 @@ $statsStmt->execute();
 $stats = $statsStmt->get_result()->fetch_assoc();
 $statsStmt->close();
 
-// Get recent applications
+// Get recent placements (Registered students)
+// We join with student to get names.
+// We TRY to join with jobapplication/attachmentopportunity to get the position name, but we use LEFT JOIN.
+// Note: We don't have a direct link from attachment to opportunity. 
+// We can try to match StudentID and HostOrgID in jobapplication, but self-placements won't have that.
 $appsStmt = $conn->prepare("
     SELECT 
         s.FirstName,
         s.LastName,
         s.Course,
-        ao.Description as position_applied,
+        COALESCE(ao.Description, 'Placement') as position_applied,
         a.StartDate,
         a.AttachmentStatus as Status
     FROM attachment a
-    INNER JOIN attachmentopportunity ao ON a.AttachmentID = ao.OpportunityID
     INNER JOIN student s ON a.StudentID = s.StudentID
+    LEFT JOIN jobapplication ja ON a.StudentID = ja.StudentID AND a.HostOrgID = ja.HostOrgID
+    LEFT JOIN attachmentopportunity ao ON ja.OpportunityID = ao.OpportunityID
     WHERE a.HostOrgID = ?
     ORDER BY a.StartDate DESC
     LIMIT 5
@@ -83,6 +88,10 @@ $conn->close();
             <a href="../Students/host-org-students.php" class="nav-item">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Students</span>
+            </a>
+            <a href="../Logbook/host-org-logbook.php" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Logbook</span>
             </a>
             <a href="../Reports/host-org-reports.php" class="nav-item">
                 <i class="fas fa-chart-bar"></i>
@@ -156,7 +165,7 @@ $conn->close();
             <!-- Activity Section -->
             <div class="activity-section">
                 <div class="section-header">
-                    <h2>Recent Applications</h2>
+                    <h2>Recent Placements</h2>
                     <a href="#" class="view-all-link">View All →</a>
                 </div>
                 <div class="activity-list">
@@ -200,6 +209,7 @@ $conn->close();
     </div>
 
     <script src="host-org-dashboard.js"></script>
+    <script src="../assets/js/dashboard-updates.js"></script>
     <script>
         function handlePostPlacement() {
             //redirect to opportunities page

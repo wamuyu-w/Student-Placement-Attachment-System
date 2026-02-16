@@ -154,7 +154,12 @@ $conn->close();
                                 </div>
                             </div>
                             <div class="opportunity-footer">
-                                <button class="btn btn-apply" onclick="openApplicationForm(<?php echo $opp['OpportunityID']; ?>)">
+                                <button class="btn btn-view" 
+                                        onclick="openDetailsModal('<?php echo htmlspecialchars(addslashes($opp['OrganizationName'])); ?>', '<?php echo htmlspecialchars(addslashes($opp['Description'])); ?>', '<?php echo htmlspecialchars(addslashes($opp['EligibilityCriteria'])); ?>', '<?php echo date('M d, Y', strtotime($opp['ApplicationEndDate'])); ?>', <?php echo $opp['OpportunityID']; ?>)">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                                <button class="btn btn-apply-card" 
+                                        onclick="openApplicationForm(<?php echo $opp['OpportunityID']; ?>, '<?php echo htmlspecialchars($opp['OrganizationName']); ?>', '<?php echo htmlspecialchars($opp['Description']); ?>')">
                                     <i class="fas fa-arrow-right"></i> Apply Now
                                 </button>
                             </div>
@@ -171,115 +176,164 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> Opportunity Details</h2>
+                <button type="button" class="modal-close" onclick="closeDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-content">
+                <div class="detail-header">
+                    <h3 id="detailsRole" class="detail-title"></h3>
+                    <div class="detail-org">
+                        <i class="fas fa-building"></i>
+                        <span id="detailsOrg"></span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-align-left"></i> Description</div>
+                    <p id="detailsDesc" class="detail-text"></p>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-graduation-cap"></i> Eligibility Criteria</div>
+                    <p id="detailsCriteria" class="detail-text"></p>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-clock"></i> Application Deadline</div>
+                    <p id="detailsDeadline" class="detail-text" style="font-weight: 600; color: #b91c1c;"></p>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 30px;">
+                    <button class="btn btn-view" onclick="closeDetailsModal()">Close</button>
+                    <button class="btn btn-apply-card" id="detailsApplyBtn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Application Modal -->
     <div id="applicationModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-file-contract"></i> Attachment Application Form</h2>
+                <h2><i class="fas fa-file-contract"></i> Apply for Attachment</h2>
                 <button type="button" class="modal-close" onclick="closeApplicationForm()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            
+            <div class="application-summary-header">
+                <div class="app-org-name" id="modalOrg"></div>
+                <div class="app-role-title" id="modalRole"></div>
+            </div>
+
             <form id="applicationForm" method="POST" action="process-apply-opportunity.php" enctype="multipart/form-data">
                 <input type="hidden" id="opportunityId" name="opportunity_id" value="">
-
-                <!-- Personal Details Section -->
+                
+                <!-- Personal & Academic Details (Read-only Summary) -->
                 <div class="form-section">
                     <div class="section-title">
-                        <i class="fas fa-user"></i>
-                        <h3>Personal Details</h3>
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Applicant Details</h3>
                     </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="fullName" class="form-label">Full Name</label>
-                            <input type="text" id="fullName" name="full_name" class="form-control" placeholder="Enter your full name" required readonly value="<?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?>">
+                    
+                    <div class="student-summary-card">
+                        <div class="summary-row">
+                            <div class="summary-item">
+                                <span class="label">Full Name</span>
+                                <span class="value"><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Admission Number</span>
+                                <span class="value"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="studentId" class="form-label">Student ID Number</label>
-                            <input type="text" id="studentId" name="student_id" class="form-control" placeholder="e.g., 102XXXX" required readonly value="<?php echo htmlspecialchars($_SESSION['student_id']); ?>">
+                        <div class="summary-row">
+                            <div class="summary-item">
+                                <span class="label">Email</span>
+                                <span class="value"><?php echo htmlspecialchars($_SESSION['email']); ?></span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Phone</span>
+                                <span class="value"><?php echo htmlspecialchars($_SESSION['phone']); ?></span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="email" class="form-label">University Email</label>
-                            <input type="email" id="email" name="email" class="form-control" placeholder="username@student.cuea.edu" required readonly value="<?php echo htmlspecialchars($_SESSION['email']); ?>">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+254 XXX XXX XXX" required readonly value="<?php echo htmlspecialchars($_SESSION['phone']); ?>">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Academic Information Section -->
-                <div class="form-section">
-                    <div class="section-title">
-                        <i class="fas fa-graduation-cap"></i>
-                        <h3>Academic Information</h3>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="faculty" class="form-label">Faculty / Department</label>
-                            <input type="text" id="faculty" name="faculty" class="form-control" placeholder="Your faculty" required readonly value="<?php echo htmlspecialchars($_SESSION['faculty']); ?>">
-                        </div>
-                        <div class="form-group">
-                            <label for="program" class="form-label">Program of Study</label>
-                            <input type="text" id="program" name="program" class="form-control" placeholder="Your course/program" required readonly value="<?php echo htmlspecialchars($_SESSION['course']); ?>">
-                        </div>
-                        <div class="form-group">
-                            <label for="yearOfStudy" class="form-label">Year of Study</label>
-                            <input type="text" id="yearOfStudy" name="year_of_study" class="form-control" placeholder="e.g., Year 3" required readonly value="<?php echo htmlspecialchars($_SESSION['year_of_study']); ?>">
+                        <div class="summary-row">
+                            <div class="summary-item">
+                                <span class="label">Program</span>
+                                <span class="value"><?php echo htmlspecialchars($_SESSION['course']); ?></span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Year of Study</span>
+                                <span class="value"><?php echo htmlspecialchars($_SESSION['year_of_study']); ?></span>
+                            </div>
                         </div>
                     </div>
+                    
+                    <!-- Hidden inputs to submit strict data if needed, though mostly backend should rely on session/db -->
+                    <input type="hidden" name="full_name" value="<?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?>">
+                    <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($_SESSION['student_id']); ?>">
+                    <input type="hidden" name="email" value="<?php echo htmlspecialchars($_SESSION['email']); ?>">
+                    <input type="hidden" name="phone" value="<?php echo htmlspecialchars($_SESSION['phone']); ?>">
+                    <input type="hidden" name="faculty" value="<?php echo htmlspecialchars($_SESSION['faculty']); ?>">
+                    <input type="hidden" name="program" value="<?php echo htmlspecialchars($_SESSION['course']); ?>">
+                    <input type="hidden" name="year_of_study" value="<?php echo htmlspecialchars($_SESSION['year_of_study']); ?>">
                 </div>
 
                 <!-- Motivation Section -->
                 <div class="form-section">
                     <div class="section-title">
-                        <i class="fas fa-lightbulb"></i>
+                        <i class="fas fa-pen-fancy"></i>
                         <h3>Application Statement</h3>
                     </div>
                     <div class="form-group full-width">
-                        <label for="motivation" class="form-label">Why are you interested in this opportunity? (Max 500 words)</label>
-                        <textarea id="motivation" name="motivation" class="form-control" placeholder="Tell us why you're interested in this opportunity and how it aligns with your career goals..." rows="6" maxlength="500" required></textarea>
-                        <span class="char-count"><span id="charCount">0</span>/500</span>
+                        <label for="motivation" class="form-label">Why are you interested in this opportunity? <span style="color: #6b7280; font-weight: 400; font-size: 0.85em;">(Max 500 words)</span></label>
+                        <textarea id="motivation" name="motivation" class="form-control" placeholder="Explain your interest and how this attachment aligns with your career goals..." rows="6" maxlength="2500" required></textarea>
+                        <span class="char-count"><span id="charCount">0</span> characters</span>
                     </div>
                 </div>
 
                 <!-- Supporting Documents Section -->
                 <div class="form-section">
                     <div class="section-title">
-                        <i class="fas fa-file-upload"></i>
+                        <i class="fas fa-paperclip"></i>
                         <h3>Supporting Documents</h3>
                     </div>
                     <div class="form-group full-width">
-                        <label for="resume" class="form-label">Upload your Resume/CV</label>
+                        <label for="resume" class="form-label">Upload Resume/CV</label>
                         <div class="file-upload">
                             <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
                             <div class="upload-area">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Click to upload or drag and drop</p>
-                                <span class="upload-hint">PDF, DOCX format up to 5MB</span>
+                                <div>
+                                    <p style="margin-bottom: 4px; font-weight: 500;">Click to upload or drag & drop</p>
+                                    <span class="upload-hint">PDF or DOCX (Max 5MB)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group full-width">
-                        <label for="resume_link" class="form-label">Or provide a link to your Resume/CV (Google Drive, Dropbox, etc.)</label>
-                        <input type="url" id="resume_link" name="resume_link" class="form-control" placeholder="https://your-resume-link.com">
-                        <span class="upload-hint">If you provide a link, uploading a file is optional.</span>
+                    <div class="form-group full-width" style="margin-top: 16px;">
+                        <label for="resume_link" class="form-label">Or provide a Link (Optional)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-link"></i>
+                            <input type="url" id="resume_link" name="resume_link" class="form-control" placeholder="https://drive.google.com/..." style="padding-left: 36px;">
+                        </div>
                     </div>
                 </div>
 
                 <!-- Form Actions -->
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeApplicationForm()">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <i class="fas fa-check"></i> Submit Application
-                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeApplicationForm()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit Application</button>
                 </div>
 
                 <!-- Alert Messages -->
-                <div id="formAlert" class="alert" style="display: none; margin-top: 16px;">
+                <div id="formAlert" class="alert" style="display: none;">
                     <i class="fas fa-info-circle"></i>
                     <span id="alertMessage"></span>
                 </div>
@@ -314,11 +368,310 @@ $conn->close();
         .alert i {
             font-size: 16px;
         }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 0;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Improved Modal Styling */
+        .modal-body-content {
+            padding: 24px;
+        }
+
+        .detail-header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 16px;
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8B1538;
+            margin-bottom: 8px;
+        }
+
+        .detail-org {
+            font-size: 1.1rem;
+            color: #4b5563;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #f3f4f6;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-text {
+            color: #1f2937;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .opportunity-footer {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .btn-view:hover {
+            background-color: #e5e7eb;
+        }
+
+        .btn-apply-card {
+            background-color: #8B1538;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-apply-card:hover {
+            background-color: #70102d;
+        }
+
+        /* Application Modal Improvements */
+        .application-summary-header {
+            background-color: #f8fafc;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .app-org-name {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .app-role-title {
+            font-size: 1.25rem;
+            color: #8B1538;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .student-summary-card {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .summary-item .value {
+            font-size: 0.95rem;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
+        }
+
+        .btn-primary {
+            background-color: #8B1538;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #70102d;
+        }
+
+        /* File Upload Styling */
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .upload-area:hover {
+            border-color: #8B1538;
+            background-color: #fff1f2;
+        }
+        
+        .upload-area i {
+            font-size: 32px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #64748b;
+            display: block;
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        /* Focus states */
+        .form-control:focus {
+            outline: none;
+            border-color: #8B1538;
+            box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+        }
     </style>
 
     <script>
-        function openApplicationForm(opportunityId) {
+        function openDetailsModal(orgName, description, criteria, deadline, opportunityId) {
+            document.getElementById('detailsOrg').textContent = orgName;
+            document.getElementById('detailsRole').textContent = description; 
+            document.getElementById('detailsDesc').textContent = description; // In real app, might separate Title from Desc
+            document.getElementById('detailsCriteria').textContent = criteria;
+            document.getElementById('detailsDeadline').textContent = deadline;
+            
+            const applyBtn = document.getElementById('detailsApplyBtn');
+            applyBtn.onclick = function() {
+                closeDetailsModal();
+                openApplicationForm(opportunityId, orgName, description);
+            };
+            
+            document.getElementById('detailsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function openApplicationForm(opportunityId, orgName, description) {
             document.getElementById('opportunityId').value = opportunityId;
+            document.getElementById('modalOrg').textContent = orgName;
+            document.getElementById('modalRole').textContent = description;
+            
             document.getElementById('applicationForm').reset();
             document.getElementById('charCount').textContent = '0';
             document.getElementById('formAlert').style.display = 'none';
@@ -375,6 +728,7 @@ $conn->close();
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 showAlert('An error occurred. Please try again.', 'error');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -382,12 +736,16 @@ $conn->close();
         });
 
         // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('applicationModal');
-            if (event.target === modal) {
+        window.onclick = function(event) {
+            const appModal = document.getElementById('applicationModal');
+            const detailsModal = document.getElementById('detailsModal');
+            if (event.target === appModal) {
                 closeApplicationForm();
             }
-        });
+            if (event.target === detailsModal) {
+                closeDetailsModal();
+            }
+        };
 
         // Drag and drop for file upload
         const fileUpload = document.getElementById('resume');

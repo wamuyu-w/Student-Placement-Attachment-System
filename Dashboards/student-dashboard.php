@@ -373,5 +373,6 @@ $conn->close();
     </div>
 
     <script src="student-dashboard.js"></script>
+    <script src="../assets/js/dashboard-updates.js"></script>
 </body>
 </html>

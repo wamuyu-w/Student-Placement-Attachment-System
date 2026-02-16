@@ -28,9 +28,7 @@
                         <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
                     </div>
                     <button type="submit" class="sign-in-button">Sign In</button>
-                    <div class="signup-link">
-                        Don't have an account? <a href="../Sign-up%20Pages/signup-host-org.php">Sign Up</a>
-                    </div>
+                
                 </form>
             </div>
         </div>

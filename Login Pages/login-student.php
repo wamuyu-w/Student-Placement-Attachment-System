@@ -71,7 +71,21 @@ if ($result->num_rows === 1) {
         $_SESSION['phone'] = $user['PhoneNumber'];
         $_SESSION['faculty'] = $user['Faculty'];
         $_SESSION['course'] = $user['Course'];
+        $_SESSION['course'] = $user['Course'];
         $_SESSION['year_of_study'] = $user['YearOfStudy'];
+        
+        // Check for default password
+        if (password_verify('Changeme123!', $storedPassword)) {
+            $_SESSION['force_password_change'] = true;
+            $basePath = getBasePath();
+            $redirectUrl = $basePath . '/Settings/first-login-update.php';
+            echo json_encode([
+                'success' => true, 
+                'message' => 'First login - Update required',
+                'redirect' => $redirectUrl
+            ]);
+            exit();
+        }
         
         $basePath = getBasePath();
         $redirectUrl = $basePath . '/Dashboards/student-dashboard.php';

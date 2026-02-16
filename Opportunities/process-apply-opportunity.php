@@ -48,6 +48,8 @@ try {
         }
 
         // Check if file size is within the 5MB limit
+        // Check if file size is within the 5MB limit
+        if ($fileSize > 5242880) { // 5MB in bytes
             throw new Exception('File size exceeds 5MB limit');
         }
 
@@ -116,28 +118,28 @@ try {
         INSERT INTO jobapplication (OpportunityID, HostOrgID, StudentID, ApplicationDate, Status, ResumePath, ResumeLink, Motivation)
         VALUES (?, ?, ?, NOW(), 'Pending', ?, ?, ?)
     ");
-    if (!$insertStmt) {
-        if ($resumeFileName) unlink($filePath);
-        throw new Exception('Database error: ' . $conn->error);
-    }
+
     $resumePathToStore = $resumeFileName ? $resumeFileName : null;
     $resumeLinkToStore = $hasLink ? $resumeLink : null;
     
     $insertStmt->bind_param("iiisss", $opportunityId, $hostOrgId, $studentId, $resumePathToStore, $resumeLinkToStore, $motivation);
     
     if (!$insertStmt->execute()) {
-        if ($resumeFileName) unlink($filePath);
+        if ($resumeFileName && file_exists($filePath)) unlink($filePath);
         throw new Exception('Failed to submit application: ' . $insertStmt->error);
     }
     $insertStmt->close();
-try{
+
     $response['success'] = true;
     $response['message'] = 'Application submitted successfully! You will receive updates via email.';
+
+} catch (Exception $e) {
+    if (isset($resumeFileName) && isset($filePath) && file_exists($filePath)) {
+        unlink($filePath);
     }
-    catch (Exception $e) {
     $response['success'] = false;
-    $response['message'] = 'Error: ' . $e->getMessage();
-    } finally {
+    $response['message'] = $e->getMessage();
+} finally {
     if (isset($conn)) {
         $conn->close();
     }

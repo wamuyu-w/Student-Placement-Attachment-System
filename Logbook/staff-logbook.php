@@ -150,15 +150,32 @@ if ($lecturerId) {
                     <?php if (!empty($entries)): ?>
                         <?php foreach($entries as $entry): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($entry['EntryDate']); ?></td>
-                                <td><?php echo htmlspecialchars($entry['FirstName'] . ' ' . $entry['LastName']); ?></td>
-                                <td class="activity-text" title="<?php echo htmlspecialchars($entry['Activities']); ?>">
-                                    <?php echo htmlspecialchars($entry['Activities']); ?>
+                                <td style="vertical-align: top; width: 15%;"><?php echo htmlspecialchars(date('M j, Y', strtotime($entry['EntryDate']))); ?></td>
+                                <td style="vertical-align: top; width: 20%;"><?php echo htmlspecialchars($entry['FirstName'] . ' ' . $entry['LastName']); ?></td>
+                                <td style="vertical-align: top; width: 40%;">
+                                    <?php 
+                                    $activities = json_decode($entry['Activities'], true);
+                                    if (json_last_error() === JSON_ERROR_NONE && is_array($activities)) {
+                                        echo '<div style="font-size: 0.9em;">';
+                                        foreach ($activities as $day => $data) {
+                                            if (!empty($data['task']) || !empty($data['comment'])) {
+                                                echo '<strong>' . $day . ':</strong><br>';
+                                                if (!empty($data['task'])) echo '<span style="color: #4b5563;">Task: ' . htmlspecialchars($data['task']) . '</span><br>';
+                                                if (!empty($data['comment'])) echo '<span style="color: #059669;">Outcome: ' . htmlspecialchars($data['comment']) . '</span><br>';
+                                                echo '<div style="margin-bottom: 8px;"></div>';
+                                            }
+                                        }
+                                        echo '</div>';
+                                    } else {
+                                        // Legacy text support
+                                        echo nl2br(htmlspecialchars($entry['Activities']));
+                                    }
+                                    ?>
                                 </td>
-                                <td><?php echo htmlspecialchars($entry['HostSupervisorComments'] ?? 'None'); ?></td>
-                                <td>
-                                    <button onclick="openCommentModal(<?php echo $entry['EntryID']; ?>)" style="color: #8B1538; background: none; border: none; cursor: pointer; text-decoration: underline;">
-                                        <?php echo $entry['HostSupervisorComments'] ? 'Edit Comment' : 'Add Comment'; ?>
+                                <td style="vertical-align: top; width: 25%;"><?php echo htmlspecialchars($entry['HostSupervisorComments'] ?? 'None'); ?></td>
+                                <td style="vertical-align: top;">
+                                    <button onclick="openCommentModal(<?php echo $entry['EntryID']; ?>)" style="color: #8B1538; background: none; border: none; cursor: pointer; text-decoration: underline; white-space: nowrap;">
+                                        <?php echo $entry['HostSupervisorComments'] ? 'Edit' : 'Add Comment'; ?>
                                     </button>
                                 </td>
                             </tr>

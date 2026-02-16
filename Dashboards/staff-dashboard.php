@@ -111,6 +111,10 @@ $conn->close();
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
+            <a href="../Supervisor/staff-supervision.php" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Supervision</span>
+            </a>
             <a href="../Settings/staff-settings.php" class="nav-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
@@ -225,6 +229,7 @@ $conn->close();
     </div>
 
     <script src="staff-dashboard.js"></script>
+    <script src="../assets/js/dashboard-updates.js"></script>
   
     <script>
         function handleReviewLogbook() {

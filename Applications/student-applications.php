@@ -245,7 +245,18 @@ while ($row = $applications->fetch_assoc()) {
                             <div class="form-group mb-3">
                                 <label class="form-label">Intended Host Organization (Optional)</label>
                                 <input type="text" name="intended_host" class="form-control" placeholder="E.g. Safaricom PLC, KRA, etc.">
-                                <small style="color: var(--text-secondary); font-size: 0.8rem;">If you already have a place in mind, let us know.</small>
+                                <small style="color: var(--text-secondary); font-size: 0.8rem;">If the organization is new, a default account will be created for them.</small>
+                            </div>
+                            
+                            <!-- Contact Details for New Org -->
+                            <div class="form-group mb-3">
+                                <label class="form-label">Contact Person Name</label>
+                                <input type="text" name="contact_person" class="form-control" placeholder="E.g. John Doe (HR Manager)">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Contact Person Email</label>
+                                <input type="email" name="contact_email" class="form-control" placeholder="E.g. john.doe@company.com">
+                                <small style="color: var(--text-secondary); font-size: 0.8rem;">This email will be used to send login credentials for first time access</small>
                             </div>
                             <button type="submit" class="btn-submit" style="width: 100%; justify-content: center; margin-top: 16px;">
                                 <i class="fas fa-paper-plane"></i> Submit Application

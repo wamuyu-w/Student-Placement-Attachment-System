@@ -9,6 +9,7 @@ $conn = getDBConnection();
 $oppStmt = $conn->prepare("
     SELECT 
         ao.OpportunityID,
+        ao.HostOrgID,
         ao.Description,
         ao.EligibilityCriteria,
         ao.ApplicationStartDate,
@@ -156,7 +157,15 @@ $conn->close();
                                 </div>
                             </div>
                             <div class="opportunity-footer">
-                                <button class="btn-small btn-edit" onclick="editOpportunity(<?php echo $opp['OpportunityID']; ?>)">
+                                <button class="btn-small btn-edit" 
+                                        onclick="editOpportunity(this)"
+                                        data-id="<?php echo $opp['OpportunityID']; ?>"
+                                        data-host="<?php echo $opp['HostOrgID']; ?>"
+                                        data-desc="<?php echo htmlspecialchars($opp['Description']); ?>"
+                                        data-criteria="<?php echo htmlspecialchars($opp['EligibilityCriteria']); ?>"
+                                        data-start="<?php echo $opp['ApplicationStartDate']; ?>"
+                                        data-end="<?php echo $opp['ApplicationEndDate']; ?>"
+                                        data-status="<?php echo $opp['Status']; ?>">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
                                 <button class="btn-small btn-delete" onclick="deleteOpportunity(<?php echo $opp['OpportunityID']; ?>)">
@@ -176,15 +185,37 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Include Edit Modal -->
+    <?php include 'edit-opportunity-modal.php'; ?>
+
     <script src="../Dashboards/admin-dashboard.js"></script>
     <script>
-        function editOpportunity(opportunityId) {
-            alert('Edit functionality coming soon - Opportunity ID: ' + opportunityId);
+        function editOpportunity(btn) {
+            // Get data from data attributes
+            const id = btn.getAttribute('data-id');
+            const hostId = btn.getAttribute('data-host');
+            const desc = btn.getAttribute('data-desc');
+            const criteria = btn.getAttribute('data-criteria');
+            const start = btn.getAttribute('data-start');
+            const end = btn.getAttribute('data-end');
+            const status = btn.getAttribute('data-status');
+
+            // Populate form fields
+            document.getElementById('editOpportunityId').value = id;
+            document.getElementById('editHostOrgSelect').value = hostId;
+            document.getElementById('editDescription').value = desc;
+            document.getElementById('editEligibilityCriteria').value = criteria;
+            document.getElementById('editStartDate').value = start;
+            document.getElementById('editEndDate').value = end;
+            document.getElementById('editStatus').value = status;
+
+            // Show modal
+            document.getElementById('editOpportunityFormContainer').style.display = 'block';
         }
 
         function deleteOpportunity(opportunityId) {
-            if (confirm('Are you sure you want to delete this opportunity?')) {
-                alert('Delete functionality coming soon - Opportunity ID: ' + opportunityId);
+            if (confirm('Are you sure you want to delete this opportunity? This action cannot be undone.')) {
+                window.location.href = 'process-delete-opportunity.php?id=' + opportunityId;
             }
         }
     </script>

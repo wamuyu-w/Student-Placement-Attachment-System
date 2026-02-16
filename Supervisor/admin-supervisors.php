@@ -73,6 +73,12 @@ $result = $conn->query($sql);
         <header class="main-header">
             <h1 class="page-title">Manage Supervisors</h1>
             <div class="header-actions">
+                <button onclick="document.getElementById('addSupervisorModal').style.display='block'" class="btn-primary" style="background-color: #8B1538; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-plus"></i> Add Supervisor
+                </button>
+                <button onclick="document.getElementById('bulkUploadModal').style.display='block'" class="btn-secondary" style="background-color: #059669; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-csv"></i> Bulk Upload
+                </button>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search supervisors..." id="searchInput">
@@ -86,6 +92,71 @@ $result = $conn->query($sql);
                 </div>
             </div>
         </header>
+
+        <!-- Messages -->
+        <?php if (isset($_GET['success'])): ?>
+            <div style="background-color: #d1fae5; color: #065f46; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1rem; border: 1px solid #a7f3d0;">
+                <?php echo htmlspecialchars($_GET['success']); ?>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1rem; border: 1px solid #fecaca;">
+                <?php echo htmlspecialchars($_GET['error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Add Supervisor Modal -->
+        <div id="addSupervisorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="background: white; width: 500px; max-width: 90%; margin: 50px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; font-size: 1.25rem;">Add New Supervisor</h2>
+                    <span onclick="document.getElementById('addSupervisorModal').style.display='none'" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                </div>
+                <form action="process-add-supervisor.php" method="POST">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Staff Number</label>
+                        <input type="text" name="staffNumber" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <div style="font-size: 0.85rem; color: #6b7280; margin-top: 10px; background-color: #f3f4f6; padding: 10px; border-radius: 4px; border: 1px solid #e5e7eb;">
+                            <p style="margin: 0 0 5px 0;"><i class="fas fa-info-circle"></i> <strong>Automatic Generation:</strong></p>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                <li>A generic <strong>Username</strong> (e.g., L004) will be generated.</li>
+                                <li>A default <strong>Password</strong> (<code>Changeme123!</code>) will be set.</li>
+                            </ul>
+                            <p style="margin: 5px 0 0 0;">The supervisor will use these to log in and update their profile.</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" onclick="document.getElementById('addSupervisorModal').style.display='none'" style="padding: 8px 16px; margin-right: 10px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                        <button type="submit" style="background-color: #8B1538; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Add Supervisor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bulk Upload Modal -->
+        <div id="bulkUploadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="background: white; width: 500px; max-width: 90%; margin: 50px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; font-size: 1.25rem;">Bulk Upload Supervisors</h2>
+                    <span onclick="document.getElementById('bulkUploadModal').style.display='none'" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                </div>
+                <form action="process-bulk-supervisors.php" method="POST" enctype="multipart/form-data">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select CSV File</label>
+                        <input type="file" name="csvFile" required accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <div style="background-color: #f8fafc; padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 0.9em; color: #64748b;">
+                            <p style="margin: 0 0 5px 0;"><strong>CSV Format (Headers required):</strong></p>
+                            <code style="display: block; background: #e2e8f0; padding: 5px; border-radius: 3px;">StaffNumber, Name, Department</code>
+                            <p style="margin: 5px 0 0 0;">Passwords will be set to default: <code>Changeme123!</code></p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" onclick="document.getElementById('bulkUploadModal').style.display='none'" style="padding: 8px 16px; margin-right: 10px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                        <button type="submit" style="background-color: #059669; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Upload & Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="content-grid">
             
             <!-- Assignment Form Section -->

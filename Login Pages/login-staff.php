@@ -75,7 +75,21 @@ if ($result->num_rows === 1) {
         $_SESSION['department'] = $user['Department'];
         $_SESSION['faculty'] = $user['Faculty'];
         $_SESSION['role'] = $user['LecturerRole'];
+        $_SESSION['role'] = $user['LecturerRole'];
         $_SESSION['user_role'] = $user['Role'];
+        
+        // Check for default password
+        if (password_verify('Changeme123!', $storedPassword)) {
+            $_SESSION['force_password_change'] = true;
+            $basePath = getBasePath();
+            $redirectUrl = $basePath . '/Settings/first-login-update.php';
+            echo json_encode([
+                'success' => true, 
+                'message' => 'First login - Update required',
+                'redirect' => $redirectUrl
+            ]);
+            exit();
+        }
         
         $basePath = getBasePath();
         

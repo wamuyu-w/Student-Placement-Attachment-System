@@ -55,39 +55,44 @@ if ($result->num_rows === 1) {
     $storedPassword = $user['Password'];
     $passwordValid = verifyAndMigratePassword($conn, $user['UserID'], $password, $storedPassword);
     
-    if ($passwordValid) {
-        // Fetch organization details using the foreign key relationship (UserID)
-        $orgStmt = $conn->prepare("SELECT HostOrgID, OrganizationName, ContactPerson, Email, PhoneNumber, PhysicalAddress
-                                   FROM hostorganization
-                                   WHERE UserID = ?");
-        $orgStmt->bind_param("i", $user['UserID']);
-        $orgStmt->execute();
-        $orgResult = $orgStmt->get_result();
-        
-        if ($orgResult->num_rows > 0) {
-            $org = $orgResult->fetch_assoc();
+        if ($passwordValid) {
+            // Check for default password
+            if ($password === 'Changeme123!') {
+                 $_SESSION['force_password_change'] = true;
+                 $redirectUrl = $basePath . '../Settings/first-login-update.php';
+            } else {
+                 $redirectUrl = $basePath . '../Dashboards/host-org-dashboard.php';
+            }
+
+            // Fetch organization details using the foreign key relationship (UserID)
+            $orgStmt = $conn->prepare("SELECT HostOrgID, OrganizationName, ContactPerson, Email, PhoneNumber, PhysicalAddress
+                                       FROM hostorganization
+                                       WHERE UserID = ?");
+            $orgStmt->bind_param("i", $user['UserID']);
+            $orgStmt->execute();
+            $orgResult = $orgStmt->get_result();
             
-            // Store all their info in the session
-            $_SESSION['user_id'] = $user['UserID'];
-            $_SESSION['user_type'] = 'host_org';
-            $_SESSION['username'] = $user['Username'];
-            $_SESSION['host_org_id'] = $org['HostOrgID'];
-            $_SESSION['organization_name'] = $org['OrganizationName'];
-            $_SESSION['email'] = $org['Email'];
-            $_SESSION['contact_person'] = $org['ContactPerson'];
-            $_SESSION['phone_number'] = $org['PhoneNumber'];
-            $_SESSION['physical_address'] = $org['PhysicalAddress'];
-            
-            $orgStmt->close();
-            
-            $basePath = getBasePath();
-            $redirectUrl = $basePath . '/Dashboards/host-org-dashboard.php';
-            error_log('Host org login - basePath: ' . $basePath . ', redirectUrl: ' . $redirectUrl);
-            echo json_encode([
-                'success' => true, 
-                'message' => 'Login successful',
-                'redirect' => $redirectUrl
-            ]);
+            if ($orgResult->num_rows > 0) {
+                $org = $orgResult->fetch_assoc();
+                
+                // Store all their info in the session
+                $_SESSION['user_id'] = $user['UserID'];
+                $_SESSION['user_type'] = 'host_org';
+                $_SESSION['username'] = $user['Username'];
+                $_SESSION['host_org_id'] = $org['HostOrgID'];
+                $_SESSION['organization_name'] = $org['OrganizationName'];
+                $_SESSION['email'] = $org['Email'];
+                $_SESSION['contact_person'] = $org['ContactPerson'];
+                $_SESSION['phone_number'] = $org['PhoneNumber'];
+                $_SESSION['physical_address'] = $org['PhysicalAddress'];
+                
+                $orgStmt->close();
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Login successful',
+                    'redirect' => $redirectUrl
+                ]);
         } else {
             // No organization record found for this user ID
             echo json_encode(['success' => false, 'message' => 'Organization record not found']);

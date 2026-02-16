@@ -14,9 +14,12 @@ $sql = "SELECT ja.OpportunityID, ja.StudentID, ja.ApplicationDate, s.FirstName, 
 $result = $conn->query($sql);
 
 // Fetch program applications (attachment approvals)
-$progSql = "SELECT aa.ApplicationID, aa.StudentID, aa.ApplicationDate, aa.ApplicationStatus, aa.IntendedHostOrg, s.FirstName, s.LastName 
+$progSql = "SELECT aa.ApplicationID, aa.StudentID, aa.ApplicationDate, aa.ApplicationStatus, 
+            COALESCE(h.OrganizationName, aa.IntendedHostOrg) AS OrganizationName, 
+            s.FirstName, s.LastName 
             FROM attachmentapplication aa
             JOIN student s ON aa.StudentID = s.StudentID
+            LEFT JOIN hostorganization h ON aa.HostOrgID = h.HostOrgID
             ORDER BY aa.ApplicationDate DESC";
 $progResult = $conn->query($progSql);
 ?>
@@ -129,7 +132,7 @@ $progResult = $conn->query($progSql);
                             <tr>
                                 <td><?php echo htmlspecialchars($row['ApplicationDate']); ?></td>
                                 <td><?php echo htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']); ?></td>
-                                <td><?php echo htmlspecialchars($row['IntendedHostOrg'] ?? 'Not Specified'); ?></td>
+                                <td><?php echo htmlspecialchars($row['OrganizationName'] ?? 'Not Specified'); ?></td>
                                 <td>
                                     <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['ApplicationStatus']); ?></span>
                                 </td>

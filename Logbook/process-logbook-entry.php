@@ -2,13 +2,7 @@
 require_once '../config.php';
 requireLogin('student');
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: student-logbook.php");
-    exit();
-}
-
 $conn = getDBConnection();
-$logbookId = sanitizeInput($_POST['logbook_id']);
 $date = sanitizeInput($_POST['entry_date']);
 $activities = sanitizeInput($_POST['activities']);
 
