@@ -57,7 +57,23 @@ if (move_uploaded_file($fileTmp, $destPath)) {
     $stmt->bind_param("is", $attachmentId, $newFileName);
     
     if ($stmt->execute()) {
-        header("Location: student-reports.php?success=submitted");
+        // Deactivate student account
+        $userId = $_SESSION['user_id'];
+        $updateUserStmt = $conn->prepare("UPDATE users SET Status = 'Inactive' WHERE UserID = ?");
+        $updateUserStmt->bind_param("i", $userId);
+        $updateUserStmt->execute();
+        $updateUserStmt->close();
+
+        // Optional: Update attachment status to Completed
+        // $updateAttStmt = $conn->prepare("UPDATE attachment SET AttachmentStatus = 'Completed' WHERE AttachmentID = ?");
+        // $updateAttStmt->bind_param("i", $attachmentId);
+        // $updateAttStmt->execute();
+        // $updateAttStmt->close();
+        
+        // Destroy session and redirect
+        session_destroy();
+        header("Location: ../Login Pages/student-login.php?message=Main_Sucessfully_Submitted_Account_Inactive");
+        exit();
     } else {
         header("Location: student-reports.php?error=db_error");
     }

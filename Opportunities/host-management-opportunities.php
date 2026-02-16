@@ -69,6 +69,10 @@ $conn->close();
                 <i class="fas fa-graduation-cap"></i>
                 <span>Students</span>
             </a>
+            <a href="../Logbook/host-org-logbook.php" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Logbook</span>
+            </a>
             <a href="../Reports/host-org-reports.php" class="nav-item">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>

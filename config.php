@@ -36,7 +36,7 @@ function requireLogin($userType) {
             'student' => 'student-login.php',
             'staff' => 'staff-login.php',
             'admin' => 'staff-login.php', // Admins are also in the staff login page
-            'host_org' => 'host-organization-login.php'
+            'host_org' => 'login-host-org.php'
         ];
         $loginPage = $loginPages[$userType] ?? 'student-login.php';
         header("Location: ../Login Pages/" . $loginPage);
