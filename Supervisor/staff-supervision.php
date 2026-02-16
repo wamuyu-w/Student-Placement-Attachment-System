@@ -26,13 +26,14 @@ if (!$staffID) {
 
 // Fetch supervised students
 $sql = "SELECT 
-            s.StudentID, s.FirstName, s.LastName, s.Course, s.YearOfStudy,
+            u.Username as AdmissionNumber, s.FirstName, s.LastName, s.Course, s.YearOfStudy,
             a.AttachmentID, a.AttachmentStatus, ho.OrganizationName,
             (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID) as AssessmentCount,
             (SELECT MAX(AssessmentDate) FROM assessment WHERE AttachmentID = a.AttachmentID) as LastAssessment
         FROM supervision sv
         JOIN attachment a ON sv.AttachmentID = a.AttachmentID
         JOIN student s ON a.StudentID = s.StudentID
+        JOIN users u ON s.UserID = u.UserID
         JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
         WHERE sv.LecturerID = ? AND (a.AttachmentStatus = 'Active' OR a.AttachmentStatus = 'Completed' OR a.AttachmentStatus = 'Ongoing')
         ORDER BY s.FirstName ASC";
@@ -178,7 +179,7 @@ $result = $stmt->get_result();
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 12px;">
                                         <div style="font-weight: 500;"><?php echo htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']); ?></div>
-                                        <div style="font-size: 0.85em; color: #6b7280;"><?php echo htmlspecialchars($row['StudentID']); ?></div>
+                                        <div style="font-size: 0.85em; color: #6b7280;"><?php echo htmlspecialchars($row['AdmissionNumber']); ?></div>
                                     </td>
                                     <td style="padding: 12px;"><?php echo htmlspecialchars($row['Course']); ?> (Y<?php echo $row['YearOfStudy']; ?>)</td>
                                     <td style="padding: 12px;"><?php echo htmlspecialchars($row['OrganizationName']); ?></td>

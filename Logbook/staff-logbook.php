@@ -20,7 +20,7 @@ if (!$lecturerId) {
 // Fetch Logbook Entries
 $entries = [];
 if ($lecturerId) {
-    $sql = "SELECT st.FirstName, st.LastName, le.EntryDate, le.Activities, le.HostSupervisorComments, le.EntryID
+    $sql = "SELECT st.FirstName, st.LastName, le.EntryDate, le.Activities, le.HostSupervisorComments, le.AcademicSupervisorComments, le.EntryID
             FROM supervision sv
             JOIN attachment a ON sv.AttachmentID = a.AttachmentID
             JOIN logbook l ON l.AttachmentID = a.AttachmentID
@@ -143,6 +143,7 @@ if ($lecturerId) {
                         <th>Student</th>
                         <th>Activities</th>
                         <th>Host Comments</th>
+                        <th>Academic Comments</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -151,8 +152,8 @@ if ($lecturerId) {
                         <?php foreach($entries as $entry): ?>
                             <tr>
                                 <td style="vertical-align: top; width: 15%;"><?php echo htmlspecialchars(date('M j, Y', strtotime($entry['EntryDate']))); ?></td>
-                                <td style="vertical-align: top; width: 20%;"><?php echo htmlspecialchars($entry['FirstName'] . ' ' . $entry['LastName']); ?></td>
-                                <td style="vertical-align: top; width: 40%;">
+                                <td style="vertical-align: top; width: 15%;"><?php echo htmlspecialchars($entry['FirstName'] . ' ' . $entry['LastName']); ?></td>
+                                <td style="vertical-align: top; width: 35%;">
                                     <?php 
                                     $activities = json_decode($entry['Activities'], true);
                                     if (json_last_error() === JSON_ERROR_NONE && is_array($activities)) {
@@ -172,10 +173,13 @@ if ($lecturerId) {
                                     }
                                     ?>
                                 </td>
-                                <td style="vertical-align: top; width: 25%;"><?php echo htmlspecialchars($entry['HostSupervisorComments'] ?? 'None'); ?></td>
-                                <td style="vertical-align: top;">
+                                <td style="vertical-align: top; width: 15%; font-size: 0.9em; color: #666;"><?php echo htmlspecialchars($entry['HostSupervisorComments'] ?? 'None'); ?></td>
+                                <td style="vertical-align: top; width: 20%;">
+                                    <div style="margin-bottom: 8px; font-size: 0.9em;">
+                                        <?php echo htmlspecialchars($entry['AcademicSupervisorComments'] ?? ''); ?>
+                                    </div>
                                     <button onclick="openCommentModal(<?php echo $entry['EntryID']; ?>)" style="color: #8B1538; background: none; border: none; cursor: pointer; text-decoration: underline; white-space: nowrap;">
-                                        <?php echo $entry['HostSupervisorComments'] ? 'Edit' : 'Add Comment'; ?>
+                                        <?php echo !empty($entry['AcademicSupervisorComments']) ? 'Edit Comment' : 'Add Comment'; ?>
                                     </button>
                                 </td>
                             </tr>

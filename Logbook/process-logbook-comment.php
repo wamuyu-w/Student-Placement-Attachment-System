@@ -9,10 +9,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $comment = sanitizeInput($_POST['comment']);
     
     if ($entryId && $comment) {
-        // Technically we should check if this entry belongs to a student supervised by this lecturer
-        // validation could be added here for stricter security
+        // Verify supervision relationship
+        $lecturerId = $_SESSION['LecturerID'];
+        $checkStmt = $conn->prepare("
+            SELECT 1 
+            FROM logbookentry le
+            JOIN logbook l ON le.LogbookID = l.LogbookID
+            JOIN supervision s ON l.AttachmentID = s.AttachmentID
+            WHERE le.EntryID = ? AND s.LecturerID = ?
+        ");
+        $checkStmt->bind_param("ii", $entryId, $lecturerId);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
         
-        $stmt = $conn->prepare("UPDATE logbookentry SET HostSupervisorComments = ? WHERE EntryID = ?");
+        if ($checkResult->num_rows === 0) {
+            $checkStmt->close();
+            header("Location: staff-logbook.php?error=unauthorized_access");
+            exit();
+        }
+        $checkStmt->close();
+        
+        $stmt = $conn->prepare("UPDATE logbookentry SET AcademicSupervisorComments = ? WHERE EntryID = ?");
         $stmt->bind_param("si", $comment, $entryId);
         
         if ($stmt->execute()) {

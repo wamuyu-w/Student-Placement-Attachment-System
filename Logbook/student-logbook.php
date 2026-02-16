@@ -414,8 +414,11 @@ if ($hasActiveAttachment) {
                         </div>
                         <div class="feedback-box">
                             <div class="feedback-title"><i class="fas fa-chalkboard-teacher"></i> Lecturer Remarks</div>
-                            <!-- Lecturer remarks logic would go here if column existed, placeholder for now -->
-                             <p style="font-size: 0.85rem;">Assessment feedback will appear here.</p>
+                            <?php if (!empty($logbookEntry['AcademicSupervisorComments'])): ?>
+                                <p class="feedback-content"><?php echo nl2br(htmlspecialchars($logbookEntry['AcademicSupervisorComments'])); ?></p>
+                            <?php else: ?>
+                                <p style="font-size: 0.85rem;">Assessment feedback will appear here.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 

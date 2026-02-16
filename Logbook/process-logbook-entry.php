@@ -3,11 +3,12 @@ require_once '../config.php';
 requireLogin('student');
 
 $conn = getDBConnection();
-$date = sanitizeInput($_POST['entry_date']);
-$activities = sanitizeInput($_POST['activities']);
+$logbookId = sanitizeInput($_POST['logbook_id'] ?? '');
+$weekEnding = sanitizeInput($_POST['week_ending'] ?? '');
+$tasks = $_POST['tasks'] ?? [];
+$comments = $_POST['comments'] ?? [];
 
-if (empty($logbookId) || empty($date) || empty($activities)) {
-    // to do: set a message showing missing fields
+if (empty($logbookId) || empty($weekEnding)) {
     header("Location: student-logbook.php?error=missing_fields");
     exit();
 }
@@ -28,12 +29,39 @@ if ($checkStmt->get_result()->num_rows === 0) {
 }
 $checkStmt->close();
 
-// Insert entry
-$stmt = $conn->prepare("INSERT INTO logbookentry (LogbookID, EntryDate, Activities) VALUES (?, ?, ?)");
-$stmt->bind_param("iss", $logbookId, $date, $activities);
+// Structure the activities data as JSON
+$activitiesData = [];
+$days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+foreach ($days as $day) {
+    $activitiesData[$day] = [
+        'task' => sanitizeInput($tasks[$day] ?? ''),
+        'comment' => sanitizeInput($comments[$day] ?? '')
+    ];
+}
+
+$activitiesJson = json_encode($activitiesData);
+
+// Check if entry exists for this week
+$checkEntry = $conn->prepare("SELECT EntryID FROM logbookentry WHERE LogbookID = ? AND EntryDate = ?");
+$checkEntry->bind_param("is", $logbookId, $weekEnding);
+$checkEntry->execute();
+$result = $checkEntry->get_result();
+$existingEntry = $result->fetch_assoc();
+$checkEntry->close();
+
+if ($existingEntry) {
+    // Update existing
+    $stmt = $conn->prepare("UPDATE logbookentry SET Activities = ? WHERE EntryID = ?");
+    $stmt->bind_param("si", $activitiesJson, $existingEntry['EntryID']);
+} else {
+    // Insert new
+    $stmt = $conn->prepare("INSERT INTO logbookentry (LogbookID, EntryDate, Activities) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $logbookId, $weekEnding, $activitiesJson);
+}
 
 if ($stmt->execute()) {
-    header("Location: student-logbook.php?success=entry_added");
+    header("Location: student-logbook.php?success=entry_saved");
 } else {
     header("Location: student-logbook.php?error=db_error");
 }
