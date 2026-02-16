@@ -124,6 +124,7 @@ body::after {
     letter-spacing: -0.025em;
     background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -240,6 +241,19 @@ body::after {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+.success-message {
+    background-color: #ecfdf5;
+    color: #047857;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    border: 1px solid #a7f3d0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .error-message-general {
