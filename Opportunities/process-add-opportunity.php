@@ -79,14 +79,48 @@ try {
             exit();
         }
     } else if ($_SESSION['user_type'] === 'admin') {
-
-        // Admin can add opportunities for any organization - get from request or use a default
-        $hostOrgId = intval($_POST['host_org_id'] ?? 0);
-        if ($hostOrgId === 0) {
-            $_SESSION['error'] = 'Organization must be selected';
-            header('Location: ../admin-dashboard.php');
+        // Admin can add opportunities for any organization
+        $orgName = trim($_POST['organization_name'] ?? '');
+        if (empty($orgName)) {
+            $_SESSION['error'] = 'Organization name must be provided';
+            header('Location: ../Opportunities/admin-opportunities-management.php');
             exit();
         }
+
+        // Check if organization exists
+        $stmt = $conn->prepare("SELECT HostOrgID FROM hostorganization WHERE OrganizationName = ?");
+        $stmt->bind_param("s", $orgName);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($row = $res->fetch_assoc()) {
+            $hostOrgId = $row['HostOrgID'];
+        } else {
+            // 1. Create User account first
+            // Generate a temporary username based on organization name
+            $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $orgName));
+            $username = $baseUsername . '_' . bin2hex(random_bytes(2));
+            $tempPassword = bin2hex(random_bytes(4)); // 8 char temp password
+            $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
+            $role = 'Host Organization';
+            
+            $userInsert = $conn->prepare("INSERT INTO users (Username, Password, Role) VALUES (?, ?, ?)");
+            $userInsert->bind_param("sss", $username, $hashedPassword, $role);
+            $userInsert->execute();
+            $newUserId = $userInsert->insert_id;
+            $userInsert->close();
+
+            // 2. Create the Host Organization and link UserID
+            $defaultEmail = $username . '@example.com';
+            $ins = $conn->prepare("INSERT INTO hostorganization (UserID, OrganizationName, Email, PhoneNumber) VALUES (?, ?, ?, 'Pending')");
+            $ins->bind_param("iss", $newUserId, $orgName, $defaultEmail);
+            $ins->execute();
+            $hostOrgId = $ins->insert_id;
+            $ins->close();
+            
+            // Log credentials so admin can provide them to the host (in a real app, email them)
+            error_log("New Host Org Account Created - Username: $username, Password: $tempPassword");
+        }
+        $stmt->close();
     }
 
     // Insert opportunity into database
@@ -116,7 +150,8 @@ try {
 
         $_SESSION['success'] = 'Opportunity added successfully!';
     } else {
-        throw new Exception('Error adding opportunity: ' . $stmt->error);
+        $_SESSION['error'] = 'Database error adding opportunity: ' . $stmt->error;
+        // Don't throw exception, just let it redirect with error
     }
 
     $stmt->close();
@@ -128,6 +163,6 @@ try {
 }
 
 // Redirect back to dashboard
-header('Location: ../' . ($_SESSION['user_type'] === 'admin' ? 'admin-dashboard.php' : 'host-org-dashboard.php'));
+header('Location: ../Opportunities/' . ($_SESSION['user_type'] === 'admin' ? 'admin-opportunities-management.php' : 'host-management-opportunities.php'));
 exit();
 ?>

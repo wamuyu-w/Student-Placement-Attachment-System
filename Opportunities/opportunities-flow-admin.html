@@ -10,7 +10,7 @@
     <div id="opportunityFormContainer" style="display: none; margin-bottom: 30px;">
         <!-- Alert Messages -->
         <div id="alertContainer"></div>
-        
+
         <div class="opportunity-form-card">
             <div class="form-header">
                 <h3><i class="fas fa-plus-circle"></i> Add New Attachment Opportunity</h3>
@@ -21,33 +21,19 @@
             <form id="opportunityForm" method="POST" action="../Opportunities/process-add-opportunity.php">
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for="hostOrgSelect" class="form-label">
+                        <label for="organizationName" class="form-label">
                             <i class="fas fa-building"></i> Host Organization
                         </label>
-                        <select id="hostOrgSelect" name="host_org_id" class="form-control" required>
-                            <option value="">Select an Organization</option>
-                            <?php 
-                            // Reset the result pointer for host organizations
-                            $hostOrganizations->data_seek(0);
-                            while ($org = $hostOrganizations->fetch_assoc()): 
-                            ?>
-                                <option value="<?php echo $org['HostOrgID']; ?>">
-                                    <?php echo htmlspecialchars($org['OrganizationName']); ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
+                        <input type="text" id="organizationName" name="organization_name" class="form-control"
+                            placeholder="Enter the name of the organization" required>
                     </div>
 
                     <div class="form-group full-width">
                         <label for="description" class="form-label">
                             <i class="fas fa-file-alt"></i> Opportunity Description
                         </label>
-                        <textarea 
-                            id="description" 
-                            name="description" 
-                            class="form-control" 
-                            placeholder="Describe the attachment opportunity (role, tasks, responsibilities)" 
-                            rows="4"
+                        <textarea id="description" name="description" class="form-control"
+                            placeholder="Describe the attachment opportunity (role, tasks, responsibilities)" rows="4"
                             required>
                         </textarea>
                     </div>
@@ -56,13 +42,8 @@
                         <label for="eligibilityCriteria" class="form-label">
                             <i class="fas fa-graduation-cap"></i> Eligibility Criteria
                         </label>
-                        <textarea 
-                            id="eligibilityCriteria" 
-                            name="eligibility_criteria" 
-                            class="form-control" 
-                            placeholder="Specify requirements (e.g., course, year of study, GPA)" 
-                            rows="3"
-                            required>
+                        <textarea id="eligibilityCriteria" name="eligibility_criteria" class="form-control"
+                            placeholder="Specify requirements (e.g., course, year of study, GPA)" rows="3" required>
                         </textarea>
                     </div>
 
@@ -70,11 +51,7 @@
                         <label for="applicationStartDate" class="form-label">
                             <i class="fas fa-calendar-alt"></i> Application Start Date
                         </label>
-                        <input 
-                            type="date" 
-                            id="applicationStartDate" 
-                            name="application_start_date" 
-                            class="form-control" 
+                        <input type="date" id="applicationStartDate" name="application_start_date" class="form-control"
                             required>
                     </div>
 
@@ -82,11 +59,7 @@
                         <label for="applicationEndDate" class="form-label">
                             <i class="fas fa-calendar-alt"></i> Application End Date
                         </label>
-                        <input 
-                            type="date" 
-                            id="applicationEndDate" 
-                            name="application_end_date" 
-                            class="form-control" 
+                        <input type="date" id="applicationEndDate" name="application_end_date" class="form-control"
                             required>
                     </div>
 
@@ -106,14 +79,8 @@
                         <label for="numberOfPositions" class="form-label">
                             <i class="fas fa-users"></i> Number of Positions Available
                         </label>
-                        <input 
-                            type="number" 
-                            id="numberOfPositions" 
-                            name="number_of_positions" 
-                            class="form-control" 
-                            placeholder="How many students can be attached?" 
-                            min="1"
-                            required>
+                        <input type="number" id="numberOfPositions" name="number_of_positions" class="form-control"
+                            placeholder="How many students can be attached?" min="1" required>
                     </div>
                 </div>
 
@@ -134,7 +101,7 @@
         <button type="button" class="btn btn-primary" onclick="toggleOpportunityForm()">
             <i class="fas fa-plus"></i> Add New Opportunity
         </button>
-    </div>          
+    </div>
 </div>
 
 <script>
@@ -142,7 +109,7 @@
         const formContainer = document.getElementById('opportunityFormContainer');
         if (formContainer.style.display === 'none' || formContainer.style.display === '') {
             formContainer.style.display = 'block';
-            document.getElementById('hostOrgSelect').focus();
+            document.getElementById('organizationName').focus();
         } else {
             formContainer.style.display = 'none';
             document.getElementById('opportunityForm').reset();
@@ -153,9 +120,9 @@
         const container = document.getElementById('alertContainer');
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type}`;
-        
+
         const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-        
+
         alertDiv.innerHTML = `
             <i class="${icon}"></i>
             <span>${message}</span>
@@ -163,9 +130,9 @@
                 <i class="fas fa-times"></i>
             </button>
         `;
-        
+
         container.appendChild(alertDiv);
-        
+
         // Auto-dismiss success alerts after 5 seconds
         if (type === 'success') {
             setTimeout(() => {
@@ -175,28 +142,28 @@
     }
 
     // Form submission with validation
-    document.getElementById('opportunityForm').addEventListener('submit', function(e) {
+    document.getElementById('opportunityForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        
-        if (!document.getElementById('hostOrgSelect').value) {
-            displayAlert('error', 'Please select an organization');
+
+        if (!document.getElementById('organizationName').value.trim()) {
+            displayAlert('error', 'Please enter an organization name');
             return;
         }
-        
+
         const startDate = new Date(document.getElementById('applicationStartDate').value);
         const endDate = new Date(document.getElementById('applicationEndDate').value);
-        
+
         if (startDate >= endDate) {
             displayAlert('error', 'Application end date must be after start date');
             return;
         }
-        
+
         // Submit the form
         this.submit();
     });
 
     // Auto-hide form on page load and check for session messages
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const formContainer = document.getElementById('opportunityFormContainer');
         if (formContainer) {
             formContainer.style.display = 'none';
@@ -213,4 +180,3 @@
         }
     });
 </script>
-

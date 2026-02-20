@@ -1,8 +1,8 @@
 <?php
 require_once '../config.php';
 
-if (!isLoggedIn() || ($_SESSION['user_type'] !== 'admin' && $_SESSION['user_type'] !== 'staff')) {
-    header("Location: ../Login Pages/staff-login.php");
+if (!isLoggedIn() || !in_array($_SESSION['user_type'], ['admin', 'staff', 'host_org'])) {
+    header("Location: ../Login Pages/login.php");
     exit();
 }
 
@@ -80,9 +80,20 @@ if ($attachment) {
 $conn->close();
 
 // Include correct CSS and Sidebar based on user type
-$cssPath = $userType === 'admin' ? '../Dashboards/Admin/admin-dashboard.css' : '../Dashboards/staff-dashboard.css';
-$userName = htmlspecialchars($_SESSION['name'] ?? ucfirst($userType));
-$userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
+// Include correct CSS and Sidebar based on user type
+$cssPath = match($userType) {
+    'admin' => '../Dashboards/Admin/admin-dashboard.css',
+    'host_org' => '../Dashboards/host-org-dashboard.css',
+    default => '../Dashboards/staff-dashboard.css'
+};
+
+if ($userType === 'host_org') {
+    $userName = htmlspecialchars($_SESSION['organization_name'] ?? 'Host Organization');
+    $userRole = 'Host Organization';
+} else {
+    $userName = htmlspecialchars($_SESSION['name'] ?? ucfirst($userType));
+    $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -172,6 +183,28 @@ $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
                 <a href="../Reports/admin-reports.php" class="nav-item">
                     <i class="fas fa-chart-bar"></i><span>Reports</span>
                 </a>
+            <?php elseif ($userType === 'host_org'): ?>
+                <a href="../Dashboards/host-org-dashboard.php" class="nav-item">
+                    <i class="fas fa-th-large"></i><span>Dashboard</span>
+                </a>
+                <a href="../Opportunities/host-management-opportunities.php" class="nav-item">
+                    <i class="fas fa-briefcase"></i><span>Opportunities</span>
+                </a>
+                <a href="../Applications/host-org-applications.php" class="nav-item">
+                    <i class="fas fa-file-alt"></i><span>Applications</span>
+                </a>
+                <a href="host-org-students.php" class="nav-item active">
+                    <i class="fas fa-graduation-cap"></i><span>Students</span>
+                </a>
+                <a href="../Logbook/host-org-logbook.php" class="nav-item">
+                    <i class="fas fa-book"></i><span>Logbook</span>
+                </a>
+                <a href="../Reports/host-org-reports.php" class="nav-item">
+                    <i class="fas fa-chart-bar"></i><span>Reports</span>
+                </a>
+                <a href="../Supervisor/host-org-supervision.php" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i><span>Supervision</span>
+                </a>
             <?php else: ?>
                 <a href="../Dashboards/staff-dashboard.php" class="nav-item">
                     <i class="fas fa-th-large"></i><span>Dashboard</span>
@@ -217,7 +250,14 @@ $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
         </header>
 
         <div style="margin-bottom: 10px;">
-            <a href="<?php echo $userType === 'admin' ? 'admin-students.php' : 'staff-students.php'; ?>" style="color: #6b7280; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back to Students</a>
+            <?php 
+                $backLink = match($userType) {
+                    'admin' => 'admin-students.php',
+                    'host_org' => 'host-org-students.php',
+                    default => 'staff-students.php'
+                };
+            ?>
+            <a href="<?php echo $backLink; ?>" style="color: #6b7280; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back to Students</a>
         </div>
 
         <?php if ($attachment): ?>
@@ -227,6 +267,7 @@ $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
                 <strong>Status:</strong> <?php echo htmlspecialchars($attachment['AttachmentStatus']); ?>
             </div>
 
+            <?php if ($userType !== 'host_org'): ?>
             <div class="progress-section">
                 <h2>Assessment Grades</h2>
                 <?php if (empty($assessments)): ?>
@@ -254,6 +295,7 @@ $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
                     </table>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
             <div class="progress-section">
                 <h2>Logbook Entries (By Week)</h2>

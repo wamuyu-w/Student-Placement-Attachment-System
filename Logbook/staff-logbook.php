@@ -6,34 +6,36 @@ $conn = getDBConnection();
 // Get LecturerID
 $lecturerId = $_SESSION['LecturerID'] ?? null;
 if (!$lecturerId) {
+    // Attempt fallback lookup
     $staffNumber = $_SESSION['staff_number'] ?? null;
     if ($staffNumber) {
         $stmt = $conn->prepare("SELECT LecturerID FROM lecturer WHERE StaffNumber = ?");
         $stmt->bind_param("s", $staffNumber);
         $stmt->execute();
         $res = $stmt->get_result();
-        if ($row = $res->fetch_assoc()) $lecturerId = $row['LecturerID'];
+        if ($row = $res->fetch_assoc()) {
+            $lecturerId = $row['LecturerID'];
+        }
         $stmt->close();
     }
 }
 
-// Fetch Logbook Entries
-$entries = [];
+// Fetch Supervised Students
+$students = [];
 if ($lecturerId) {
-    $sql = "SELECT st.FirstName, st.LastName, le.EntryDate, le.Activities, le.HostSupervisorComments, le.AcademicSupervisorComments, le.EntryID
+    $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.PhoneNumber, s.Email, 
+                   ho.OrganizationName, a.AttachmentStatus, a.AttachmentID
             FROM supervision sv
             JOIN attachment a ON sv.AttachmentID = a.AttachmentID
-            JOIN logbook l ON l.AttachmentID = a.AttachmentID
-            JOIN logbookentry le ON l.LogbookID = le.LogbookID
-            JOIN student st ON a.StudentID = st.StudentID
-            WHERE sv.LecturerID = ?
-            ORDER BY le.EntryDate DESC LIMIT 50";
+            JOIN student s ON a.StudentID = s.StudentID
+            JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
+            WHERE sv.LecturerID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $lecturerId);
     $stmt->execute();
     $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) {
-        $entries[] = $row;
+        $students[] = $row;
     }
     $stmt->close();
 }
@@ -43,7 +45,7 @@ if ($lecturerId) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logbooks - Staff</title>
+    <title>Select Student Logbooks - Staff</title>
     <link rel="stylesheet" href="../Dashboards/staff-dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -71,12 +73,6 @@ if ($lecturerId) {
         }
         tr:hover {
             background-color: #f5f5f5;
-        }
-        .activity-text {
-            max-width: 300px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -109,11 +105,11 @@ if ($lecturerId) {
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span>Supervision</span>
             </a>
-        </nav>
             <a href="../Settings/staff-settings.php" class="nav-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
+        </nav>
         <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
@@ -123,12 +119,8 @@ if ($lecturerId) {
     </div>
     <div class="main-content">
         <header class="main-header">
-            <h1 class="page-title">Reflected Logbook Entries</h1>
+            <h1 class="page-title">Select Student to View Logbook</h1>
              <div class="header-actions">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search entries..." id="searchInput">
-                </div>
                  <div class="user-profile">
                     <div class="profile-img" style="width: 40px; height: 40px; border-radius: 50%; background: #8B1538; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;"><?php echo strtoupper(substr($_SESSION['name'][0] ?? 'S', 0, 1)); ?></div>
                     <div class="profile-info">
@@ -140,83 +132,39 @@ if ($lecturerId) {
         </header>
 
         <div class="table-container">
+            <p style="margin-bottom: 20px; color: #4b5563;">Select a student below to view their unified progress tracker (Logbooks grouped by week and Assessment Grades).</p>
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Student</th>
-                        <th>Activities</th>
-                        <th>Host Comments</th>
-                        <th>Academic Comments</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Host Organization</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($entries)): ?>
-                        <?php foreach($entries as $entry): ?>
+                    <?php if (!empty($students)): ?>
+                        <?php foreach($students as $student): ?>
                             <tr>
-                                <td style="vertical-align: top; width: 15%;"><?php echo htmlspecialchars(date('M j, Y', strtotime($entry['EntryDate']))); ?></td>
-                                <td style="vertical-align: top; width: 15%;"><?php echo htmlspecialchars($entry['FirstName'] . ' ' . $entry['LastName']); ?></td>
-                                <td style="vertical-align: top; width: 35%;">
-                                    <?php 
-                                    $activities = json_decode($entry['Activities'], true);
-                                    if (json_last_error() === JSON_ERROR_NONE && is_array($activities)) {
-                                        echo '<div style="font-size: 0.9em;">';
-                                        foreach ($activities as $day => $data) {
-                                            if (!empty($data['task']) || !empty($data['comment'])) {
-                                                echo '<strong>' . $day . ':</strong><br>';
-                                                if (!empty($data['task'])) echo '<span style="color: #4b5563;">Task: ' . htmlspecialchars($data['task']) . '</span><br>';
-                                                if (!empty($data['comment'])) echo '<span style="color: #059669;">Outcome: ' . htmlspecialchars($data['comment']) . '</span><br>';
-                                                echo '<div style="margin-bottom: 8px;"></div>';
-                                            }
-                                        }
-                                        echo '</div>';
-                                    } else {
-                                        // Legacy text support
-                                        echo nl2br(htmlspecialchars($entry['Activities']));
-                                    }
-                                    ?>
-                                </td>
-                                <td style="vertical-align: top; width: 15%; font-size: 0.9em; color: #666;"><?php echo htmlspecialchars($entry['HostSupervisorComments'] ?? 'None'); ?></td>
-                                <td style="vertical-align: top; width: 20%;">
-                                    <div style="margin-bottom: 8px; font-size: 0.9em;">
-                                        <?php echo htmlspecialchars($entry['AcademicSupervisorComments'] ?? ''); ?>
-                                    </div>
-                                    <button onclick="openCommentModal(<?php echo $entry['EntryID']; ?>)" style="color: #8B1538; background: none; border: none; cursor: pointer; text-decoration: underline; white-space: nowrap;">
-                                        <?php echo !empty($entry['AcademicSupervisorComments']) ? 'Edit Comment' : 'Add Comment'; ?>
-                                    </button>
+                                <td><?php echo htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']); ?></td>
+                                <td><?php echo htmlspecialchars($student['Course']); ?></td>
+                                <td><?php echo htmlspecialchars($student['OrganizationName']); ?></td>
+                                <td><?php echo htmlspecialchars($student['AttachmentStatus']); ?></td>
+                                <td>
+                                    <a href="../Students/view-student-progress.php?student_id=<?php echo $student['StudentID']; ?>" style="background-color: #8B1538; color: white; padding: 6px 12px; border: none; border-radius: 4px; text-decoration: none; font-size: 0.85rem; display: inline-block;">
+                                        <i class="fas fa-book-open"></i> View Logbook
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="5">No logbook entries found.</td></tr>
+                        <tr><td colspan="5">No supervised students found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
-
-    <!-- Comment Modal -->
-    <div id="commentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 24px; border-radius: 8px; width: 500px; max-width: 90%;">
-            <h3 style="margin-top: 0; color: #1f2937;">Add Supervisor Comment</h3>
-            <form action="process-logbook-comment.php" method="POST">
-                <input type="hidden" name="entry_id" id="modalEntryId">
-                <textarea name="comment" rows="4" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 4px; margin: 16px 0; font-family: inherit;" placeholder="Enter your feedback here..."></textarea>
-                <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                    <button type="button" onclick="document.getElementById('commentModal').style.display='none'" style="padding: 8px 16px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
-                    <button type="submit" style="padding: 8px 16px; background: #8B1538; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Comment</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function openCommentModal(entryId) {
-            document.getElementById('modalEntryId').value = entryId;
-            document.getElementById('commentModal').style.display = 'flex';
-        }
-    </script>
 </body>
 </html>
 <?php $conn->close(); ?>

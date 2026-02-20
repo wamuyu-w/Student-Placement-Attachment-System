@@ -6,7 +6,7 @@ $conn = getDBConnection();
 $hostOrgId = $_SESSION['host_org_id'];
 
 // Get students attached
-$sql = "SELECT s.FirstName, s.LastName, s.Course, s.YearOfStudy, a.StartDate, a.EndDate, a.AttachmentStatus
+$sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.YearOfStudy, a.StartDate, a.EndDate, a.AttachmentStatus
         FROM attachment a
         JOIN student s ON a.StudentID = s.StudentID
         WHERE a.HostOrgID = ?
@@ -95,6 +95,7 @@ $result = $stmt->get_result();
                                 <th style="padding: 12px;">Start Date</th>
                                 <th style="padding: 12px;">End Date</th>
                                 <th style="padding: 12px;">Status</th>
+                                <th style="padding: 12px;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -106,6 +107,11 @@ $result = $stmt->get_result();
                                     <td style="padding: 12px;"><?php echo htmlspecialchars($row['StartDate']); ?></td>
                                     <td style="padding: 12px;"><?php echo htmlspecialchars($row['EndDate']); ?></td>
                                     <td style="padding: 12px;"><?php echo htmlspecialchars($row['AttachmentStatus']); ?></td>
+                                    <td style="padding: 12px;">
+                                        <a href="view-student-progress.php?student_id=<?php echo $row['StudentID']; ?>" style="background-color: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 4px; text-decoration: none; font-size: 0.85rem; display: inline-block;">
+                                            Progress
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>

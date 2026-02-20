@@ -36,6 +36,7 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
     }
 
     // Expected: StaffNumber, Name, Department
+    // Department since it is assumed they are all in the same faculty e.g. Science
     if (count($data) < 2) {
         continue;
     }

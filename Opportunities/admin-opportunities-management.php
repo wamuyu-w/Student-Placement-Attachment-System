@@ -15,9 +15,9 @@ $oppStmt = $conn->prepare("
         ao.ApplicationStartDate,
         ao.ApplicationEndDate,
         ao.Status,
-        ho.OrganizationName
+        COALESCE(ho.OrganizationName, 'Unknown Organization') as OrganizationName
     FROM attachmentopportunity ao
-    INNER JOIN hostorganization ho ON ao.HostOrgID = ho.HostOrgID
+    LEFT JOIN hostorganization ho ON ao.HostOrgID = ho.HostOrgID
     ORDER BY ao.ApplicationEndDate DESC
 ");
 $oppStmt->execute();

@@ -48,6 +48,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -215,6 +216,7 @@ select.form-control {
     gap: 8px;
     transition: all 0.2s ease;
 }
+
 .btn-primary {
     background-color: #8B1538;
     color: white;
@@ -241,6 +243,43 @@ select.form-control {
     align-items: flex-start;
 }
 
+/* Grid Layout */
+.opportunities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    border: 2px dashed #e5e7eb;
+    margin-top: 20px;
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.empty-state p {
+    color: #4b5563;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.empty-state .text-muted {
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: normal;
+}
+
 /* Fix card layout */
 .opportunity-card {
     display: flex;
@@ -251,7 +290,7 @@ select.form-control {
     border-radius: 12px;
     padding: 20px;
     border: 1px solid #e5e7eb;
-    
+
 }
 
 /* Header */
@@ -399,7 +438,8 @@ select.form-control {
     }
 
     .form-control {
-        font-size: 16px; /* Prevents zoom on iOS */
+        font-size: 16px;
+        /* Prevents zoom on iOS */
     }
 
     .form-header h3 {
@@ -422,5 +462,3 @@ select.form-control {
         font-size: 13px;
     }
 }
-
-

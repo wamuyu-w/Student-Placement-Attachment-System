@@ -219,9 +219,9 @@ $result = $conn->query($sql);
             <table border="1" cellpadding="10" cellspacing="0" style="width:100%; border-collapse: collapse;">
                 <thead>
                     <tr>
+                        <!--it is assumed that the lecturers are from the same faculty hence no need for faculty column -->
                         <th>Name</th>
                         <th>Department</th>
-                        <th>Faculty</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -235,7 +235,6 @@ $result = $conn->query($sql);
                             <tr>
                                 <td><?php echo htmlspecialchars($row['Name']); ?></td>
                                 <td><?php echo htmlspecialchars($row['Department']); ?></td>
-                                <td><?php echo htmlspecialchars($row['Faculty']); ?></td>
                                 <td><?php echo htmlspecialchars($row['Status']); ?></td>
                             </tr>
                         <?php endwhile; ?>

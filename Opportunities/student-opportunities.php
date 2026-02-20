@@ -315,7 +315,7 @@ $conn->close();
                     <div class="form-group full-width">
                         <label for="resume" class="form-label">Upload Resume/CV</label>
                         <div class="file-upload">
-                            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
                             <div class="upload-area">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <div>
@@ -788,9 +788,27 @@ $conn->close();
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            fileUpload.files = e.dataTransfer.files;
+            if (e.dataTransfer.files.length) {
+                fileUpload.files = e.dataTransfer.files;
+                updateFileName(e.dataTransfer.files[0].name);
+            }
             uploadArea.style.backgroundColor = '';
         });
+
+        fileUpload.addEventListener('change', (e) => {
+            if (fileUpload.files.length) {
+                updateFileName(fileUpload.files[0].name);
+            }
+        });
+
+        function updateFileName(name) {
+            const hint = uploadArea.querySelector('.upload-hint');
+            if (hint) {
+                hint.textContent = 'Selected: ' + name;
+                hint.style.color = '#10b981';
+                hint.style.fontWeight = '600';
+            }
+        }
 
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function(e) {
