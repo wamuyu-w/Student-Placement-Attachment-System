@@ -56,8 +56,8 @@ $supervisor = $result->fetch_assoc();
             <a href="../Reports/student-reports.php" class="nav-item">
                 <i class="fas fa-file-pdf"></i>
                 <span>Reports</span>
-            </a>
-            <a href="student-supervisor.php" class="nav-item active">
+            </a>        
+            <a href="../Supervisor/student-supervisor.php" class="nav-item">
                 <i class="fas fa-user-tie"></i>
                 <span>Supervisor</span>
             </a>
@@ -394,10 +394,8 @@ $supervisor = $result->fetch_assoc();
 
                             // Define milestones
                             $milestones = [
-                                ['type' => 'Initial Visit', 'label' => 'Initial Visit', 'icon' => 'fa-check'],
                                 ['type' => 'First Assessment', 'label' => 'First Assessment', 'icon' => 'fa-calendar-check'],
-                                ['type' => 'Mid-Term', 'label' => 'Mid-term Assessment', 'icon' => 'fa-calendar-alt'],
-                                ['type' => 'Final', 'label' => 'Final Evaluation', 'icon' => 'fa-flag-checkered']
+                                ['type' => 'Final Assessment', 'label' => 'Final Assessment', 'icon' => 'fa-flag-checkered']
                             ];
 
                             foreach ($milestones as $m): 
@@ -406,7 +404,7 @@ $supervisor = $result->fetch_assoc();
                                 // Logic: If it exists, it's completed/scheduled. If it has marks, it's definitely completed.
                                 $statusClass = $isCompleted ? ($data['Marks'] ? 'status-completed' : 'status-scheduled') : 'status-pending';
                                 // Hack: Initial Visit is usually implied or manual, let's assume it's completed if any assessment exists
-                                if ($m['type'] == 'Initial Visit' && !empty($assessments)) {
+                                if ($m['type'] == 'First Assessment' && !empty($assessments)) {
                                     $isCompleted = true;
                                     $statusClass = 'status-completed';
                                     $data = ['AssessmentDate' => $assessments[array_key_first($assessments)]['AssessmentDate']]; // Use first date

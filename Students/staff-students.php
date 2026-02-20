@@ -23,8 +23,8 @@ if (!$lecturerId) {
 // Fetch Supervised Students
 $students = [];
 if ($lecturerId) {
-    $sql = "SELECT s.FirstName, s.LastName, s.Course, s.PhoneNumber, s.Email, 
-                   ho.OrganizationName, a.AttachmentStatus
+    $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.PhoneNumber, s.Email, 
+                   ho.OrganizationName, a.AttachmentStatus, a.AttachmentID
             FROM supervision sv
             JOIN attachment a ON sv.AttachmentID = a.AttachmentID
             JOIN student s ON a.StudentID = s.StudentID
@@ -105,6 +105,11 @@ if ($lecturerId) {
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
+        
+            <a href="../Supervisor/staff-supervision.php" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Supervision</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">
@@ -140,6 +145,7 @@ if ($lecturerId) {
                         <th>Host Organization</th>
                         <th>Status</th>
                         <th>Contacts</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -154,10 +160,15 @@ if ($lecturerId) {
                                     <?php echo htmlspecialchars($student['Email']); ?><br>
                                     <small><?php echo htmlspecialchars($student['PhoneNumber']); ?></small>
                                 </td>
+                                <td>
+                                    <a href="view-student-progress.php?student_id=<?php echo $student['StudentID']; ?>" style="background-color: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 4px; text-decoration: none; font-size: 0.85rem; display: inline-block;">
+                                        <i class="fas fa-chart-line"></i> Progress
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="5">No supervised students found.</td></tr>
+                        <tr><td colspan="6">No supervised students found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

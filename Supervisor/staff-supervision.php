@@ -134,12 +134,14 @@ $result = $stmt->get_result();
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span>Supervision</span>
             </a>
-            <a href="../Settings/staff-settings.php" class="nav-item">
+
+            
+        </nav>
+        <div class="sidebar-footer">
+               <a href="../Settings/staff-settings.php" class="nav-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
-        </nav>
-        <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
@@ -197,9 +199,14 @@ $result = $stmt->get_result();
                                         <div style="font-size: 0.85em; color: #6b7280;">Total: <?php echo $row['AssessmentCount']; ?></div>
                                     </td>
                                     <td style="padding: 12px;">
-                                        <button class="btn-schedule" onclick="openScheduleModal(<?php echo $row['AttachmentID']; ?>, '<?php echo htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])); ?>')">
-                                            <i class="fas fa-calendar-plus"></i> Schedule
-                                        </button>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn-schedule" style="flex: 1; text-align: center; padding: 8px 4px; font-size: 0.85rem;" onclick="openScheduleModal(<?php echo $row['AttachmentID']; ?>, '<?php echo htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])); ?>')">
+                                                <i class="fas fa-calendar-plus" style="display: block; margin-bottom: 4px; font-size: 1.1rem;"></i> Schedule
+                                            </button>
+                                            <a href="../Assessment/staff-enter-assessment-code.php?attachment_id=<?php echo $row['AttachmentID']; ?>" class="btn-schedule" style="background-color: #4b5563; flex: 1; text-align: center; text-decoration: none; padding: 8px 4px; font-size: 0.85rem;">
+                                                <i class="fas fa-clipboard-check" style="display: block; margin-bottom: 4px; font-size: 1.1rem;"></i> Conduct<br>Assessment
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -225,7 +232,6 @@ $result = $stmt->get_result();
                     <label for="assessmentType">Assessment Type</label>
                     <select id="assessmentType" name="assessment_type" class="form-control" required>
                         <option value="First Assessment">First Assessment</option>
-                        <option value="Mid-Term">Mid-Term Assessment</option>
                         <option value="Final">Final Assessment</option>
                     </select>
                 </div>

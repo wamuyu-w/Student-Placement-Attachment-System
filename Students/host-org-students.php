@@ -59,6 +59,11 @@ $result = $stmt->get_result();
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
+        
+            <a href="../Supervisor/student-supervisor.php" class="nav-item">
+                <i class="fas fa-user-tie"></i>
+                <span>Supervisor</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">

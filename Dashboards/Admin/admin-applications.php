@@ -55,6 +55,11 @@ $result = $conn->query($sql);
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
+        
+            <a href="../../Supervisor/admin-supervisors.php" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Supervisors</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
              <a href="../Settings/admin-settings.php" class="nav-item">

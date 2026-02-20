@@ -64,11 +64,11 @@ if (move_uploaded_file($fileTmp, $destPath)) {
         $updateUserStmt->execute();
         $updateUserStmt->close();
 
-        // Optional: Update attachment status to Completed
-        // $updateAttStmt = $conn->prepare("UPDATE attachment SET AttachmentStatus = 'Completed' WHERE AttachmentID = ?");
-        // $updateAttStmt->bind_param("i", $attachmentId);
-        // $updateAttStmt->execute();
-        // $updateAttStmt->close();
+        // Update attachment status to Completed and Cleared
+        $updateAttStmt = $conn->prepare("UPDATE attachment SET AttachmentStatus = 'Completed', ClearanceStatus = 'Cleared' WHERE AttachmentID = ?");
+        $updateAttStmt->bind_param("i", $attachmentId);
+        $updateAttStmt->execute();
+        $updateAttStmt->close();
         
         // Destroy session and redirect
         session_destroy();

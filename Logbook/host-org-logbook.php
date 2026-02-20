@@ -99,6 +99,11 @@ if ($hostOrgId) {
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
+        
+            <a href="../Supervisor/host-org-supervision.php" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Supervision</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">

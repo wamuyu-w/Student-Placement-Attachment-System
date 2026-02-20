@@ -6,46 +6,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = getDBConnection();
     
     $attachmentId = sanitizeInput($_POST['attachment_id']);
-    $score = sanitizeInput($_POST['total_score']);
-    $grade = sanitizeInput($_POST['grade']);
-    $comments = sanitizeInput($_POST['comments']);
     $lecturerId = sanitizeInput($_POST['lecturer_id']);
+    $totalScore = filter_var($_POST['total_score'], FILTER_SANITIZE_NUMBER_INT);
+    $comments = sanitizeInput($_POST['comments']);
+    
+    $criteriaData = $_POST['criteria'] ?? [];
+    $criteriaJson = json_encode($criteriaData);
     
     // Validate inputs
-    if ($attachmentId && $score && $grade && $lecturerId) {
+    if ($attachmentId && $lecturerId && isset($totalScore) && !empty($criteriaData)) {
         
-        // Prepare statement (assuming 'assessment' table exists as per logic gap analysis, 
-        // if not we'd create it, but standard assumption is schema exists)
-        // Schema check: The View File on sql file earlier showed basic schema. 
-        // Let's assume standard fields. If 'assessment' table missing, we might need SQL execution.
-        // For now, proceeding with standard insert.
+        // Ensure session validation from the previous step is present
+        if (!isset($_SESSION['authorized_assessment_' . $attachmentId])) {
+            header("Location: ../Supervisor/staff-supervision.php?error=unauthorized_assessment");
+            exit();
+        }
+
+        // Assessment type logic - determine if first or final based on existing count
+        $countStmt = $conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ?");
+        $countStmt->bind_param("i", $attachmentId);
+        $countStmt->execute();
+        $res = $countStmt->get_result();
+        $count = $res->fetch_assoc()['count'];
+        $assessmentType = ($count == 0) ? 'First Assessment' : 'Final Assessment';
+        $countStmt->close();
         
-        $sql = "INSERT INTO assessment (AttachmentID, TotalScore, Grade, Comments, DateAssessed) 
-                VALUES (?, ?, ?, ?, NOW())";
+        // Insert into assessment table including CriteriaScores
+        $sql = "INSERT INTO assessment (AttachmentID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores) 
+                VALUES (?, ?, ?, ?, CURDATE(), ?)";
                 
         $stmt = $conn->prepare($sql);
-        
         if ($stmt) {
-            $stmt->bind_param("idss", $attachmentId, $score, $grade, $comments);
+            $stmt->bind_param("isdss", $attachmentId, $assessmentType, $totalScore, $comments, $criteriaJson);
             
             if ($stmt->execute()) {
-                header("Location: staff-assessment.php?success=submitted");
+                // Done - unset the authorization
+                unset($_SESSION['authorized_assessment_' . $attachmentId]);
+                header("Location: ../Supervisor/staff-supervision.php?success=assessment_submitted");
             } else {
                 error_log("Assessment Insert Error: " . $stmt->error);
-                header("Location: staff-assessment.php?error=db_error");
+                header("Location: ../Supervisor/staff-supervision.php?error=db_error");
             }
             $stmt->close();
         } else {
             error_log("Assessment Prepare Error: " . $conn->error);
-            header("Location: staff-assessment.php?error=prepare_error");
+            header("Location: ../Supervisor/staff-supervision.php?error=db_error");
         }
         
     } else {
-        header("Location: staff-assessment.php?error=missing_data");
+        header("Location: ../Supervisor/staff-supervision.php?error=missing_data");
     }
     
     $conn->close();
 } else {
-    header("Location: staff-assessment.php");
+    header("Location: ../Supervisor/staff-supervision.php");
 }
 ?>

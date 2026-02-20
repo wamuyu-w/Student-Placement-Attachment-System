@@ -1,0 +1,10 @@
+I want the functionality of adding students  and lecturers to the system to be done by the admin in the following workflow:
+1. Under the Admin Panel, there is a button where the admin can add either a student (Under the Student Page) or a supervisor(Under the Supervisor Page). There is validation done to check whether the user exists, if it does not exist, a default password is generated that they can use to sign in from their respective ends. Once they have successfully signed in, they will be required to update their details which will automatically be reflected across all parts of the system
+
+fix the navigation structure across all portals
+A feature should be added where the admin can see a list of all the students, and who they are supervised to. This can also be branched out to specify whether it is the first assessment, or the second
+
+We need to remember that CUEA has attachment recommendation letters and medical cover letters that are necessary by organizations - but that can be a later feature.
+
+
+

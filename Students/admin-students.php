@@ -197,8 +197,14 @@ $result = $conn->query($sql);
                                                 <i class="fas fa-check"></i> Clear
                                             </button>
                                         </form>
+                                        <a href="view-student-progress.php?student_id=<?php echo $row['StudentID']; ?>" style="background-color: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 4px; text-decoration: none; font-size: 0.85rem; display: inline-block;">
+                                            <i class="fas fa-chart-line"></i> Progress
+                                        </a>
                                     <?php elseif ($status == 'Cleared'): ?>
                                         <span style="color: #10b981;"><i class="fas fa-check-circle"></i> Done</span>
+                                        <a href="view-student-progress.php?student_id=<?php echo $row['StudentID']; ?>" style="background-color: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 4px; text-decoration: none; font-size: 0.85rem; display: inline-block; margin-left: 5px;">
+                                            <i class="fas fa-chart-line"></i> Progress
+                                        </a>
                                     <?php else: ?>
                                         <span style="color: #9ca3af;">-</span>
                                     <?php endif; ?>

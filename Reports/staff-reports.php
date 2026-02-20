@@ -40,6 +40,11 @@ requireLogin('staff');
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
+        
+            <a href="../Supervisor/staff-supervision.php" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Supervision</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">

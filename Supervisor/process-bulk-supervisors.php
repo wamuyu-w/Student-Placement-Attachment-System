@@ -49,7 +49,6 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
     }
 
     // Since we need a username for the `users` table, we can generate one or use StaffNumber as username.
-    // The previous manual add logic (from admin-supervisors.php hint) says "generic Username will be generated".
     // But for bulk, using StaffNumber as Username is safer/easier unless we want to implement auto-increment logic here (L004, L005 etc).
     // Let's use StaffNumber as Username for simplicity and uniqueness.
     
@@ -80,23 +79,20 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
 
     // Insert User
     // Default to using StaffNumber as Username for bulk upload to ensure uniqueness without complex logic
-    // Alternatively, we could generate L00X, but that requires locking/transaction to avoid race conditions in a loop
     $insertUser = $conn->prepare("INSERT INTO users (Username, Password, Role, Status) VALUES (?, ?, 'Lecturer', 'Active')");
     $insertUser->bind_param("ss", $username, $defaultPassword);
     
     if ($insertUser->execute()) {
         $userID = $conn->insert_id;
         
-        // Insert Lecturer
-        // Role = Supervisor (Hardcoded in SQL as 'Supervisor')
+        // Insert Lecturer and insert the Role = Supervisor 
         $insertLec = $conn->prepare("INSERT INTO lecturer (UserID, StaffNumber, Name, Department, Role) VALUES (?, ?, ?, ?, 'Supervisor')");
-        // FIXED: bind_param types "isss" matches 4 variables (UserID, StaffNumber, Name, Department)
         $insertLec->bind_param("isss", $userID, $staffNumber, $name, $department);
         
         if ($insertLec->execute()) {
             $successCount++;
         } else {
-            // If lecturer insert fails, we should ideally delete the user we just created to maintain consistency
+            // If lecturer insert fails, delete the user created 
             $conn->query("DELETE FROM users WHERE UserID = $userID");
             $errorCount++;
             error_log("Failed to insert lecturer details for $staffNumber: " . $insertLec->error);

@@ -114,6 +114,11 @@ if ($lecturerId) {
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
+        
+            <a href="../Supervisor/staff-supervision.php" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Supervision</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
              <a href="../Login Pages/logout.php" class="nav-item">
@@ -137,6 +142,15 @@ if ($lecturerId) {
                         Assessment submitted successfully!
                     </div>
                 <?php endif; ?>
+                <?php if (isset($_GET['error'])): ?>
+                    <div style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; margin-bottom: 20px;">
+                        <?php 
+                        if ($_GET['error'] === 'invalid_code') echo 'Invalid Assessment Code for this student.';
+                        else if ($_GET['error'] === 'db_error') echo 'A database error occurred.';
+                        else echo 'An error occurred submitting the assessment.';
+                        ?>
+                    </div>
+                <?php endif; ?>
                 
                 <form action="process-assessment.php" method="POST">
                     <input type="hidden" name="lecturer_id" value="<?php echo htmlspecialchars($lecturerId); ?>">
@@ -154,25 +168,28 @@ if ($lecturerId) {
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Total Score (0-100)</label>
-                        <input type="number" name="total_score" class="form-input" min="0" max="100" required>
+                        <label class="form-label">Assessment Code (Provided by Host Organization)</label>
+                        <input type="text" name="assessment_code" class="form-input" required placeholder="e.g. X72B9A">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Grade (A, B, C, D, F)</label>
-                        <select name="grade" class="form-select" required>
-                            <option value="">-- Select Grade --</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                            <option value="F">F</option>
+                        <label class="form-label">Assessment Type</label>
+                        <select name="assessment_type" class="form-select" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="Mid-Term">Mid-Term</option>
+                            <option value="Final">Final</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Comments / Remarks</label>
-                        <textarea name="comments" class="form-textarea" rows="5" required></textarea>
+                        <label class="form-label">Marks (0-100)</label>
+                        <input type="number" step="0.01" name="marks" class="form-input" min="0" max="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Remarks</label>
+                        <textarea name="remarks" class="form-textarea" rows="5" required></textarea>
                     </div>
                     
                     <button type="submit" class="btn-submit">Submit Assessment</button>
