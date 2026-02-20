@@ -228,7 +228,7 @@ $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
             </div>
 
             <div class="progress-section">
-                <h2><i class="fas fa-star" style="color: #f59e0b;"></i> Assessment Grades</h2>
+                <h2>Assessment Grades</h2>
                 <?php if (empty($assessments)): ?>
                     <p style="color: #6b7280;">No assessments recorded yet.</p>
                 <?php else: ?>
@@ -256,7 +256,7 @@ $userRole = $userType === 'admin' ? 'Coordinator' : 'Lecturer';
             </div>
 
             <div class="progress-section">
-                <h2><i class="fas fa-book-open" style="color: #3b82f6;"></i> Logbook Entries (By Week)</h2>
+                <h2>Logbook Entries (By Week)</h2>
                 <?php if (empty($logbookEntries)): ?>
                     <p style="color: #6b7280;">No logbook entries submitted yet.</p>
                 <?php else: ?>

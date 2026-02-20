@@ -155,11 +155,19 @@ $conn->close();
                             </div>
                             <div class="opportunity-footer">
                                 <button class="btn btn-view" 
-                                        onclick="openDetailsModal('<?php echo htmlspecialchars(addslashes($opp['OrganizationName'])); ?>', '<?php echo htmlspecialchars(addslashes($opp['Description'])); ?>', '<?php echo htmlspecialchars(addslashes($opp['EligibilityCriteria'])); ?>', '<?php echo date('M d, Y', strtotime($opp['ApplicationEndDate'])); ?>', <?php echo $opp['OpportunityID']; ?>)">
+                                        data-org="<?php echo htmlspecialchars($opp['OrganizationName']); ?>"
+                                        data-desc="<?php echo htmlspecialchars($opp['Description']); ?>"
+                                        data-crit="<?php echo htmlspecialchars($opp['EligibilityCriteria']); ?>"
+                                        data-deadline="<?php echo date('M d, Y', strtotime($opp['ApplicationEndDate'])); ?>"
+                                        data-id="<?php echo $opp['OpportunityID']; ?>"
+                                        onclick="handleViewDetails(this)">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
                                 <button class="btn btn-apply-card" 
-                                        onclick="openApplicationForm(<?php echo $opp['OpportunityID']; ?>, '<?php echo htmlspecialchars($opp['OrganizationName']); ?>', '<?php echo htmlspecialchars($opp['Description']); ?>')">
+                                        data-id="<?php echo $opp['OpportunityID']; ?>"
+                                        data-org="<?php echo htmlspecialchars($opp['OrganizationName']); ?>"
+                                        data-desc="<?php echo htmlspecialchars($opp['Description']); ?>"
+                                        onclick="handleApplyForm(this)">
                                     <i class="fas fa-arrow-right"></i> Apply Now
                                 </button>
                             </div>
@@ -645,6 +653,22 @@ $conn->close();
     </style>
 
     <script>
+        function handleViewDetails(btn) {
+            const orgName = btn.getAttribute('data-org');
+            const description = btn.getAttribute('data-desc');
+            const criteria = btn.getAttribute('data-crit');
+            const deadline = btn.getAttribute('data-deadline');
+            const opportunityId = btn.getAttribute('data-id');
+            openDetailsModal(orgName, description, criteria, deadline, opportunityId);
+        }
+
+        function handleApplyForm(btn) {
+            const opportunityId = btn.getAttribute('data-id');
+            const orgName = btn.getAttribute('data-org');
+            const description = btn.getAttribute('data-desc');
+            openApplicationForm(opportunityId, orgName, description);
+        }
+
         function openDetailsModal(orgName, description, criteria, deadline, opportunityId) {
             document.getElementById('detailsOrg').textContent = orgName;
             document.getElementById('detailsRole').textContent = description; 

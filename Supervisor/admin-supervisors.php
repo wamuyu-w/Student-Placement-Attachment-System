@@ -45,7 +45,7 @@ $result = $conn->query($sql);
                 <i class="fas fa-lightbulb"></i>
                 <span>Opportunities</span>
             </a>
-            <a href="admin-supervisors.php" class="nav-item active">
+             <a href="../Supervisor/admin-supervisors.php" class="nav-item">
                 <i class="fas fa-users"></i>
                 <span>Supervisors</span>
             </a>
@@ -58,10 +58,7 @@ $result = $conn->query($sql);
                 <span>Reports</span>
             </a>
         
-            <a href="../Supervisor/admin-supervisors.php" class="nav-item">
-                <i class="fas fa-users"></i>
-                <span>Supervisors</span>
-            </a>
+           
         </nav>
         <div class="sidebar-footer">
              <a href="../Settings/admin-settings.php" class="nav-item">
@@ -174,16 +171,22 @@ $result = $conn->query($sql);
                             <option value="">-- Choose Student --</option>
                             <?php
                             // Fetch students with active attachments needing supervision
-                            $studSql = "SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName 
-                                        FROM attachment a 
-                                        JOIN student s ON a.StudentID = s.StudentID 
-                                        JOIN hostorganization h ON a.HostOrgID = h.HostOrgID
-                                        LEFT JOIN supervision sup ON a.AttachmentID = sup.AttachmentID
-                                        WHERE a.AttachmentStatus = 'Ongoing' AND sup.SupervisionID IS NULL";
+                            $studSql = "
+                            SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName,
+                                   (SELECT COUNT(*) FROM supervision WHERE AttachmentID = a.AttachmentID) as SupCount,
+                                   (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID) as AssessCount
+                            FROM attachment a
+                            JOIN student s ON a.StudentID = s.StudentID
+                            JOIN hostorganization h ON a.HostOrgID = h.HostOrgID
+                            WHERE a.AttachmentStatus = 'Ongoing'
+                            HAVING SupCount = 0 OR (SupCount = 1 AND AssessCount >= 1)
+                            ";
+                            
                             $studRes = $conn->query($studSql);
                             if ($studRes->num_rows > 0) {
                                 while($row = $studRes->fetch_assoc()) {
-                                    echo "<option value='" . $row['AttachmentID'] . "'>" . htmlspecialchars($row['FirstName'] . " " . $row['LastName'] . " (" . $row['OrganizationName'] . ")") . "</option>";
+                                    $label = ($row['SupCount'] == 0) ? " (Needs 1st Supervisor)" : " (Needs 2nd Supervisor)";
+                                    echo "<option value='" . $row['AttachmentID'] . "'>" . htmlspecialchars($row['FirstName'] . " " . $row['LastName'] . " - " . $row['OrganizationName'] . $label) . "</option>";
                                 }
                             } else {
                                 echo "<option value='' disabled>No students pending assignment</option>";

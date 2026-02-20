@@ -105,16 +105,15 @@ if ($lecturerId) {
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-             <a href="../Settings/staff-settings.php" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
-        
             <a href="../Supervisor/staff-supervision.php" class="nav-item">
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span>Supervision</span>
             </a>
         </nav>
+            <a href="../Settings/staff-settings.php" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
         <div class="sidebar-footer">
             <a href="../Login Pages/logout.php" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>

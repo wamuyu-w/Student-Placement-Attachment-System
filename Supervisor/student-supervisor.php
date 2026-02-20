@@ -5,7 +5,7 @@ requireLogin('student');
 $conn = getDBConnection();
 $studentId = $_SESSION['student_id'] ?? null;
 
-// Get Active Attachment and Supervisor
+// Get Active Attachment and Supervisors
 $sql = "SELECT l.Name, l.Department, l.Faculty, l.Role, u.Username as Email, a.AttachmentID
         FROM supervision s
         JOIN attachment a ON s.AttachmentID = a.AttachmentID
@@ -17,7 +17,12 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $studentId);
 $stmt->execute();
 $result = $stmt->get_result();
-$supervisor = $result->fetch_assoc();
+
+$supervisors = [];
+while ($row = $result->fetch_assoc()) {
+    $supervisors[] = $row;
+}
+$firstAttachmentID = !empty($supervisors) ? $supervisors[0]['AttachmentID'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -345,7 +350,8 @@ $supervisor = $result->fetch_assoc();
         </style>
 
         <div class="content">
-            <?php if (!$supervisor): ?>
+        <div class="content">
+            <?php if (empty($supervisors)): ?>
                  <div class="empty-state text-center py-12 bg-white rounded-lg shadow-sm">
                     <div class="text-gray-400 mb-4">
                         <i class="fas fa-user-clock text-6xl"></i>
@@ -355,20 +361,22 @@ $supervisor = $result->fetch_assoc();
                 </div>
             <?php else: ?>
                 
-                <!-- 1. Supervisor Profile Card (Full Width) -->
-                <div class="custom-card supervisor-profile-card">
-                    <div class="profile-left">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($supervisor['Name']); ?>&background=random&size=128" alt="Dr. Profile" class="supervisor-avatar">
-                        <div class="supervisor-info">
-                            <h2><?php echo htmlspecialchars($supervisor['Name']); ?></h2>
-                            <p><?php echo htmlspecialchars($supervisor['Department']); ?></p>
-                            <span><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($supervisor['Role']); ?> & Academic Supervisor</span>
+                <!-- 1. Supervisor Profile Cards (Full Width) -->
+                <?php foreach ($supervisors as $index => $supervisor): ?>
+                    <div class="custom-card supervisor-profile-card" style="margin-bottom: <?php echo ($index == count($supervisors) - 1) ? '0' : '1.5rem'; ?>;">
+                        <div class="profile-left">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($supervisor['Name']); ?>&background=random&size=128" alt="Dr. Profile" class="supervisor-avatar">
+                            <div class="supervisor-info">
+                                <h2><?php echo htmlspecialchars($supervisor['Name']); ?></h2>
+                                <p><?php echo htmlspecialchars($supervisor['Department']); ?></p>
+                                <span><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($supervisor['Role']); ?> & Academic Supervisor</span>
+                            </div>
                         </div>
+                        <a href="mailto:<?php echo htmlspecialchars($supervisor['Email'] ?? ''); ?>" class="btn-email">
+                            <i class="fas fa-envelope"></i> Email Supervisor
+                        </a>
                     </div>
-                    <a href="mailto:<?php echo htmlspecialchars($supervisor['Username']); ?>" class="btn-email">
-                        <i class="fas fa-envelope"></i> Email Supervisor
-                    </a>
-                </div>
+                <?php endforeach; ?>
 
                 <!-- 2. Main Grid: Tracker & Feedback -->
                 <div class="dashboard-grid">
@@ -382,9 +390,9 @@ $supervisor = $result->fetch_assoc();
                         <div class="timeline">
                             <?php
                             // Fetch assessments to determine progress
-                            $assessSql = "SELECT * FROM assessment WHERE AttachmentID = ?";
+                            $assessSql = "SELECT a.*, l.Name as AssessorName FROM assessment a LEFT JOIN lecturer l ON a.LecturerID = l.LecturerID WHERE a.AttachmentID = ?";
                             $stmt = $conn->prepare($assessSql);
-                            $stmt->bind_param("i", $supervisor['AttachmentID']);
+                            $stmt->bind_param("i", $firstAttachmentID);
                             $stmt->execute();
                             $assessRes = $stmt->get_result();
                             $assessments = [];
@@ -404,7 +412,7 @@ $supervisor = $result->fetch_assoc();
                                 // Logic: If it exists, it's completed/scheduled. If it has marks, it's definitely completed.
                                 $statusClass = $isCompleted ? ($data['Marks'] ? 'status-completed' : 'status-scheduled') : 'status-pending';
                                 // Hack: Initial Visit is usually implied or manual, let's assume it's completed if any assessment exists
-                                if ($m['type'] == 'First Assessment' && !empty($assessments)) {
+                                if ($m['type'] == 'First Assessment' && !empty($assessments) && !$isCompleted) {
                                     $isCompleted = true;
                                     $statusClass = 'status-completed';
                                     $data = ['AssessmentDate' => $assessments[array_key_first($assessments)]['AssessmentDate']]; // Use first date
@@ -423,11 +431,17 @@ $supervisor = $result->fetch_assoc();
                                         <?php endif; ?>
                                         
                                         <?php if ($isCompleted && isset($data['Marks'])): ?>
-                                            <span class="status-badge badge-green">Score: <?php echo $data['Marks']; ?>/100</span>
+                                            <div style="margin-top: 8px;">
+                                                <span class="status-badge badge-green">Score: <?php echo $data['Marks']; ?>/100</span>
+                                                <?php if(!empty($data['AssessorName'])): ?>
+                                                    <span class="status-badge badge-gray" style="margin-left: 4px;">Assessed by: <?php echo htmlspecialchars($data['AssessorName']); ?></span>
+                                                <?php endif; ?>
+                                                <a href="../Assessment/view-assessment.php?id=<?php echo $data['AssessmentID']; ?>" target="_blank" class="status-badge badge-blue" style="margin-left: 4px; text-decoration: none;"><i class="fas fa-file-pdf"></i> View Form</a>
+                                            </div>
                                         <?php elseif ($isCompleted): ?>
-                                            <span class="status-badge badge-blue">Scheduled</span>
+                                            <span class="status-badge badge-blue" style="margin-top: 8px;">Scheduled</span>
                                         <?php else: ?>
-                                            <span class="status-badge badge-gray">Pending</span>
+                                            <span class="status-badge badge-gray" style="margin-top: 8px;">Pending</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -453,7 +467,7 @@ $supervisor = $result->fetch_assoc();
                                        WHERE l.AttachmentID = ? AND le.HostSupervisorComments IS NOT NULL AND le.HostSupervisorComments != ''
                                        limit 5";
                         $stmt = $conn->prepare($logbookSql);
-                        $stmt->bind_param("i", $supervisor['AttachmentID']);
+                        $stmt->bind_param("i", $firstAttachmentID);
                         $stmt->execute();
                         $res = $stmt->get_result();
                         while ($row = $res->fetch_assoc()) {

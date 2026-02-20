@@ -32,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $countStmt->close();
         
         // Insert into assessment table including CriteriaScores
-        $sql = "INSERT INTO assessment (AttachmentID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores) 
-                VALUES (?, ?, ?, ?, CURDATE(), ?)";
+        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores) 
+                VALUES (?, ?, ?, ?, ?, CURDATE(), ?)";
                 
         $stmt = $conn->prepare($sql);
         if ($stmt) {
-            $stmt->bind_param("isdss", $attachmentId, $assessmentType, $totalScore, $comments, $criteriaJson);
+            $stmt->bind_param("iisdss", $attachmentId, $lecturerId, $assessmentType, $totalScore, $comments, $criteriaJson);
             
             if ($stmt->execute()) {
                 // Done - unset the authorization

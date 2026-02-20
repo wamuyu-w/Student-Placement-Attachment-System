@@ -9,12 +9,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lecturerId = sanitizeInput($_POST['lecturer_id']);
     
     if ($attachmentId && $lecturerId) {
-        // Check if already assigned
-        $checkStmt = $conn->prepare("SELECT SupervisionID FROM supervision WHERE AttachmentID = ?");
+        // Check existing supervisors
+        $checkStmt = $conn->prepare("SELECT LecturerID FROM supervision WHERE AttachmentID = ?");
         $checkStmt->bind_param("i", $attachmentId);
         $checkStmt->execute();
+        $res = $checkStmt->get_result();
         
-        if ($checkStmt->get_result()->num_rows === 0) {
+        $supervisors = [];
+        while ($row = $res->fetch_assoc()) {
+            $supervisors[] = $row['LecturerID'];
+        }
+        $checkStmt->close();
+
+        // Check existing assessments
+        $assessStmt = $conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ?");
+        $assessStmt->bind_param("i", $attachmentId);
+        $assessStmt->execute();
+        $assessCount = $assessStmt->get_result()->fetch_assoc()['count'];
+        $assessStmt->close();
+
+        $canAssign = false;
+        $errorMsg = "";
+
+        if (count($supervisors) == 0) {
+            $canAssign = true; // 1st Supervisor
+        } elseif (count($supervisors) == 1) {
+            if (in_array($lecturerId, $supervisors)) {
+                $errorMsg = "already_assigned"; // Same supervisor
+            } elseif ($assessCount == 0) {
+                $errorMsg = "assessment_pending"; // 1st Assessment not done yet
+            } else {
+                $canAssign = true; // 2nd Supervisor
+            }
+        } else {
+            $errorMsg = "max_supervisors_reached";
+        }
+        
+        if ($canAssign) {
             $stmt = $conn->prepare("INSERT INTO supervision (LecturerID, AttachmentID) VALUES (?, ?)");
             $stmt->bind_param("ii", $lecturerId, $attachmentId);
             
@@ -25,9 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $stmt->close();
         } else {
-            header("Location: admin-supervisors.php?error=already_assigned");
+            header("Location: admin-supervisors.php?error=" . urlencode($errorMsg));
         }
-        $checkStmt->close();
     } else {
         header("Location: admin-supervisors.php?error=missing_data");
     }
