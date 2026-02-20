@@ -316,15 +316,15 @@ $criteriaList = [
 
             <div class="section-title">Assessment Areas</div>
             <p style="font-size: 0.9rem; color: #4b5563; margin-top: 5px; margin-bottom: 15px;">
-                Please indicate your assessment of the performance of the student during the attachment period using percentages as shown below:
+                Please indicate your assessment of the performance of the student during the attachment period using the following scale:
             </p>
 
             <div class="rating-scale-legend">
-                <span>0-20 - Poor</span>
-                <span>21-40 - Below Average</span>
-                <span>41-60 - Average</span>
-                <span>61-80 - Good</span>
-                <span>81-100 - Excellent</span>
+                <span>0-2 - Poor</span>
+                <span>3-4 - Below Average</span>
+                <span>5-6 - Average</span>
+                <span>7-8 - Good</span>
+                <span>9-10 - Excellent</span>
             </div>
             
             <p style="font-size: 0.85rem; font-style: italic; color: #64748b; margin-bottom: 10px;">
