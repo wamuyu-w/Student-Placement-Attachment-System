@@ -246,54 +246,61 @@ $logsResult = $logStmt->get_result();
                     <?php 
                     $activitiesData = json_decode($log['Activities'], true);
                     if (json_last_error() === JSON_ERROR_NONE && is_array($activitiesData)):
-                        foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as $day):
-                            if (!empty($activitiesData[$day]['task']) || !empty($activitiesData[$day]['comment'])):
                     ?>
-                                <div class="entry-section" style="border-left: 3px solid #6b7280; padding-left: 10px; margin-bottom: 20px;">
-                                    <div class="entry-label" style="border: none; margin-bottom: 2px;"><?php echo $day; ?></div>
-                                    
-                                    <?php if (!empty($activitiesData[$day]['task'])): ?>
-                                        <div style="font-size: 0.9em; margin-bottom: 4px;">
-                                            <strong>Task:</strong><br>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #000; padding: 8px; background-color: #f0f0f0; -webkit-print-color-adjust: exact; width: 15%; text-align: left;">Date</th>
+                                    <th style="border: 1px solid #000; padding: 8px; background-color: #f0f0f0; -webkit-print-color-adjust: exact; width: 50%; text-align: left;">Activities Done</th>
+                                    <th style="border: 1px solid #000; padding: 8px; background-color: #f0f0f0; -webkit-print-color-adjust: exact; width: 35%; text-align: left;">Student's Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as $day): ?>
+                                <?php if (!empty($activitiesData[$day]['task']) || !empty($activitiesData[$day]['comment'])): ?>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
+                                            <strong><?php echo $day; ?></strong>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
                                             <?php 
-                                            $task = trim(html_entity_decode(html_entity_decode($activitiesData[$day]['task'], ENT_QUOTES | ENT_HTML5)), "\"'");
-                                            echo nl2br(htmlspecialchars($task)); 
+                                            if (!empty($activitiesData[$day]['task'])) {
+                                                $task = trim(html_entity_decode(html_entity_decode($activitiesData[$day]['task'], ENT_QUOTES | ENT_HTML5)), "\"'");
+                                                echo nl2br(htmlspecialchars($task)); 
+                                            }
                                             ?>
-                                        </div>
-                                    <?php endif; ?>
-                                    
-                                    <?php if (!empty($activitiesData[$day]['comment'])): ?>
-                                        <div style="font-size: 0.9em; color: #4b5563;">
-                                            <em>Reflection:</em><br>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
                                             <?php 
-                                            $comment = trim(html_entity_decode(html_entity_decode($activitiesData[$day]['comment'], ENT_QUOTES | ENT_HTML5)), "\"'");
-                                            echo nl2br(htmlspecialchars($comment)); 
+                                            if (!empty($activitiesData[$day]['comment'])) {
+                                                $comment = trim(html_entity_decode(html_entity_decode($activitiesData[$day]['comment'], ENT_QUOTES | ENT_HTML5)), "\"'");
+                                                echo nl2br(htmlspecialchars($comment)); 
+                                            }
                                             ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                    <?php 
-                            endif;
-                        endforeach;
-                    else: 
-                    ?>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
                         <div class="entry-section">
-                            <div class="entry-label">Activities</div>
-                            <div class="entry-content"><?php echo nl2br(htmlspecialchars($log['Activities'])); ?></div>
+                            <div class="entry-label" style="font-weight: bold; border-bottom: 1px solid #e5e7eb;">Activities</div>
+                            <div class="entry-content" style="padding: 10px 0;"><?php echo nl2br(htmlspecialchars($log['Activities'])); ?></div>
                         </div>
                     <?php endif; ?>
 
                     <?php if (!empty($log['HostSupervisorComments'])): ?>
-                    <div class="entry-section" style="margin-top: 15px; border-top: 1px dashed #d1d5db; padding-top: 15px;">
-                        <div style="font-size: 0.9em; font-weight: bold; color: #047857;">Host Supervisor Comments:</div>
-                        <div style="font-size: 0.9em; font-style: italic; margin-top: 5px;"><?php echo nl2br(htmlspecialchars($log['HostSupervisorComments'])); ?></div>
+                    <div style="border: 1px solid #000; padding: 15px; margin-bottom: 20px;">
+                        <span style="font-weight: bold; font-size: 11pt;">Host Supervisor Comments:</span><br>
+                        <div style="margin-top: 10px; font-size: 11pt;"><?php echo nl2br(htmlspecialchars($log['HostSupervisorComments'])); ?></div>
                     </div>
                     <?php endif; ?>
 
                     <?php if (!empty($log['AcademicSupervisorComments'])): ?>
-                    <div class="entry-section" style="margin-top: 15px; border-top: 1px dashed #d1d5db; padding-top: 15px;">
-                        <div style="font-size: 0.9em; font-weight: bold; color: #8B1538;">Academic Supervisor Comments:</div>
-                        <div style="font-size: 0.9em; font-style: italic; margin-top: 5px;"><?php echo nl2br(htmlspecialchars($log['AcademicSupervisorComments'])); ?></div>
+                    <div style="border: 1px solid #000; padding: 15px; margin-bottom: 20px;">
+                        <span style="font-weight: bold; font-size: 11pt;">Lecturer Comments:</span><br>
+                        <div style="margin-top: 10px; font-size: 11pt;"><?php echo nl2br(htmlspecialchars($log['AcademicSupervisorComments'])); ?></div>
                     </div>
                     <?php endif; ?>
 
