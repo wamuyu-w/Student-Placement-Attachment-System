@@ -15,6 +15,32 @@ if (!$studentId) {
     exit();
 }
 
+// Handle Form Submission for Logbook Comments
+$message = '';
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'submit_comment') {
+    $entryId = intval($_POST['entry_id']);
+    $comment = trim($_POST['comment']);
+
+    if ($entryId > 0) {
+        if ($userType === 'host_org') {
+            $stmt = $conn->prepare("UPDATE logbookentry SET HostSupervisorComments = ? WHERE EntryID = ?");
+        } elseif ($userType === 'staff') {
+            $stmt = $conn->prepare("UPDATE logbookentry SET AcademicSupervisorComments = ? WHERE EntryID = ?");
+        }
+        
+        if (isset($stmt)) {
+            $stmt->bind_param("si", $comment, $entryId);
+            if ($stmt->execute()) {
+                $message = "Comment saved successfully.";
+            } else {
+                $error = "Failed to save comment.";
+            }
+            $stmt->close();
+        }
+    }
+}
+
 // Fetch student details
 $stmt = $conn->prepare("SELECT FirstName, LastName, Course, Faculty FROM student WHERE StudentID = ?");
 $stmt->bind_param("i", $studentId);
@@ -58,7 +84,7 @@ if ($attachment) {
     
     // Fetch logbook grouped by week
     $stmt = $conn->prepare("
-        SELECT le.EntryDate, le.Activities, le.HostSupervisorComments,
+        SELECT le.EntryID, le.EntryDate, le.Activities, le.HostSupervisorComments, le.AcademicSupervisorComments,
                CEIL(DATEDIFF(le.EntryDate, ?) / 7) as WeekNumber
         FROM logbookentry le
         JOIN logbook l ON le.LogbookID = l.LogbookID
@@ -249,6 +275,17 @@ if ($userType === 'host_org') {
             </div>
         </header>
 
+        <?php if ($message): ?>
+            <div style="background-color: #D1FAE5; color: #065F46; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($error): ?>
+            <div style="background-color: #FEE2E2; color: #B91C1C; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+
         <div style="margin-bottom: 10px;">
             <?php 
                 $backLink = match($userType) {
@@ -345,10 +382,39 @@ if ($userType === 'host_org') {
                                         }
                                         ?>
                                     </div>
-                                    <?php if ($entry['HostSupervisorComments']): ?>
-                                        <div style="background: #f9fafb; padding: 10px; border-radius: 4px; border-left: 3px solid #10b981; font-size: 0.9rem;">
+                                     <?php if ($entry['HostSupervisorComments']): ?>
+                                        <div style="background: #f9fafb; padding: 10px; border-radius: 4px; border-left: 3px solid #10b981; font-size: 0.9rem; margin-bottom: 5px;">
                                             <strong>Host Supervisor:</strong> <?php echo nl2br(htmlspecialchars($entry['HostSupervisorComments'])); ?>
                                         </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($entry['AcademicSupervisorComments']): ?>
+                                        <div style="background: #f9fafb; padding: 10px; border-radius: 4px; border-left: 3px solid #8B1538; font-size: 0.9rem; margin-bottom: 5px;">
+                                            <strong>Academic Supervisor:</strong> <?php echo nl2br(htmlspecialchars($entry['AcademicSupervisorComments'])); ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <!-- Comment Form for Authorized Roles -->
+                                    <?php if ($userType === 'host_org' || $userType === 'staff'): ?>
+                                        <form method="POST" style="margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
+                                            <input type="hidden" name="action" value="submit_comment">
+                                            <input type="hidden" name="entry_id" value="<?php echo $entry['EntryID']; ?>">
+                                            
+                                            <div style="margin-bottom: 10px;">
+                                                <label style="font-weight: 500; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 5px;">
+                                                    <?php echo $userType === 'host_org' ? 'Update Host Organization Comment:' : 'Update Staff/Academic Comment:'; ?>
+                                                </label>
+                                                <?php 
+                                                    $existingComment = $userType === 'host_org' ? $entry['HostSupervisorComments'] : $entry['AcademicSupervisorComments'];
+                                                ?>
+                                                <textarea name="comment" rows="2" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 8px; font-family: inherit; font-size: 0.9rem;" placeholder="Leave your official remarks here..."><?php echo htmlspecialchars($existingComment ?? ''); ?></textarea>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <button type="submit" style="background-color: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">
+                                                    <i class="fas fa-save"></i> Save Comment
+                                                </button>
+                                            </div>
+                                        </form>
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>

@@ -44,6 +44,7 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
     $staffNumber = sanitizeInput($data[0]);
     $name = sanitizeInput($data[1] ?? '');
     $department = sanitizeInput($data[2] ?? '');
+    $faculty = sanitizeInput($_POST['faculty'] ?? '');
 
     if (empty($staffNumber)) {
         continue;
@@ -87,8 +88,8 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $userID = $conn->insert_id;
         
         // Insert Lecturer and insert the Role = Supervisor 
-        $insertLec = $conn->prepare("INSERT INTO lecturer (UserID, StaffNumber, Name, Department, Role) VALUES (?, ?, ?, ?, 'Supervisor')");
-        $insertLec->bind_param("isss", $userID, $staffNumber, $name, $department);
+        $insertLec = $conn->prepare("INSERT INTO lecturer (UserID, StaffNumber, Name, Department, Faculty, Role) VALUES (?, ?, ?, ?, ?, 'Supervisor')");
+        $insertLec->bind_param("isssss", $userID, $staffNumber, $name, $department, $faculty);
         
         if ($insertLec->execute()) {
             $successCount++;

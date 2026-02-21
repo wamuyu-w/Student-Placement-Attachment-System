@@ -27,12 +27,12 @@ function getTimeAgo($datetime) {
 $conn = getDBConnection();
 
 // Get pending applications count
-$pendingAppsQuery = "SELECT COUNT(*) as count FROM attachmentapplication WHERE ApplicationStatus = 'Pending'";
+$pendingAppsQuery = "SELECT COUNT(*) as count FROM jobapplication WHERE Status = 'Pending'";
 $pendingAppsResult = $conn->query($pendingAppsQuery);
 $pendingApps = $pendingAppsResult->fetch_assoc()['count'] ?? 0;
 
 // Get active placements count
-$activePlacementsQuery = "SELECT COUNT(*) as count FROM attachment WHERE AttachmentStatus = 'Active'";
+$activePlacementsQuery = "SELECT COUNT(*) as count FROM attachment WHERE AttachmentStatus = 'Ongoing'";
 $activePlacementsResult = $conn->query($activePlacementsQuery);
 $activePlacements = $activePlacementsResult->fetch_assoc()['count'] ?? 0;
 
@@ -44,7 +44,7 @@ $opportunities = $opportunitiesResult->fetch_assoc()['count'] ?? 0;
 // Get unassigned students count (students without active attachments)
 $unassignedQuery = "SELECT COUNT(DISTINCT s.StudentID) as count 
                     FROM student s 
-                    LEFT JOIN attachment a ON s.StudentID = a.StudentID AND a.AttachmentStatus = 'Active'
+                    LEFT JOIN attachment a ON s.StudentID = a.StudentID AND a.AttachmentStatus = 'Ongoing'
                     WHERE a.AttachmentID IS NULL AND s.EligibilityStatus = 'Eligible'";
 $unassignedResult = $conn->query($unassignedQuery);
 $unassignedStudents = $unassignedResult->fetch_assoc()['count'] ?? 0;
@@ -53,10 +53,10 @@ $unassignedStudents = $unassignedResult->fetch_assoc()['count'] ?? 0;
 $activities = [];
 try {
     // Get recent applications
-    $appsQuery = "SELECT aa.ApplicationID, s.FirstName, s.LastName, aa.ApplicationDate, aa.ApplicationStatus
-                  FROM attachmentapplication aa
-                  JOIN student s ON aa.StudentID = s.StudentID
-                  ORDER BY aa.ApplicationDate DESC
+    $appsQuery = "SELECT ja.OpportunityID as ApplicationID, s.FirstName, s.LastName, ja.ApplicationDate, ja.Status as ApplicationStatus
+                  FROM jobapplication ja
+                  JOIN student s ON ja.StudentID = s.StudentID
+                  ORDER BY ja.ApplicationDate DESC
                   LIMIT 4";
     
     $result = $conn->query($appsQuery);
@@ -284,38 +284,9 @@ $conn->close();
                 </div>
                 <div class="activity-list" id="activityList">
                     <?php if (empty($activities)): ?>
-                        <!-- Default activities if database is empty -->
-                        <div class="activity-item">
-                            <img src="https://ui-avatars.com/api/?name=John+Doe&background=8B1538&color=fff&size=128" alt="John Doe" class="activity-avatar">
-                            <div class="activity-content">
-                                <div class="activity-title">New Application from John Doe</div>
-                                <div class="activity-description">Applied to Tech Solutions Inc.</div>
-                                <div class="activity-time">2m ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <img src="https://ui-avatars.com/api/?name=Innovate+Corp&background=10b981&color=fff&size=128" alt="Innovate Corp" class="activity-avatar">
-                            <div class="activity-content">
-                                <div class="activity-title">Innovate Corp posted a new opportunity</div>
-                                <div class="activity-description">Software Engineering Intern</div>
-                                <div class="activity-time">1h ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <img src="https://ui-avatars.com/api/?name=Emily+White&background=3b82f6&color=fff&size=128" alt="Emily White" class="activity-avatar">
-                            <div class="activity-content">
-                                <div class="activity-title">Emily White completed placement</div>
-                                <div class="activity-description">At Data Dynamics Ltd.</div>
-                                <div class="activity-time">3h ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <img src="https://ui-avatars.com/api/?name=Michael+Brown&background=f59e0b&color=fff&size=128" alt="Michael Brown" class="activity-avatar">
-                            <div class="activity-content">
-                                <div class="activity-title">Supervisor assigned to Michael Brown</div>
-                                <div class="activity-description">Dr. Alan Grant</div>
-                                <div class="activity-time">1d ago</div>
-                            </div>
+                        <div style="padding: 20px; text-align: center; color: #6b7280;">
+                            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; color: #d1d5db;"></i>
+                            <p>No recent activity found.</p>
                         </div>
                     <?php else: ?>
                         <?php foreach ($activities as $activity): ?>

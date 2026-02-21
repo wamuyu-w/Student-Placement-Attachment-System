@@ -43,6 +43,34 @@ $stmt->bind_param("i", $staffID);
 $stmt->execute();
 $result = $stmt->get_result();
 
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'verify_code') {
+    $attachmentIdVerify = sanitizeInput($_POST['attachment_id']);
+    $enteredCode = sanitizeInput($_POST['assessment_code']);
+    
+    $stmtVerify = $conn->prepare("SELECT AssessmentCode FROM attachment WHERE AttachmentID = ?");
+    $stmtVerify->bind_param("i", $attachmentIdVerify);
+    $stmtVerify->execute();
+    $resultVerify = $stmtVerify->get_result();
+    
+    if ($rowVerify = $resultVerify->fetch_assoc()) {
+        $actualCode = $rowVerify['AssessmentCode'];
+        if (!$actualCode) {
+            $error = "The Host Organization has not yet generated an assessment code for this student.";
+        } elseif (trim(strtoupper($enteredCode)) === trim(strtoupper($actualCode))) {
+            // Success - Set session and redirect
+            $_SESSION['authorized_assessment_' . $attachmentIdVerify] = true;
+            header("Location: ../Assessment/staff-actual-assessment.php?attachment_id=" . urlencode($attachmentIdVerify));
+            exit();
+        } else {
+            $error = "Invalid Assessment Code entered.";
+        }
+    } else {
+        $error = "Attachment records could not be verified.";
+    }
+    $stmtVerify->close();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -203,9 +231,9 @@ $result = $stmt->get_result();
                                             <button class="btn-schedule" style="flex: 1; text-align: center; padding: 8px 4px; font-size: 0.85rem;" onclick="openScheduleModal(<?php echo $row['AttachmentID']; ?>, '<?php echo htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])); ?>')">
                                                 <i class="fas fa-calendar-plus" style="display: block; margin-bottom: 4px; font-size: 1.1rem;"></i> Schedule
                                             </button>
-                                            <a href="../Assessment/staff-enter-assessment-code.php?attachment_id=<?php echo $row['AttachmentID']; ?>" class="btn-schedule" style="background-color: #4b5563; flex: 1; text-align: center; text-decoration: none; padding: 8px 4px; font-size: 0.85rem;">
+                                            <button type="button" onclick="openConductModal(<?php echo $row['AttachmentID']; ?>)" class="btn-schedule" style="background-color: #4b5563; flex: 1; text-align: center; padding: 8px 4px; font-size: 0.85rem;">
                                                 <i class="fas fa-clipboard-check" style="display: block; margin-bottom: 4px; font-size: 1.1rem;"></i> Conduct<br>Assessment
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -216,6 +244,29 @@ $result = $stmt->get_result();
                     <p style="color: #6b7280; text-align: center; padding: 20px;">No students assigned for supervision yet.</p>
                 <?php endif; ?>
             </div>
+        </div>
+    </div>
+
+    <!-- Conduct Modal -->
+    <div id="conductModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="margin-bottom: 1rem;">Supervision Code Verification</h3>
+            <p style="margin-bottom: 1.5rem; color: #4b5563;">Kindly enter the code provided by the host organization to proceed with the assessment.</p>
+            
+            <form method="POST" action="">
+                <input type="hidden" name="action" value="verify_code">
+                <input type="hidden" id="conductAttachmentId" name="attachment_id">
+                
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <input type="text" name="assessment_code" required autocomplete="off" placeholder="ENTER CODE"
+                           style="width: 100%; padding: 15px; font-size: 1.2rem; text-align: center; letter-spacing: 3px; border: 2px solid #e5e7eb; border-radius: 6px; background-color: #f9fafb;">
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button type="button" class="btn-schedule" style="background-color: #9ca3af;" onclick="closeConductModal()">Cancel</button>
+                    <button type="submit" class="btn-schedule">Verify Code</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -300,11 +351,33 @@ $result = $stmt->get_result();
             });
         }
 
+        function openConductModal(attachmentId) {
+            document.getElementById('conductAttachmentId').value = attachmentId;
+            document.getElementById('conductModal').style.display = 'flex';
+        }
+
+        function closeConductModal() {
+            document.getElementById('conductModal').style.display = 'none';
+        }
+
         window.onclick = function(event) {
             if (event.target == document.getElementById('scheduleModal')) {
                 closeScheduleModal();
             }
+            if (event.target == document.getElementById('conductModal')) {
+                closeConductModal();
+            }
         }
     </script>
+    <?php if (!empty($error)): ?>
+    <script>
+        Swal.fire({
+            title: 'Verification Failed',
+            text: '<?php echo addslashes($error); ?>',
+            icon: 'error',
+            confirmButtonColor: '#8B1538'
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>

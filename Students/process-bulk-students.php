@@ -45,6 +45,7 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
     $admNumber = sanitizeInput($data[0]);
     $firstName = sanitizeInput($data[1] ?? '');
     $lastName = sanitizeInput($data[2] ?? '');
+    $faculty = sanitizeInput($_POST['faculty'] ?? '');
 
     if (empty($admNumber)) {
         continue;
@@ -65,8 +66,8 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             $userID = $conn->insert_id;
             
             // Create Student Profile
-            $insertStudent = $conn->prepare("INSERT INTO student (UserID, FirstName, LastName, EligibilityStatus) VALUES (?, ?, ?, 'Pending')");
-            $insertStudent->bind_param("iss", $userID, $firstName, $lastName);
+            $insertStudent = $conn->prepare("INSERT INTO student (UserID, FirstName, LastName, Faculty, EligibilityStatus) VALUES (?, ?, ?, ?, 'Pending')");
+            $insertStudent->bind_param("issss", $userID, $firstName, $lastName, $faculty);
             $insertStudent->execute();
             $insertStudent->close();
             

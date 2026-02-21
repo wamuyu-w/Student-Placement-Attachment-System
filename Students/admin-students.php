@@ -141,6 +141,18 @@ $result = $conn->query($sql);
                 </div>
                 <form action="process-bulk-students.php" method="POST" enctype="multipart/form-data">
                     <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select Faculty</label>
+                        <select name="faculty" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
+                            <option value="">-- Choose Faculty --</option>
+                            <option value="Science">Science</option>
+                             <option value="Law">Law</option>
+                            <option value="Business">Business & Economics</option>
+                            <option value="Arts & Social Sciences">Arts & Social Sciences</option>
+                            <option value="Education">Education</option>
+                            <option value="Theology">Theology</option>
+                            <option value="Nursing">Nursing</option>
+                        </select>
+                        
                         <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select CSV File</label>
                         <input type="file" name="csvFile" required accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         <div style="background-color: #f8fafc; padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 0.9em; color: #64748b;">
