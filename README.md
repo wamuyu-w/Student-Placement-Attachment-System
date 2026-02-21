@@ -1,23 +1,90 @@
-# Module Testing Documentation
+# Student Placement Attachment System
 
-## 6.5 Module Testing
-The module testing phase was conducted to verify the functionality of individual modules of the Student Placement Attachment System and ensure that each module performs as specified. Each functional module was tested independently using test data, and the actual output was compared with the expected results. The following modules were tested:
+## Overview
+This system is a web-based application designed to manage student placements and attachments. It facilitates the interaction between Students, Staff (Lecturers/Supervisors), Host Organizations, and Administrators.
 
-*   Student Registration Module
-*   Opportunity Management Module
-*   Application & Attachment Module
-*   Logbook Management Module
-*   Login & Authentication Module
+## Folder Structure
 
-A summary of the testing results for the **Login & Authentication Module** is shown in the table below as an example.
+The project is organized into modular directories based on functionality or user role.
 
-| Test Case | Input Data | Expected Output | Actual Output | Pass/Fail |
-| :--- | :--- | :--- | :--- | :--- |
-| Student Login - Valid Credentials | Email: student@test.com, Pass: valid123 | Redirect to Student Dashboard | Redirected to Student Dashboard | Pass |
-| Staff Login - Valid Credentials | Email: staff@test.com, Pass: staff123 | Redirect to Staff Dashboard | Redirected to Staff Dashboard | Pass |
-| Host Organization Login - Valid Credentials | Email: host@test.com, Pass: host123 | Redirect to Host Org Dashboard | Redirected to Host Org Dashboard | Pass |
-| Login with Invalid Password | Email: student@test.com, Pass: wrongpass | Error: "Invalid email or password" | Error displayed: "Invalid email or password" | Pass |
-| Login with Unregistered Email | Email: unknown@test.com, Pass: 123456 | Error: "Invalid email or password" | Error displayed: "Invalid email or password" | Pass |
-| Login with Empty Fields | Email: [Empty], Pass: [Empty] | Validation Error: "Fields cannot be empty" | Validation Error displayed | Pass |
+### **Root Directory**
+- `index.php`: The landing page of the application.
+- `config.php`: Database connection configuration and helper functions.
+- `index.css`: Styles for the landing page.
+- `attachmentmanagementsystem.sql`: Database schema import file.
 
-Similar tests were performed for all other modules, and the outcomes confirmed that the system meets its functional requirements as specified in the design. User Acceptance Testing (UAT) was also performed with sample users to validate usability and alignment with user needs.
+### **Applications/**
+Contains files related to attachment applications.
+- `student-applications.php`: Form for students to apply for attachments.
+- `admin-applications.php`: Admin view to manage applications.
+- `host-org-applications.php`: Host organization view of applications.
+- `process-*.php`: Scripts handling application processing logic.
+
+### **Assessment/**
+Handles student assessment modules.
+- `staff-assessment.php`: Interface for staff to assess students.
+- `process-assessment.php`: Backend logic for saving assessments.
+
+### **Dashboards/**
+Contains the main dashboard interfaces for each user role.
+- **Admin/**: Contains the main `admin-dashboard.php` and its assets. Note that specific admin sub-pages (Students, Supervisors, etc.) are located in their respective functional directories (e.g., `Students/`, `Supervisor/`) but are linked from here.
+- `student-dashboard.php`, `staff-dashboard.php`, `host-org-dashboard.php`: Main dashboards for other roles.
+- Corresponding `.css` and `.js` files for each dashboard.
+
+### **Logbook/**
+Manages student logbook entries.
+- `student-logbook.php`: Interface for students to enter logbook activities.
+- `staff-logbook.php`: Interface for staff to review logbooks.
+- `process-*.php`: Scripts for processing entries and comments.
+
+### **Login Pages/**
+Authentication pages for all users.
+- `login-student.php`, `login-staff.php`, `login-host-org.php`: Individual login pages.
+- `logout.php`: Session destruction script.
+- `login.css`, `login.js`: Shared styles and scripts for login pages.
+
+### **Opportunities/**
+Management of attachment opportunities.
+- `admin-opportunities-management.php`: Admin interface to create and manage opportunities.
+- `host-management-opportunities.php`: Host organization interface to post opportunities.
+- `student-opportunities.php`: Student view of available opportunities.
+- `process-*.php`: Backend logic for adding/applying to opportunities.
+
+### **Reports/**
+System reporting functionality.
+- `admin-reports.php`: Admin interface for generating system reports.
+- `host-org-reports.php`, `staff-reports.php`, `student-reports.php`: Report views for other roles.
+
+### **Settings/**
+User account settings.
+- `*-settings.php`: Settings pages for Admin (in root or respective folder), Staff, Student, etc.
+- `process-update-password.php`: Password update logic.
+
+### **Sign-up Pages/**
+Registration pages.
+- `signup-student.php`: Student registration form.
+- `signup-host-org.php`: Host organization registration form.
+- `process-signup-*.php`: Registration processing scripts.
+
+### **Students/**
+Student management for admins.
+- `admin-students.php`: **Active** admin page for managing the list of students.
+- `staff-students.php`, `host-org-students.php`: Views for staff and host orgs to see their students.
+- `process-clear-student.php`: Logic for clearing a student's attachment.
+
+### **Supervisor/**
+Supervisor management.
+- `admin-supervisors.php`: Admin page for managing supervisors and assignments.
+- `student-supervisor.php`: Student view of their assigned supervisor.
+- `process-assign-supervisor.php`: Logic for assigning supervisors.
+
+### **assets/**
+Global assets.
+- `css/`: Contains `global.css`, `theme.css`.
+- `js/`: Global JavaScript files.
+- `images/`: Static images (Logos, etc.).
+
+## Setup Instructions
+1. Import `attachmentmanagementsystem.sql` into your MySQL database.
+2. Configure `config.php` with your database credentials.
+3. Serve the application using a PHP-enabled server (e.g., XAMPP, Apache).
