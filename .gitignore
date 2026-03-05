@@ -16,7 +16,9 @@ Thumbs.db
 desktop.ini
 
 # Environment
-.env
+# return the .env file to the .gitignore file so that it doesn't get pushed to github.
+#it was here!!
+#.env
 config/local.php
 
 # Uploads (if any)

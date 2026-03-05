@@ -1,13 +1,14 @@
+<?php use App\Core\Helpers; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Global Styles -->
-    <link rel="stylesheet" href="assets/css/theme.css">
-    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/global.css') ?>">
     <!-- Page Specific Styles -->
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/index.css') ?>">
     <title>Student Placement and Attachment System - CUEA </title>
 </head>
 <body>
@@ -18,7 +19,7 @@
         <div class="margin">
           <div class="container3">
             <div class="img-university-logo-margin">
-              <img class="university-logo" src="assets/cuea-logo.png" />
+              <img class="university-logo" src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" />
             </div>
             <div class="container4">
               <div class="image-text">
@@ -47,17 +48,17 @@
         </div>
         <div class="container6">
           <div class="student-login">
-            <a href="Login Pages/student-login.php">
+            <a href="<?= Helpers::baseUrl('/login/student') ?>">
               <button class="button">Student Login</button>
             </a>
           </div>
           <div class="staff-login">
-            <a href="Login Pages/staff-login.php">
+            <a href="<?= Helpers::baseUrl('/login/staff') ?>">
               <button class="button2">Staff Login</button>
             </a>
           </div>
           <div class="host-organization-login">
-            <a href="Login Pages/host-organization-login.php">
+            <a href="<?= Helpers::baseUrl('/login/host') ?>">
               <button class="button3">Host Organization Login</button>
             </a>
           </div>
@@ -65,7 +66,7 @@
       </div>
       <img
         class="background-image"
-        src="assets/CUEA_Ext-01.jpg"
+        src="<?= Helpers::baseUrl('../assets/CUEA_Ext-01.jpg') ?>"
       />
     </div>
   </div>
