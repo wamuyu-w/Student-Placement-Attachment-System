@@ -66,4 +66,20 @@ class Controller {
             }
         }
     }
+
+    // New method to protect actions from read-only (inactive) students
+    protected function requireActiveStudent() {
+        $this->requireAuth('student');
+        if (isset($_SESSION['status']) && $_SESSION['status'] === 'Inactive') {
+            // If it's an AJAX request, return JSON
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                $this->json(['success' => false, 'message' => 'Unauthorized. Your account is in read-only mode.']);
+            }
+            
+            // Otherwise redirect to dashboard with an error
+            $_SESSION['error_message'] = "Unauthorized. Your account is in read-only mode.";
+            header("Location: " . Helpers::baseUrl('/student/dashboard'));
+            exit();
+        }
+    }
 }

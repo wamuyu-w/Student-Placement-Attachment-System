@@ -56,16 +56,22 @@
                         <span style="background: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;"><?= htmlspecialchars($progress['ReportStatus'] ?? 'Pending') ?></span>
                     </div>
                 <?php else: ?>
-                    <form action="<?= Helpers::baseUrl('/student/reports/upload') ?>" method="POST" enctype="multipart/form-data">
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Upload Final Report (PDF)</label>
-                            <input type="file" name="final_report" accept=".pdf" required class="form-control">
-                            <small style="color: #6b7280;">Ensure your report follows the university guidelines. Max size: 10MB.</small>
+                    <?php if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'Inactive'): ?>
+                        <form action="<?= Helpers::baseUrl('/student/reports/upload') ?>" method="POST" enctype="multipart/form-data">
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Upload Final Report (PDF)</label>
+                                <input type="file" name="final_report" accept=".pdf" required class="form-control">
+                                <small style="color: #6b7280;">Ensure your report follows the university guidelines. Max size: 10MB.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload Report
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <div class="alert alert-info" style="background-color: #e0f2fe; color: #0284c7; padding: 15px; border-radius: 4px; border: 1px solid #bae6fd;">
+                            <strong>Notice:</strong> Your attachment period is closed. You can no longer submit a final report.
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> Upload Report
-                        </button>
-                    </form>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         <?php else: ?>

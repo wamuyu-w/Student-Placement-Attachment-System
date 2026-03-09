@@ -40,8 +40,5 @@
             </div>
             <button type="submit" class="btn-auth">Register</button>
         </form>
-        <div class="auth-footer">
-            <p>Already have an account? <a href="<?= Helpers::baseUrl('/login/host') ?>">Login here</a></p>
-        </div>
     </div>
 </div>

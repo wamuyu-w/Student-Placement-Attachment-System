@@ -23,7 +23,7 @@ class LogbookController extends Controller {
     }
 
     public function createEntry() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'week_number' => $_POST['week_number'],

@@ -32,10 +32,6 @@
                 </div>
                 
                 <button type="submit" class="sign-in-button">Sign In</button>
-                
-                <div class="signup-link" style="margin-top: 1rem;">
-                    <p>New Partner? <a href="<?= Helpers::baseUrl('../Sign-up Pages/signup-host-org.php') ?>">Register here</a></p>
-                </div>
             </form>
         </div>
     </div>

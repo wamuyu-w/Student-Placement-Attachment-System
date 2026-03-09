@@ -183,7 +183,14 @@ class SettingsController extends Controller {
         
         // Profile Update
         $success = false;
-        if ($role === 'student') {
+        
+        // Ensure Session ID exists
+        if (!isset($_SESSION['user_type']) || empty($_SESSION['user_id'])) {
+             header("Location: " . Helpers::baseUrl('/auth/first-login?error=Session expired. Please login again.'));
+             exit();
+        }
+
+        if ($role === 'student' && isset($_SESSION['student_id'])) {
             $model = $this->model('Student');
             $data = [
                 'firstName' => Helpers::sanitize($_POST['firstName']),
@@ -204,7 +211,7 @@ class SettingsController extends Controller {
                 $_SESSION['faculty'] = $data['faculty'];
                 $_SESSION['year_of_study'] = $data['yearOfStudy'];
             }
-        } elseif ($role === 'staff' || $role === 'admin') {
+        } elseif (($role === 'staff' || $role === 'admin') && isset($_SESSION['LecturerID'])) {
             $model = $this->model('Staff');
             $data = [
                 'name' => Helpers::sanitize($_POST['name']),
@@ -216,7 +223,7 @@ class SettingsController extends Controller {
                 $_SESSION['name'] = $data['name'];
                 $_SESSION['department'] = $data['department'];
             }
-        } elseif ($role === 'host_org') {
+        } elseif ($role === 'host_org' && isset($_SESSION['host_org_id'])) {
             $model = $this->model('Host');
             $data = [
                 'org_name' => Helpers::sanitize($_POST['organization_name']),

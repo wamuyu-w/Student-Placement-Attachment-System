@@ -122,7 +122,7 @@ class ApplicationController extends Controller {
     }
 
     public function applySession() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $appModel = $this->model('Application');
             $result = $appModel->createSessionApplication($_SESSION['student_id'], $_POST);
@@ -133,7 +133,7 @@ class ApplicationController extends Controller {
     }
 
     public function registerPlacement() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $appModel = $this->model('Application');
             $result = $appModel->registerPlacement($_SESSION['student_id'], $_POST);

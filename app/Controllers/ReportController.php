@@ -76,7 +76,7 @@ class ReportController extends Controller {
     }
 
     public function upload() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['final_report'])) {
             try {
                 $reportModel = $this->model('Report');

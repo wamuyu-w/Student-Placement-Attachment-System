@@ -1,5 +1,6 @@
 <?php
 namespace App\Config;
+
 // Database configuration class for managing database connections
 class Database {
     private $host = 'localhost';

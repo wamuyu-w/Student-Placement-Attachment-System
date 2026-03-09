@@ -68,7 +68,14 @@ class AuthController extends Controller {
             
             // Check Status
             if ($user['Status'] !== 'Active') {
-                $this->redirectWithError($role, "Account is inactive.");
+                if ($role === 'student' && $user['Status'] === 'Inactive') {
+                    // Allow login but set read-only flag
+                    $_SESSION['status'] = 'Inactive';
+                } else {
+                    $this->redirectWithError($role, "Account is inactive.");
+                }
+            } else {
+                $_SESSION['status'] = 'Active';
             }
 
             // Verify Role Match (Prevent Student logging in as Staff)

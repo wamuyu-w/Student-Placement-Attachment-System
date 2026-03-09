@@ -99,6 +99,7 @@ $userType = $_SESSION['user_type'] ?? 'guest';
             <i class="fas fa-th-large"></i>
             <span>Dashboard</span>
         </a>
+        <?php if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'Inactive'): ?>
         <a href="<?= Helpers::baseUrl('/student/opportunities') ?>" class="nav-item <?= ($page === 'opportunities') ? 'active' : '' ?>">
             <i class="fas fa-briefcase"></i>
             <span>Opportunities</span>
@@ -107,6 +108,7 @@ $userType = $_SESSION['user_type'] ?? 'guest';
             <i class="fas fa-file-alt"></i>
             <span>My Applications</span>
         </a>
+        <?php endif; ?>
         <a href="<?= Helpers::baseUrl('/student/logbook') ?>" class="nav-item <?= ($page === 'logbook') ? 'active' : '' ?>">
             <i class="fas fa-book"></i>
             <span>Logbook</span>

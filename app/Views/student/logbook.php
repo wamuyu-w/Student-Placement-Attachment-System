@@ -6,6 +6,7 @@
             You do not have an active ongoing attachment. Please register your placement first.
         </div>
     <?php else: ?>
+        <?php if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'Inactive'): ?>
         <!-- Add Entry Form -->
         <div class="bg-white p-6 rounded-lg shadow-sm mb-8" style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 24px;">
             <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">New Weekly Entry</h2>
@@ -43,6 +44,7 @@
                 </button>
             </form>
         </div>
+        <?php endif; ?>
 
         <!-- Entries List -->
         <div class="bg-white p-6 rounded-lg shadow-sm" style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">

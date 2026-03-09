@@ -32,10 +32,6 @@
                 </div>
                 
                 <button type="submit" class="sign-in-button">Sign In</button>
-                
-                <div class="signup-link" style="margin-top: 1rem;">
-                    <p>Don't have an account? <a href="<?= Helpers::baseUrl('../Sign-up Pages/signup-student.php') ?>">Sign up here</a></p>
-                </div>
             </form>
         </div>
     </div>

@@ -21,7 +21,7 @@ class OpportunityController extends Controller {
     }
 
     public function apply() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->isAjax()) {
             $this->json(['success' => false, 'message' => 'Invalid request.']);

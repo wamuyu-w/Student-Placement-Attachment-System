@@ -1,5 +1,10 @@
 <?php use App\Core\Helpers; // Student Dashboard Content ?>
 
+<?php if (isset($_SESSION['status']) && $_SESSION['status'] === 'Inactive'): ?>
+<div class="alert alert-warning" style="background-color: #fff3cd; color: #856404; padding: 15px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #ffeeba;">
+    <strong>Read-Only Mode:</strong> Your attachment period has concluded. You are currently in read-only mode to view your historical records.
+</div>
+<?php endif; ?>
 <!-- Summary Cards -->
 <div class="summary-cards">
     <div class="summary-card">
@@ -60,7 +65,7 @@
             <?php endif; ?>
         </div>
     </div>
-
+    <?php if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'Inactive'): ?>
     <!-- Quick Actions -->
     <div class="quick-actions-section">
         <h2>Quick Actions</h2>
@@ -79,6 +84,7 @@
             </button>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <script src="<?= Helpers::baseUrl('../assets/js/student-dashboard.js') ?>"></script>
