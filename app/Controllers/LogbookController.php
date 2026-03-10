@@ -17,7 +17,7 @@ class LogbookController extends Controller {
             'hasAttachment' => ($entries !== null),
             'title' => 'My Logbook',
             'page' => 'logbook',
-            'page_css' => 'student-dashboard.css'
+            'page_css' => ['student-dashboard.css', 'logbook.css']
         ];
         $this->view('student/logbook', $data);
     }
@@ -28,9 +28,24 @@ class LogbookController extends Controller {
             $data = [
                 'week_number' => $_POST['week_number'],
                 'start_date' => $_POST['start_date'],
-                'end_date' => $_POST['end_date'],
-                'description' => Helpers::sanitize($_POST['description'])
+                'end_date' => $_POST['end_date']
             ];
+            
+            // Handle structured daily entries (JSON)
+            if (isset($_POST['tasks']) && is_array($_POST['tasks'])) {
+                $weeklyData = [];
+                $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                
+                foreach ($days as $day) {
+                    $weeklyData[$day] = [
+                        'task' => Helpers::sanitize($_POST['tasks'][$day] ?? ''),
+                        'comment' => Helpers::sanitize($_POST['comments'][$day] ?? '')
+                    ];
+                }
+                $data['description'] = json_encode($weeklyData, JSON_UNESCAPED_UNICODE);
+            } else {
+                $data['description'] = Helpers::sanitize($_POST['description'] ?? '');
+            }
             
             $logbookModel = $this->model('Logbook');
             $result = $logbookModel->createEntry($_SESSION['student_id'], $data);

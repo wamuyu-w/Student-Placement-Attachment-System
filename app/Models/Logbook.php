@@ -12,6 +12,8 @@ class Logbook {
         $this->ensureTablesExist();
     }
 
+    //there should be a function to ensure that the logbook is opened only to students whose attachment is active
+    
     private function ensureTablesExist() {
         $check = $this->conn->query("SHOW TABLES LIKE 'logbook'");
         if ($check->num_rows == 0) {

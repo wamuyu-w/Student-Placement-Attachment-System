@@ -209,7 +209,7 @@ class Student {
         return array_slice($activities, 0, 4);
     }
 
-    public function getSupervisor($studentId) {
+    public function getSupervisors($studentId) {
         $stmt = $this->conn->prepare("
             SELECT l.Name, l.Department, l.Faculty, a.StartDate as AssignedDate
             FROM supervision s
@@ -219,6 +219,30 @@ class Student {
         ");
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+        $result = $stmt->get_result();
+        $supervisors = [];
+        while ($row = $result->fetch_assoc()) {
+            $supervisors[] = $row;
+        }
+        return $supervisors;
+    }
+
+    public function getAssessments($studentId) {
+        $stmt = $this->conn->prepare("
+            SELECT ass.*, l.Name as LecturerName
+            FROM assessment ass
+            JOIN attachment att ON ass.AttachmentID = att.AttachmentID
+            LEFT JOIN lecturer l ON ass.LecturerID = l.LecturerID
+            WHERE att.StudentID = ? AND att.AttachmentStatus = 'Ongoing'
+            ORDER BY ass.AssessmentDate DESC
+        ");
+        $stmt->bind_param("i", $studentId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $assessments = [];
+        while ($row = $result->fetch_assoc()) {
+            $assessments[] = $row;
+        }
+        return $assessments;
     }
 }

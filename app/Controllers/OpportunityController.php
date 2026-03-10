@@ -71,7 +71,7 @@ class OpportunityController extends Controller {
             'hostOrganizations' => $oppModel->getHostOrganizations(),
             'title' => 'Manage Opportunities',
             'page' => 'opportunities',
-            'page_css' => 'admin-dashboard.css'
+            'page_css' => ['admin-dashboard.css', 'opportunities.css']
         ];
         $this->view('admin/opportunities', $data);
     }
@@ -84,7 +84,7 @@ class OpportunityController extends Controller {
             'opportunities' => $oppModel->getByHost($_SESSION['host_org_id']),
             'title' => 'My Opportunities',
             'page' => 'opportunities',
-            'page_css' => 'host-org-dashboard.css'
+            'page_css' => ['host-org-dashboard.css', 'opportunities.css']
         ];
         $this->view('host/opportunities', $data);
     }

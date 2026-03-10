@@ -28,9 +28,30 @@
                             <td style="padding: 12px; font-size: 0.9em; color: #6b7280;">
                                 <?= date('M d', strtotime($row['StartDate'])) ?> - <?= date('M d', strtotime($row['EndDate'])) ?>
                             </td>
-                            <td style="padding: 12px;">
-                                <div style="max-height: 100px; overflow-y: auto; font-size: 0.9em;">
-                                    <?= nl2br(htmlspecialchars($row['Description'])) ?>
+                            <td style="padding: 12px; vertical-align: top;">
+                                <div style="max-height: 200px; overflow-y: auto; font-size: 0.9em;">
+                                    <?php 
+                                        $desc = $row['Description'];
+                                        $decoded = json_decode($desc, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $daysMapping = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri'];
+                                            echo "<div style='display: flex; flex-direction: column; gap: 8px;'>";
+                                            foreach($daysMapping as $key => $label) {
+                                                $task = $decoded[$key]['task'] ?? '';
+                                                $comment = $decoded[$key]['comment'] ?? '';
+                                                if (!empty(trim($task)) || !empty(trim($comment))) {
+                                                    echo "<div style='background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0;'>";
+                                                    echo "<strong style='color: #1e293b; display: block; margin-bottom: 4px;'>" . $label . "</strong>";
+                                                    if (!empty(trim($task))) echo "<div><span style='color:#64748b; font-size: 0.85em;'>Task:</span> " . nl2br(htmlspecialchars($task)) . "</div>";
+                                                    if (!empty(trim($comment))) echo "<div style='margin-top:4px;'><span style='color:#64748b; font-size: 0.85em;'>Cmnt:</span> " . nl2br(htmlspecialchars($comment)) . "</div>";
+                                                    echo "</div>";
+                                                }
+                                            }
+                                            echo "</div>";
+                                        } else {
+                                            echo nl2br(htmlspecialchars($desc));
+                                        }
+                                    ?>
                                 </div>
                             </td>
                             <td style="padding: 12px;">

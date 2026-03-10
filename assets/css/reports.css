@@ -1,0 +1,140 @@
+/* Common Styles for Printable Reports */
+@page {
+    size: A4;
+    margin: 20mm;
+}
+
+body {
+    font-family: 'Times New Roman', serif;
+    color: #000;
+    background: #fff;
+    padding: 0;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.report-container {
+    padding: 20px;
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid #8B1538;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    gap: 30px;
+}
+
+.logo-container img {
+    height: 100px;
+    width: auto;
+}
+
+.header-text {
+    text-align: center;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 18pt;
+    color: #8B1538;
+    text-transform: uppercase;
+}
+
+.header-text h2 {
+    margin: 5px 0 0 0;
+    font-size: 14pt;
+    color: #333;
+}
+
+.info-table,
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 11pt;
+}
+
+.info-table td {
+    padding: 6px 0;
+    vertical-align: top;
+}
+
+.info-label {
+    font-weight: bold;
+    width: 30%;
+}
+
+.info-value {
+    border-bottom: 1px dotted #ccc;
+    width: 70%;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 10pt;
+}
+
+.footer-signatures {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sig-block {
+    width: 40%;
+    text-align: center;
+}
+
+.sig-line {
+    border-bottom: 1px solid #000;
+    margin-bottom: 8px;
+    height: 40px;
+}
+
+.print-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #8B1538;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.print-btn:hover {
+    background: #6b0f2a;
+    transform: translateY(-2px);
+}
+
+@media print {
+    .print-btn {
+        display: none;
+    }
+
+    body {
+        padding: 0;
+    }
+
+    .report-container {
+        padding: 0;
+    }
+}

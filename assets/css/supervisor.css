@@ -1,0 +1,220 @@
+/* Supervisor View Styles */
+
+.supervisor-container {
+    padding: 20px 0;
+}
+
+.supervisor-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 2rem;
+}
+
+/* Supervisor Card Styles */
+.supervisor-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.supervisor-info {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.supervisor-avatar {
+    width: 64px;
+    height: 64px;
+    background: #e5e7eb;
+    border-radius: 50%;
+}
+
+.supervisor-details h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.supervisor-details p {
+    margin: 4px 0 0;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.supervisor-role {
+    margin-top: 4px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.btn-contact {
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-contact:hover {
+    background: #2563eb;
+}
+
+/* Grid for Progress and Feedback */
+.supervisor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+@media (max-width: 1024px) {
+    .supervisor-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.section-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.view-all-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Progress Tracker Styles */
+.progress-item {
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.progress-icon {
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border: 2px solid #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    font-size: 1.25rem;
+}
+
+.progress-content {
+    flex: 1;
+}
+
+.progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.assessment-title {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
+    display: block;
+}
+
+.assessment-date {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.assessment-meta {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.score-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #059669;
+}
+
+.assessor-name {
+    font-size: 0.75rem;
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.btn-view-form {
+    background: #dbeafe;
+    color: #1e40af;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.status-scheduled {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Feedback History Styles */
+.feedback-item {
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.feedback-item h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.feedback-text {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}

@@ -25,13 +25,17 @@ class StudentController extends Controller {
     public function viewSupervisor() {
         $this->requireAuth('student');
         $studentModel = $this->model('Student');
-        $supervisor = $studentModel->getSupervisor($_SESSION['student_id']);
+        $studentId = $_SESSION['student_id'];
+        
+        $supervisors = $studentModel->getSupervisors($studentId);
+        $assessments = $studentModel->getAssessments($studentId);
         
         $data = [
-            'supervisor' => $supervisor,
+            'supervisors' => $supervisors,
+            'assessments' => $assessments,
             'title' => 'My Supervisor',
             'page' => 'supervisor',
-            'page_css' => 'student-dashboard.css'
+            'page_css' => ['student-dashboard.css', 'supervisor.css']
         ];
         $this->view('student/supervisor', $data);
     }

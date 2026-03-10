@@ -9,66 +9,83 @@ if (!isset($student) || empty($student)) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Logbook - <?= htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']) ?></title>
-    <style>
-        @page { size: A4; margin: 20mm; }
-        body { font-family: 'Times New Roman', serif; color: #000; background: #fff; padding: 20px; }
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .header h1 { margin: 0; font-size: 16pt; text-transform: uppercase; }
-        .header h2 { margin: 5px 0 0 0; font-size: 14pt; }
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt; }
-        .info-table td { padding: 5px; }
-        .entry-block { border: 1px solid #000; margin-bottom: 15px; page-break-inside: avoid; }
-        .entry-header { background-color: #f0f0f0; border-bottom: 1px solid #000; padding: 5px 10px; font-weight: bold; display: flex; justify-content: space-between; }
-        .entry-content { padding: 10px; min-height: 50px; }
-        .entry-feedback { border-top: 1px dotted #000; padding: 5px 10px; font-size: 10pt; font-style: italic; background: #fafafa; }
-        .print-btn { position: fixed; top: 20px; right: 20px; background: #8B1538; color: #fff; border: none; padding: 10px 20px; cursor: pointer; }
-        @media print { .print-btn { display: none; } }
-    </style>
+    <title>Weekly Logbook - Week <?= htmlspecialchars($logbook['WeekNumber']) ?></title>
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports.css') ?>">
 </head>
 <body>
     <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 
-    <div class="header">
-        <h1>The Catholic University of Eastern Africa</h1>
-        <h2>Student Attachment Logbook</h2>
-    </div>
-
-    <table class="info-table">
-        <tr>
-            <td><strong>Name:</strong> <?= htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']) ?></td>
-            <td><strong>Reg. No:</strong> <?= htmlspecialchars($student['AdmissionNumber']) ?></td>
-        </tr>
-        <tr>
-            <td><strong>Course:</strong> <?= htmlspecialchars($student['Course']) ?></td>
-            <td><strong>Faculty:</strong> <?= htmlspecialchars($student['Faculty']) ?></td>
-        </tr>
-    </table>
-
-    <?php if ($entries && $entries->num_rows > 0): ?>
-        <?php while($row = $entries->fetch_assoc()): ?>
-            <div class="entry-block">
-                <div class="entry-header">
-                    <span>Week <?= htmlspecialchars($row['WeekNumber']) ?></span>
-                    <span><?= date('d M Y', strtotime($row['StartDate'])) ?> - <?= date('d M Y', strtotime($row['EndDate'])) ?></span>
-                </div>
-                <div class="entry-content">
-                    <?= nl2br(htmlspecialchars($row['Description'])) ?>
-                </div>
-                <?php if (!empty($row['AcademicSupervisorComments']) || !empty($row['HostSupervisorComments'])): ?>
-                    <div class="entry-feedback">
-                        <?php if ($row['AcademicSupervisorComments']): ?>
-                            <div><strong>Lecturer:</strong> <?= htmlspecialchars($row['AcademicSupervisorComments']) ?></div>
-                        <?php endif; ?>
-                        <?php if ($row['HostSupervisorComments']): ?>
-                            <div><strong>Host:</strong> <?= htmlspecialchars($row['HostSupervisorComments']) ?></div>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+    <div class="report-container">
+        <div class="report-header">
+            <div class="logo-container">
+                <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
             </div>
-        <?php endwhile; ?>
-    <?php else: ?>
-        <p style="text-align: center; font-style: italic;">No logbook entries found.</p>
-    <?php endif; ?>
+            <div class="header-text">
+                <h1>The Catholic University of Eastern Africa</h1>
+                <h2>Weekly Attachment Logbook Entry</h2>
+            </div>
+        </div>
+
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Student Name:</td><td class="info-value"><?= htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']) ?></td>
+                <td class="info-label" style="padding-left: 20px;">Week Number:</td><td class="info-value"><?= htmlspecialchars($logbook['WeekNumber']) ?></td>
+            </tr>
+            <tr>
+                <td class="info-label">Course:</td><td class="info-value"><?= htmlspecialchars($student['Course']) ?></td>
+                <td class="info-label" style="padding-left: 20px;">Dates:</td><td class="info-value"><?= date('d M', strtotime($logbook['StartDate'])) ?> - <?= date('d M, Y', strtotime($logbook['EndDate'])) ?></td>
+            </tr>
+        </table>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Day</th>
+                    <th style="width: 42.5%;">Task Assigned</th>
+                    <th style="width: 42.5%;">Student Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                $daysMapping = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday'];
+                foreach($daysMapping as $key => $label): 
+                    $task = $weeklyData[$key]['task'] ?? '';
+                    $comment = $weeklyData[$key]['comment'] ?? '';
+                ?>
+                <tr>
+                    <td style="font-weight: bold; background: #f8f9fa;"><?= $label ?></td>
+                    <td><?= nl2br(htmlspecialchars($task)) ?></td>
+                    <td><?= nl2br(htmlspecialchars($comment)) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+            <div>
+                <strong>Host Supervisor Feedback:</strong>
+                <div style="border: 1px solid #ddd; padding: 15px; min-height: 100px; margin-top: 10px; background: #fff; border-radius: 4px; font-size: 10pt;">
+                    <?= !empty($logbook['HostSupervisorComments']) ? nl2br(htmlspecialchars($logbook['HostSupervisorComments'])) : 'No feedback provided.' ?>
+                </div>
+            </div>
+            <div>
+                <strong>Academic Supervisor Remarks:</strong>
+                <div style="border: 1px solid #ddd; padding: 15px; min-height: 100px; margin-top: 10px; background: #fff; border-radius: 4px; font-size: 10pt;">
+                    <?= !empty($logbook['AcademicSupervisorComments']) ? nl2br(htmlspecialchars($logbook['AcademicSupervisorComments'])) : 'No remarks provided.' ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-signatures" style="margin-top: 60px;">
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div><strong>Host Supervisor Signature</strong></div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div><strong>University Supervisor Signature</strong></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

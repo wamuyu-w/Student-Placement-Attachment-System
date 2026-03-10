@@ -4,50 +4,58 @@
 <head>
     <meta charset="UTF-8">
     <title>Supervisor List</title>
-    <style>
-        @page { size: A4; margin: 20mm; }
-        body { font-family: 'Times New Roman', serif; color: #000; background: #fff; padding: 20px; }
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .header h1 { margin: 0; font-size: 16pt; text-transform: uppercase; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .table th, .table td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 11pt; }
-        .table th { background-color: #f0f0f0; }
-        .print-btn { position: fixed; top: 20px; right: 20px; background: #8B1538; color: #fff; border: none; padding: 10px 20px; cursor: pointer; }
-        @media print { .print-btn { display: none; } }
-    </style>
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports.css') ?>">
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">Print List</button>
+    <button class="print-btn" onclick="window.print()">Print List / Save PDF</button>
 
-    <div class="header">
-        <h1>The Catholic University of Eastern Africa</h1>
-        <h2>Registered Academic Supervisors</h2>
-        <p>Date Generated: <?= date('d M Y') ?></p>
+    <div class="report-container">
+        <div class="report-header">
+            <div class="logo-container">
+                <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
+            </div>
+            <div class="header-text">
+                <h1>The Catholic University of Eastern Africa</h1>
+                <h2>Registered Academic Supervisors</h2>
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 10pt;">Date Generated: <?= date('d M Y') ?></p>
+            </div>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Faculty</th>
+                    <th style="text-align: center;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (isset($supervisors) && $supervisors && $supervisors->num_rows > 0): ?>
+                    <?php while($row = $supervisors->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['Name']) ?></td>
+                            <td><?= htmlspecialchars($row['Department']) ?></td>
+                            <td><?= htmlspecialchars($row['Faculty']) ?></td>
+                            <td style="text-align: center;"><?= htmlspecialchars($row['Status'] ?? 'Active') ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="4" style="text-align: center;">No supervisors found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <div class="footer-signatures" style="margin-top: 80px;">
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div><strong>University Administrator</strong></div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div><strong>Official Stamp</strong></div>
+            </div>
+        </div>
     </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Faculty</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (isset($supervisors) && $supervisors && $supervisors->num_rows > 0): ?>
-                <?php while($row = $supervisors->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['Name']) ?></td>
-                        <td><?= htmlspecialchars($row['Department']) ?></td>
-                        <td><?= htmlspecialchars($row['Faculty']) ?></td>
-                        <td><?= htmlspecialchars($row['Status']) ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr><td colspan="4" style="text-align: center;">No supervisors found.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
 </body>
 </html>
