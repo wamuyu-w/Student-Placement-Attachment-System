@@ -190,11 +190,22 @@ class SettingsController extends Controller {
              exit();
         }
 
+        // Fetch current profile to ensure immutable fields aren't changed maliciously
+        $profile = [];
+        if ($role === 'student') {
+            $profile = $userModel->getStudentProfile($userId);
+        } elseif ($role === 'staff' || $role === 'admin') {
+            $profile = $userModel->getStaffProfile($userId);
+        } elseif ($role === 'host_org') {
+            $profile = $userModel->getHostProfile($userId);
+        }
+
         if ($role === 'student' && isset($_SESSION['student_id'])) {
             $model = $this->model('Student');
             $data = [
-                'firstName' => Helpers::sanitize($_POST['firstName']),
-                'lastName' => Helpers::sanitize($_POST['lastName']),
+                //make some details of the student added immutable (since they were obtained from the .csv file in bulk upload)
+                'firstName' => !empty($profile['FirstName']) ? $profile['FirstName'] : Helpers::sanitize($_POST['firstName']),
+                'lastName' => !empty($profile['LastName']) ? $profile['LastName'] : Helpers::sanitize($_POST['lastName']),
                 'email' => Helpers::sanitize($_POST['email']),
                 'phone' => Helpers::sanitize($_POST['phone']),
                 'course' => Helpers::sanitize($_POST['course']),
@@ -214,7 +225,7 @@ class SettingsController extends Controller {
         } elseif (($role === 'staff' || $role === 'admin') && isset($_SESSION['LecturerID'])) {
             $model = $this->model('Staff');
             $data = [
-                'name' => Helpers::sanitize($_POST['name']),
+                'name' => !empty($profile['Name']) ? $profile['Name'] : Helpers::sanitize($_POST['name']),
                 'department' => Helpers::sanitize($_POST['department']),
                 'faculty' => Helpers::sanitize($_POST['faculty'])
             ];

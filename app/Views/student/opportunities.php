@@ -1,6 +1,6 @@
 <?php use App\Core\Helpers; ?>
 
-<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/opportunities.css') ?>">
+<link rel="stylesheet" href="<?= Helpers::baseUrl('assets/css/opportunities.css') ?>">
 
 
     <div class="opportunities-section">
@@ -228,4 +228,4 @@
     </div>
 </div>
 
-<script src="<?= Helpers::baseUrl('../assets/js/opportunities.js') ?>"></script>
+<script src="<?= Helpers::baseUrl('assets/js/opportunities.js') ?>"></script>

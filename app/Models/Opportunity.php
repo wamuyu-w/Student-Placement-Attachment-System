@@ -26,11 +26,11 @@ class Opportunity {
 
     // --- Student/Public Methods ---
     public function getAllActive() {
-        $sql = "SELECT ao.*, ho.OrganizationName, ho.LogoPath 
+        $sql = "SELECT ao.*, ho.OrganizationName 
                 FROM attachmentopportunity ao
                 JOIN hostorganization ho ON ao.HostOrgID = ho.HostOrgID
                 WHERE ao.Status = 'Active' AND ao.ApplicationEndDate >= CURDATE()
-                ORDER BY ao.PostedDate DESC";
+                ORDER BY ao.ApplicationEndDate ASC";
         return $this->conn->query($sql);
     }
 

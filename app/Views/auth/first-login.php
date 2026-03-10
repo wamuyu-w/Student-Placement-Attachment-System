@@ -33,11 +33,11 @@
                 <?php if ($role === 'student'): ?>
                     <div class="form-group">
                         <label class="form-label">First Name</label>
-                        <input type="text" name="firstName" class="form-input" required value="<?= htmlspecialchars($profile['FirstName'] ?? '') ?>">
+                        <input type="text" name="firstName" class="form-input" required value="<?= htmlspecialchars($profile['FirstName'] ?? '') ?>" <?= !empty($profile['FirstName']) ? 'readonly style="background-color: #f3f4f6; cursor: not-allowed;"' : '' ?>>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Last Name</label>
-                        <input type="text" name="lastName" class="form-input" required value="<?= htmlspecialchars($profile['LastName'] ?? '') ?>">
+                        <input type="text" name="lastName" class="form-input" required value="<?= htmlspecialchars($profile['LastName'] ?? '') ?>" <?= !empty($profile['LastName']) ? 'readonly style="background-color: #f3f4f6; cursor: not-allowed;"' : '' ?>>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email Address</label>
@@ -69,7 +69,7 @@
                 <?php elseif ($role === 'staff' || $role === 'admin'): ?>
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-input" required value="<?= htmlspecialchars($profile['Name'] ?? '') ?>">
+                        <input type="text" name="name" class="form-input" required value="<?= htmlspecialchars($profile['Name'] ?? '') ?>" <?= !empty($profile['Name']) ? 'readonly style="background-color: #f3f4f6; cursor: not-allowed;"' : '' ?>>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Department</label>
