@@ -28,9 +28,9 @@ The **Student Placement Attachment System** is a comprehensive web-based applica
 * **Settings & Configuration**: Configure system-wide parameters and ensure smooth operation.
 
 ## Technology Stack
-* **Backend**: Object-Oriented PHP 8+ using a Custom MVC (Model-View-Controller) Framework.
-* **Frontend**: HTML5, CSS3, JavaScript. Refactored from Tailwind CSS to pure CSS for specific UI components to ensure layout integrity.
-* **Database**: MySQL / MariaDB (relational database management).
+* **Backend**: PHP 8+ using a Custom MVC (Model-View-Controller) Framework.
+* **Frontend**: HTML5, CSS3 and JavaScript.
+* **Database**: MySQL .
 
 ## Directory Structure
 ```text
