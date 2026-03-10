@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// The Host class represents a host organization in the attachment management system, providing methods to manage their profile, retrieve dashboard statistics,
 // and handle student attachments, while ensuring secure database interactions through prepared statements and transaction management for critical operations like registration.
 // It serves as the primary interface for host organizations to interact
 class Host {
@@ -12,7 +11,6 @@ class Host {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
-    // this function retrieves the dashboard statistics for a host organization, including the number of active placements, students currently attached, and pending logbook submissions, by executing a single SQL query with subqueries to gather all relevant data efficiently
     public function getDashboardStats($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
@@ -26,7 +24,6 @@ class Host {
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
-    // this function retrieves the recent placements for a host organization, including student details and the status of their attachment, and returns the results to be displayed on the host organization's dashboard
     public function getRecentPlacements($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
@@ -45,7 +42,6 @@ class Host {
         $stmt->execute();
         return $stmt->get_result();
     }
-    // this function updates the profile information of a host organization, allowing them to change their organization name, contact person, email, and phone number, while ensuring that the changes are saved to the database
     public function updateProfile($hostId, $data) {
         $stmt = $this->conn->prepare("UPDATE hostorganization SET OrganizationName = ?, ContactPerson = ?, Email = ?, PhoneNumber = ? WHERE HostOrgID = ?");
         $stmt->bind_param("ssssi", $data['org_name'], $data['contact_person'], $data['email'], $data['phone'], $hostId);
@@ -58,7 +54,6 @@ class Host {
         return $stmt->execute();
     }
 
-    // this function gets the students attached to a host organization and their details, including the status of their attachment and passes it to the view
     public function getAttachedStudents($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.YearOfStudy, a.AttachmentID, a.StartDate, a.EndDate, a.AttachmentStatus, a.AssessmentCode
@@ -71,7 +66,6 @@ class Host {
         $stmt->execute();
         return $stmt->get_result();
     }
-    // this function generates a unique 6-character alphanumeric code for an attachment, ensuring that the attachment belongs to the host organization before updating the record with the new code
     public function generateAssessmentCode($attachmentId, $hostOrgId) {
         // Verify ownership
         $verifyStmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE AttachmentID = ? AND HostOrgID = ?");

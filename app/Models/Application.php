@@ -1,8 +1,7 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// This model handles all operations related to job and attachment applications, including retrieval, status updates, and creation of new applications.
-//It serves as the central point for managing application data for both students and host organizations.
+
 class Application {
     private $db;
     private $conn;
@@ -12,7 +11,6 @@ class Application {
         $this->conn = $this->db->connect();
     }
 
-    // --- Admin Methods ---
     public function getAllJobApplications() {
         $sql = "SELECT ja.OpportunityID, ja.StudentID, ja.ApplicationDate, s.FirstName, s.LastName, ao.Description, h.OrganizationName, ja.Status
                 FROM jobapplication ja
@@ -34,13 +32,63 @@ class Application {
         return $this->conn->query($sql);
     }
 
-    public function updateProgramStatus($appId, $status) {
-        $stmt = $this->conn->prepare("UPDATE attachmentapplication SET ApplicationStatus = ? WHERE ApplicationID = ?");
-        $stmt->bind_param("si", $status, $appId);
+    public function updateProgramStatus($appId, $status, $rejectionReason = null) {
+        if ($status === 'Rejected' && $rejectionReason) {
+            $stmt = $this->conn->prepare("UPDATE attachmentapplication SET ApplicationStatus = ?, RejectionReason = ? WHERE ApplicationID = ?");
+            $stmt->bind_param("ssi", $status, $rejectionReason, $appId);
+        } else {
+            $stmt = $this->conn->prepare("UPDATE attachmentapplication SET ApplicationStatus = ? WHERE ApplicationID = ?");
+            $stmt->bind_param("si", $status, $appId);
+        }
         return $stmt->execute();
     }
 
-    // --- Host Methods ---
+    public function approveAndCreateAttachment($appId, $financialClearance = 'Cleared') {
+        $this->conn->begin_transaction();
+        try {
+            // Get application details including student-supplied dates
+            $stmt = $this->conn->prepare(
+                "SELECT aa.StudentID, aa.HostOrgID, aa.IntendedHostOrg, aa.StartDate, aa.EndDate
+                 FROM attachmentapplication aa WHERE aa.ApplicationID = ?"
+            );
+            $stmt->bind_param("i", $appId);
+            $stmt->execute();
+            $app = $stmt->get_result()->fetch_assoc();
+
+            if (!$app) throw new \Exception("Application not found.");
+
+            $studentId = $app['StudentID'];
+            $hostOrgId = $app['HostOrgID'];
+
+            $startDate = $app['StartDate'] ?: date('Y-m-d');
+            $endDate   = $app['EndDate']   ?: date('Y-m-d', strtotime($startDate . ' +84 days'));
+
+            $check = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
+            $check->bind_param("i", $studentId);
+            $check->execute();
+            if ($check->get_result()->num_rows > 0)
+                throw new \Exception("Student already has an ongoing attachment.");
+
+            $upd = $this->conn->prepare("UPDATE attachmentapplication SET ApplicationStatus = 'Approved', FinancialClearanceStatus = ? WHERE ApplicationID = ?");
+            $upd->bind_param("si", $financialClearance, $appId);
+            $upd->execute();
+
+            // Create attachment record with student-defined dates and ClearedAt = NOW()
+            $ins = $this->conn->prepare(
+                "INSERT INTO attachment (StudentID, HostOrgID, StartDate, EndDate, ClearanceStatus, AttachmentStatus, ClearedAt)
+                 VALUES (?, ?, ?, ?, 'Cleared', 'Ongoing', NOW())"
+            );
+            $ins->bind_param("iiss", $studentId, $hostOrgId, $startDate, $endDate);
+            $ins->execute();
+
+            $this->conn->commit();
+            return ['success' => true, 'student_id' => $studentId, 'host_org_id' => $hostOrgId];
+        } catch (\Exception $e) {
+            $this->conn->rollback();
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
     public function getHostApplications($hostOrgId) {
         $sql = "SELECT ja.ApplicationDate, s.FirstName, s.LastName, s.Course, ao.Description, ja.Status, ja.OpportunityID, ja.StudentID, ja.ResumePath, ja.ResumeLink, ja.Motivation
                 FROM jobapplication ja
@@ -68,9 +116,11 @@ class Application {
         return $stmt->execute();
     }
 
-    // --- Student Methods ---
     public function getStudentApplications($studentId) {
-        $stmt = $this->conn->prepare("SELECT * FROM attachmentapplication WHERE StudentID = ? ORDER BY ApplicationDate DESC");
+        $stmt = $this->conn->prepare(
+            "SELECT *, RejectionReason, FinancialClearanceStatus 
+             FROM attachmentapplication WHERE StudentID = ? ORDER BY ApplicationDate DESC"
+        );
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
         return $stmt->get_result();
@@ -133,8 +183,15 @@ class Application {
                 }
             }
 
-            $stmt = $this->conn->prepare("INSERT INTO attachmentapplication (StudentID, ApplicationDate, ApplicationStatus, IntendedHostOrg, HostOrgID) VALUES (?, CURDATE(), 'Pending', ?, ?)");
-            $stmt->bind_param("isi", $studentId, $intendedHost, $hostOrgId);
+            $financialStatus = $data['financial_clearance_status'] ?? 'Pending';
+            $startDate = !empty($data['start_date']) ? $data['start_date'] : null;
+            $endDate   = !empty($data['end_date'])   ? $data['end_date']   : null;
+            $stmt = $this->conn->prepare(
+                "INSERT INTO attachmentapplication 
+                 (StudentID, ApplicationDate, ApplicationStatus, IntendedHostOrg, HostOrgID, FinancialClearanceStatus, StartDate, EndDate)
+                 VALUES (?, CURDATE(), 'Pending', ?, ?, ?, ?, ?)"
+            );
+            $stmt->bind_param("isisss", $studentId, $intendedHost, $hostOrgId, $financialStatus, $startDate, $endDate);
             
             if (!$stmt->execute()) throw new \Exception("Failed to submit application");
             
@@ -173,5 +230,12 @@ class Application {
 
     public function getAllHosts() {
         return $this->conn->query("SELECT HostOrgID, OrganizationName FROM hostorganization ORDER BY OrganizationName");
+    }
+
+    public function getApplicationById($appId) {
+        $stmt = $this->conn->prepare("SELECT * FROM attachmentapplication WHERE ApplicationID = ?");
+        $stmt->bind_param("i", $appId);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
     }
 }

@@ -2,10 +2,10 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// Controller for managing applications (job and program) for students, hosts, and admins
+use App\Core\Mailer;
+
 class ApplicationController extends Controller {
 
-    // --- Admin ---
     public function adminIndex() {
         $this->requireAuth('admin');
         $appModel = $this->model('Application');
@@ -23,13 +23,41 @@ class ApplicationController extends Controller {
     public function updateProgramStatus() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $appId = $_POST['application_id'];
+            $appId  = $_POST['application_id'];
             $status = $_POST['status'];
-            
+            $rejectionReason = Helpers::sanitize($_POST['rejection_reason'] ?? '');
+            $financialClearance = $_POST['financial_clearance'] ?? 'Cleared';
+
             $appModel = $this->model('Application');
-            $appModel->updateProgramStatus($appId, $status);
-            
-            header("Location: " . Helpers::baseUrl('/admin/applications'));
+
+            if ($status === 'Approved') {
+                $result = $appModel->approveAndCreateAttachment($appId, $financialClearance);
+
+                if ($result['success']) {
+                    $studentModel = $this->model('Student');
+                    $student = $studentModel->getById($result['student_id']);
+                    if ($student && !empty($student['Email'])) {
+                        $orgName = $_POST['org_name'] ?? 'your host organization';
+                        Mailer::notifyStudentApproved($student['Email'], $student['FirstName'] . ' ' . $student['LastName'], $orgName);
+                    }
+                    header("Location: " . Helpers::baseUrl('/admin/applications?success=Application+approved+and+attachment+created'));
+                } else {
+                    header("Location: " . Helpers::baseUrl('/admin/applications?error=' . urlencode($result['message'])));
+                }
+            } else {
+                $appModel->updateProgramStatus($appId, $status, $rejectionReason);
+
+                $studentModel = $this->model('Student');
+                $appData = $appModel->getApplicationById($appId);
+                if ($appData) {
+                    $student = $studentModel->getById($appData['StudentID']);
+                    if ($student && !empty($student['Email'])) {
+                        $reason = $rejectionReason ?: 'No specific reason provided.';
+                        Mailer::notifyStudentRejected($student['Email'], $student['FirstName'] . ' ' . $student['LastName'], $reason);
+                    }
+                }
+                header("Location: " . Helpers::baseUrl('/admin/applications?success=Status+updated'));
+            }
         }
     }
 
@@ -47,7 +75,6 @@ class ApplicationController extends Controller {
         }
     }
 
-    // --- Host ---
     public function hostIndex() {
         $this->requireAuth('host_org');
         $appModel = $this->model('Application');
@@ -87,7 +114,6 @@ class ApplicationController extends Controller {
         }
     }
 
-    // --- Student ---
     public function studentIndex() {
         $this->requireAuth('student');
         $appModel = $this->model('Application');
@@ -137,15 +163,38 @@ class ApplicationController extends Controller {
         $studentModel = $this->model('Student');
         $student = $studentModel->getById($studentId);
         
-        if ($hasActiveAttachment || ($student['EligibilityStatus'] === 'Cleared')) {
+        if (!empty($student) && ($hasActiveAttachment || $student['EligibilityStatus'] === 'Cleared')) {
             header("Location: " . Helpers::baseUrl('/student/applications?error=You already have an active placement or are cleared.'));
             exit();
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Validate financial clearance is declared
+            $allowedStatuses = ['Cleared', 'Pending', 'Not Cleared'];
+            $financialStatus = $_POST['financial_clearance_status'] ?? '';
+            if (!in_array($financialStatus, $allowedStatuses)) {
+                header("Location: " . Helpers::baseUrl('/student/applications?error=Please+declare+your+financial+clearance+status.'));
+                exit();
+            }
+
+            // Validate attachment duration: 45 days min, 90 days max
+            $startDate = $_POST['start_date'] ?? '';
+            $endDate   = $_POST['end_date']   ?? '';
+            if ($startDate && $endDate) {
+                $diff = (new \DateTime($startDate))->diff(new \DateTime($endDate))->days;
+                if ($diff < 45) {
+                    header("Location: " . Helpers::baseUrl('/student/applications?error=Attachment+period+must+be+at+least+1.5+months+(45+days).'));
+                    exit();
+                }
+                if ($diff > 90) {
+                    header("Location: " . Helpers::baseUrl('/student/applications?error=Attachment+period+cannot+exceed+3+months+(90+days).'));
+                    exit();
+                }
+            }
+
             $result = $appModel->createSessionApplication($_SESSION['student_id'], $_POST);
             
-            $param = $result['success'] ? 'success=applied' : 'error=db_error&message=' . urlencode($result['message']);
+            $param = $result['success'] ? 'success=Application submitted successfully' : 'error=db_error&message=' . urlencode($result['message']);
             header("Location: " . Helpers::baseUrl('/student/applications?' . $param));
         }
     }

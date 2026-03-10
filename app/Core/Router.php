@@ -14,7 +14,8 @@ class Router {
         // I have registered all the working routes here  
         $this->routes = [
             '/' => ['controller' => 'HomeController', 'action' => 'index'],
-            '/student/register' => ['controller' => 'AuthController', 'action' => 'registerStudent'],
+            // removing the student registration route since all they do is log in
+            // '/student/register' => ['controller' => 'AuthController', 'action' => 'registerStudent'],
             '/admin/dashboard' => ['controller' => 'AdminController', 'action' => 'dashboard'],
             '/admin/supervisors' => ['controller' => 'AdminController', 'action' => 'viewSupervisors'],
             '/admin/supervisors/create' => ['controller' => 'AdminController', 'action' => 'createSupervisor'],
@@ -65,6 +66,7 @@ class Router {
             '/admin/students/create' => ['controller' => 'AdminController', 'action' => 'createStudent'],
             '/admin/students/bulk-upload' => ['controller' => 'AdminController', 'action' => 'bulkUploadStudents'],
             '/admin/students/clear' => ['controller' => 'AdminController', 'action' => 'clearStudent'],
+            '/admin/students/progress' => ['controller' => 'AdminController', 'action' => 'viewStudentProgress'],
             '/admin/reports' => ['controller' => 'ReportController', 'action' => 'adminIndex'],
             '/admin/reports/assessment-schedule' => ['controller' => 'ReportController', 'action' => 'assessmentSchedule'],
             '/admin/reports/supervisor-stats' => ['controller' => 'ReportController', 'action' => 'supervisorStats'],

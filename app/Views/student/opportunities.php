@@ -1,3 +1,4 @@
+<?php use App\Core\Helpers; ?>
 <link rel="stylesheet" href="<?= Helpers::baseUrl('assets/css/opportunities.css') ?>">
 
 <style>

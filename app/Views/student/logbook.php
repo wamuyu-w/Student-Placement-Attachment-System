@@ -100,9 +100,9 @@
     <div class="bg-white p-6 rounded-lg shadow-sm" style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Logbook History</h2>
         
-        <?php if ($entries && $entries->num_rows > 0): ?>
+        <?php if (!empty($entries)): ?>
             <div class="entries-list">
-                <?php while($row = $entries->fetch_assoc()): 
+                <?php foreach($entries as $row): 
                     $description = $row['Description'];
                     $isJson = false;
                     $weeklyData = [];
@@ -120,6 +120,7 @@
                                 <h3 class="history-card-title" style="font-weight: 700; color: #1e293b; font-size: 1.1rem; margin: 0 0 4px 0;">Week <?= htmlspecialchars($row['WeekNumber']) ?></h3>
                                 <div class="history-card-dates" style="color: #64748b; font-size: 0.85rem;">
                                     <?= date('M d', strtotime($row['StartDate'])) ?> - <?= date('M d, Y', strtotime($row['EndDate'])) ?>
+                                    &nbsp;|&nbsp; Submitted: <?= date('M d, Y', strtotime($row['EntryDate'])) ?>
                                 </div>
                             </div>
                             <span class="status-badge status-<?= strtolower($row['Status']) ?>" style="padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; background-color: <?= $row['Status'] == 'Approved' ? '#dcfce7' : '#fef9c3' ?>; color: <?= $row['Status'] == 'Approved' ? '#166534' : '#854d0e' ?>; border: 1px solid <?= $row['Status'] == 'Approved' ? '#bbf7d0' : '#fef08a' ?>;">
@@ -139,7 +140,6 @@
                                     </thead>
                                     <tbody>
                                         <?php 
-                                        // storing the weeks event in the db and trimming them so that they can be stored as a .json file
                                         $daysMapping = ['monday' => 'Monday', 'tuesday' => 'Tuesday', 'wednesday' => 'Wednesday', 'thursday' => 'Thursday', 'friday' => 'Friday'];
                                         foreach($daysMapping as $key => $label): 
                                             $task = $weeklyData[$key]['task'] ?? '';
@@ -184,11 +184,11 @@
                             </div>
                         </div>
                     </div>
-                <?php endwhile; ?>
-            </div>
+                <?php endforeach; ?>
         <?php else: ?>
             <p style="color: #6b7280; text-align: center; padding: 20px;">No logbook entries found.</p>
         <?php endif; ?>
+    </div>
     </div>
 <?php endif; ?>
 

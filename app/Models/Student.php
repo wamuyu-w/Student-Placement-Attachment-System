@@ -2,7 +2,6 @@
 namespace App\Models;
 use App\Config\Database;
 // Student model for handling student-related database operations
-// This model includes methods for retrieving student data, registering new students, updating profiles, and getting dashboard statistics and recent activities.
 class Student {
     private $db;
     private $conn;
@@ -16,7 +15,6 @@ class Student {
         // Join with users to get Admission Number (Username)
         return $this->conn->query("SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.Faculty, s.YearOfStudy, s.Email, s.EligibilityStatus, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID ORDER BY s.StudentID DESC");
     }
-// this function gets the students attached to a host organization and their details, including the status of their attachment
     public function getById($studentId) {
         $stmt = $this->conn->prepare("SELECT s.*, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID WHERE s.StudentID = ?");
         $stmt->bind_param("i", $studentId);

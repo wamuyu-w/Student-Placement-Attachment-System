@@ -61,7 +61,6 @@ class Supervisor {
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
-// this function gets the students attached to a host organization and their details, including the status of their attachment
     public function getStudentsForAssignment() {
         $sql = "
             SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName,
@@ -75,12 +74,10 @@ class Supervisor {
         ";
         return $this->conn->query($sql);
     }
-// this function gets the lecturers that can be assigned as supervisors (those with Role = Supervisor or Admin)
     public function getAssignableLecturers() {
         $sql = "SELECT LecturerID, Name FROM lecturer WHERE Role = 'Supervisor' OR Role = 'Admin'";
         return $this->conn->query($sql);
     }
-// this function assigns a supervisor to a student's attachment, ensuring no more than 2 supervisors and that the first assessment is completed before assigning a second supervisor
     public function assign($attachmentId, $lecturerId) {
         if (empty($attachmentId) || empty($lecturerId)) {
             return ['success' => false, 'message' => 'Missing data'];
@@ -133,7 +130,6 @@ class Supervisor {
             return ['success' => false, 'message' => $errorMsg];
         }
     }
-// this function processes the bulk upload of supervisors from a CSV file, creating user accounts and lecturer records for each valid entry while handling duplicates and errors gracefully
     public function createBulk($file, $faculty) {
         $handle = fopen($file, "r");
         if ($handle === FALSE) return ['successCount' => 0, 'errorCount' => 0];
@@ -161,7 +157,7 @@ class Supervisor {
                 $userID = $this->conn->insert_id;
 
                 $lecStmt = $this->conn->prepare("INSERT INTO lecturer (UserID, StaffNumber, Name, Department, Faculty, Role) VALUES (?, ?, ?, ?, ?, 'Supervisor')");
-                $lecStmt->bind_param("isssss", $userID, $staffNumber, $name, $department, $faculty);
+                $lecStmt->bind_param("issss", $userID, $staffNumber, $name, $department, $faculty);
                 $lecStmt->execute();
                 
                 $this->conn->commit();

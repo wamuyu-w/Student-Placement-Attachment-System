@@ -1,9 +1,5 @@
 <?php
 namespace App\Controllers;
-// The AdminController class manages administrative functions such as viewing the dashboard, 
-// managing supervisors and students, and handling bulk uploads. 
-//It ensures that only authenticated administrators can access these features and interacts 
-// with the corresponding models to retrieve and manipulate data before passing it to the views for rendering.
 use App\Core\Controller;
 use App\Core\Helpers;
 

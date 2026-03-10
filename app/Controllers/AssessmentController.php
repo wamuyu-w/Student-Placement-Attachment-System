@@ -2,12 +2,9 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// The AssessmentController manages all actions related to assessments, including scheduling, conducting, and viewing assessments for both staff and students. 
-//It ensures that only authorized users can access specific functionalities and handles the logic for verifying assessment codes, submitting assessment results, and generating printable summaries of assessments.
+
 class AssessmentController extends Controller {
 
-    // --- Staff Actions ---
-    
     public function index() {
         $this->requireAuth('staff');
         $staffModel = $this->model('Staff');
@@ -23,6 +20,12 @@ class AssessmentController extends Controller {
 
     public function verifyCode() {
         $this->requireAuth('staff');
+
+        // Admins do not conduct assessments
+        if (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin') {
+            $this->json(['success' => false, 'message' => 'Administrators do not conduct student assessments.']);
+            return;
+        }
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $attachmentId = $_POST['attachment_id'];
@@ -103,30 +106,42 @@ class AssessmentController extends Controller {
     //validating the input, and inserting a new record into the assessment table with the provided details, including the attachment ID, lecturer ID, assessment type, date, and any remarks
     public function schedule() {
         $this->requireAuth('staff');
+
+        // Admins do not conduct assessments
+        if (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin') {
+            $this->json(['success' => false, 'message' => 'Administrators do not schedule assessments.']);
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (empty($_POST['attachment_id']) || empty($_POST['assessment_type']) || empty($_POST['assessment_date'])) {
+            if (empty($_POST['attachment_id']) || empty($_POST['assessment_date'])) {
                 $this->json(['success' => false, 'message' => 'Missing required fields']);
                 return;
             }
 
+            $attachmentId = $_POST['attachment_id'];
+            $assessmentModel = $this->model('Assessment');
+
+            // Auto-determine type — system decides, not the lecturer
+            $count = $assessmentModel->getAssessmentCount($attachmentId);
+            $type = ($count == 0) ? 'First Assessment' : 'Final Assessment';
+
             $data = [
-                'attachment_id' => $_POST['attachment_id'],
-                'lecturer_id' => $_SESSION['LecturerID'],
-                'assessment_type' => $_POST['assessment_type'],
+                'attachment_id' => $attachmentId,
+                'lecturer_id'   => $_SESSION['LecturerID'],
+                'assessment_type' => $type,
                 'assessment_date' => $_POST['assessment_date'],
-                'remarks' => Helpers::sanitize($_POST['remarks'] ?? '')
+                'supervision_comments' => Helpers::sanitize($_POST['supervision_comments'] ?? '')
             ];
             
-            $assessmentModel = $this->model('Assessment');
             if ($assessmentModel->schedule($data)) {
-                $this->json(['success' => true, 'message' => 'Assessment scheduled successfully']);
+                $this->json(['success' => true, 'message' => "$type scheduled successfully"]);
             } else {
                 $this->json(['success' => false, 'message' => 'Failed to schedule assessment']);
             }
         }
     }
 
-    // --- Student/Shared Actions ---
 
     public function viewAssessment() {
         // Allow student or staff/admin to view

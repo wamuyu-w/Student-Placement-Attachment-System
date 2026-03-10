@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// This model handles all report-related functionalities for admin, staff, host, and students.
+
 class Report {
     private $db;
     private $conn;

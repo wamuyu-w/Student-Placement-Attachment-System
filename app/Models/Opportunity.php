@@ -11,7 +11,6 @@ class Opportunity {
         $this->conn = $this->db->connect();
     }
 
-    // --- Admin Methods ---
     public function getAll() {
         $sql = "SELECT ao.*, COALESCE(ho.OrganizationName, 'Unknown') as OrganizationName 
                 FROM attachmentopportunity ao
@@ -24,7 +23,6 @@ class Opportunity {
         return $this->conn->query("SELECT HostOrgID, OrganizationName FROM hostorganization ORDER BY OrganizationName");
     }
 
-    // --- Student/Public Methods ---
     public function getAllActive() {
         $sql = "SELECT ao.*, ho.OrganizationName 
                 FROM attachmentopportunity ao
@@ -34,7 +32,6 @@ class Opportunity {
         return $this->conn->query($sql);
     }
 
-    // --- Host Methods ---
     public function getByHost($hostId) {
         $stmt = $this->conn->prepare("SELECT *, DATE_ADD(ApplicationEndDate, INTERVAL 0 DAY) as daysUntilExpire FROM attachmentopportunity WHERE HostOrgID = ? ORDER BY ApplicationEndDate DESC");
         $stmt->bind_param("i", $hostId);
@@ -137,7 +134,6 @@ class Opportunity {
         }
     }
 
-    // --- CRUD Operations ---
     public function save($data) {
         $this->conn->begin_transaction();
         try {

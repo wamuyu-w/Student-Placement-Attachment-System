@@ -2,7 +2,7 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// This controller handles all authentication-related actions: login, registration, logout, and password management.
+
 class AuthController extends Controller {
     
     public function registerStudent() {
@@ -32,7 +32,6 @@ class AuthController extends Controller {
         // Proceed to register...
     }
 
-    // --- Login Views ---
     public function loginStudent() {
         $this->view('auth/login-student', ['title' => 'Student Login'], 'auth');
     }
@@ -49,7 +48,6 @@ class AuthController extends Controller {
         $this->view('auth/register-host', ['title' => 'Host Organization Registration'], 'auth');
     }
 
-    // --- Process Login ---
     public function processLogin() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: " . Helpers::baseUrl('/'));

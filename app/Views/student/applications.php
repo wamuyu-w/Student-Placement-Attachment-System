@@ -110,12 +110,13 @@
                 </button>
             <?php else: ?>
                 <form action="<?= Helpers::baseUrl('/student/applications/apply-session') ?>" method="POST">
+                    <!-- Host Organization -->
                     <div class="form-group mb-3">
-                        <label class="form-label">Intended Host Organization (Optional)</label>
+                        <label class="form-label">Intended Host Organization <span style="color:#9ca3af;font-weight:400;">(Optional)</span></label>
                         <input type="text" name="intended_host" class="form-control" placeholder="E.g. Safaricom PLC, KRA, etc.">
                         <small style="color: var(--text-secondary); font-size: 0.8rem;">If the organization is new, a default account will be created for them.</small>
                     </div>
-                    
+
                     <!-- Contact Details for New Org -->
                     <div class="form-group mb-3">
                         <label class="form-label">Contact Person Name</label>
@@ -124,54 +125,69 @@
                     <div class="form-group mb-3">
                         <label class="form-label">Contact Person Email</label>
                         <input type="email" name="contact_email" class="form-control" placeholder="E.g. john.doe@company.com">
-                        <small style="color: var(--text-secondary); font-size: 0.8rem;">This email will be used to send login credentials for first time access</small>
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">Login credentials will be sent to this email if it's a new organization.</small>
                     </div>
-                    <button type="submit" class="btn-submit" style="width: 100%; justify-content: center; margin-top: 16px;">
+
+                    <!-- Attachment Date Range -->
+                    <div style="border-radius:10px;padding:16px;margin-bottom:12px;">
+                        <label class="form-label" style="font-weight:700;color:#1e293b;margin-bottom:10px;">
+                           
+                            Expected Attachment Period <span style="color:#dc2626;">*</span>
+                        </label>
+                        <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">Minimum: <strong>1.5 months</strong> (45 days) &mdash; Maximum: <strong>3 months</strong> (90 days). End date auto-fills when you pick a start date.</p>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div>
+                                <label class="form-label" style="font-size:0.85rem;">Start Date</label>
+                                <input type="date" name="start_date" id="app_start_date" required class="form-control"
+                                       min="<?= date('Y-m-d') ?>"
+                                       onchange="autoSetEndDate(this.value)">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:0.85rem;">End Date</label>
+                                <input type="date" name="end_date" id="app_end_date" required class="form-control"
+                                       min="<?= date('Y-m-d') ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Clearance Declaration -->
+                    <div class="form-group mb-3" style="border-radius:10px;padding:16px;">
+                        <label class="form-label" style="font-weight:700;color:#1e293b;margin-bottom:10px;">
+                            <i class="fas fa-money-check-alt" style="color:#8B1538;margin-right:6px;"></i>
+                            Financial Clearance Declaration <span style="color:#dc2626;">*</span>
+                        </label>
+                        <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">Confirm your current fee payment status. The admin will verify this before approving your attachment.</p>
+
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;background:white;">
+                                <input type="radio" name="financial_clearance_status" value="Cleared" >
+                                <span>
+                                    <strong>I have cleared all outstanding fees</strong><br>
+                                </span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;background:white;transition:border-color 0.2s;">
+                                <input type="radio" name="financial_clearance_status" value="Pending">
+                                <span>
+                                    <strong>Clearance is in progress</strong><br>
+                                </span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;background:white;transition:border-color 0.2s;">
+                                <input type="radio" name="financial_clearance_status" value="Not Cleared" >
+                                <span>
+                                    <strong>I have an outstanding fee balance</strong><br>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" style="width: 100%; justify-content: center; margin-top: 8px;">
                         <i class="fas fa-paper-plane"></i> Submit Application
                     </button>
                 </form>
             <?php endif; ?>
         </div>
 
-        <!-- Registration Section -->
-        <?php if ($hasApproved && !$hasActiveAttachment): ?>
-        <div class="application-card mt-4">
-            <div class="section-header">
-                <div>
-                    <h3 class="section-title"><i class="fas fa-briefcase"></i> Register Your Placement</h3>
-                    <p class="section-desc">Your application is approved! Please register the organization where you have secured your attachment.</p>
-                </div>
-            </div>
-            
-            <form action="<?= Helpers::baseUrl('/student/applications/register-placement') ?>" method="POST" class="register-form">
-                <div class="form-group full-width">
-                    <label class="form-label">Host Organization</label>
-                    <select name="host_org_id" required class="form-control">
-                        <option value="">-- Select Organization --</option>
-                        <?php if($hosts) while($host = $hosts->fetch_assoc()): ?>
-                            <option value="<?= $host['HostOrgID']; ?>">
-                                <?= htmlspecialchars($host['OrganizationName']); ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Can't find your org? Contact Admin.</p>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" name="start_date" required class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">End Date</label>
-                    <input type="date" name="end_date" required class="form-control">
-                </div>
-                <div class="form-group full-width" style="margin-top: 8px;">
-                    <button type="submit" class="btn-submit" style="background-color: #10b981;">
-                        <i class="fas fa-save"></i> Register Placement
-                    </button>
-                </div>
-            </form>
-        </div>
-        <?php endif; ?>
+        <?php /* Register Placement section removed — admin approval now auto-creates the attachment record in a single step */ ?>
     </div>
 
     <!-- Right Column: History -->
@@ -197,6 +213,17 @@
                                     <span class="status-badge status-<?= strtolower($app['ApplicationStatus']); ?>">
                                         <?= htmlspecialchars($app['ApplicationStatus']); ?>
                                     </span>
+                                    <?php if ($app['ApplicationStatus'] === 'Rejected' && !empty($app['RejectionReason'])): ?>
+                                        <div style="margin-top:6px;padding:8px 10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:0.82rem;color:#991b1b;">
+                                            <i class="fas fa-exclamation-circle" style="margin-right:4px;"></i>
+                                            <strong>Reason:</strong> <?= htmlspecialchars($app['RejectionReason']); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['FinancialClearanceStatus']) && $app['FinancialClearanceStatus'] !== 'Pending'): ?>
+                                        <div style="margin-top:4px;font-size:0.8rem;color:#64748b;">
+                                            Finance: <?= htmlspecialchars($app['FinancialClearanceStatus']); ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -236,3 +263,18 @@
     .status-approved, .status-active { background-color: #d1fae5; color: #065f46; }
     .status-rejected { background-color: #fee2e2; color: #991b1b; }
 </style>
+
+<script>
+function autoSetEndDate(startVal) {
+    if (!startVal) return;
+    const toStr = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const minEnd = new Date(startVal);
+    const maxEnd = new Date(startVal);
+    minEnd.setDate(minEnd.getDate() + 45); // 1.5 months minimum
+    maxEnd.setDate(maxEnd.getDate() + 90); // 3 months maximum
+    const endInput = document.getElementById('app_end_date');
+    endInput.min   = toStr(minEnd);
+    endInput.max   = toStr(maxEnd);
+    endInput.value = toStr(minEnd); // default to minimum
+}
+</script>

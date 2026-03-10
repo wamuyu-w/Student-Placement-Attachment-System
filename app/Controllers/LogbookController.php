@@ -2,8 +2,7 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// The LogbookController manages logbook entries for students, allowing them to create and view their entries, while staff and host organizations can review and manage these entries. 
-//It also includes functionality for printing logbooks in a user-friendly format.
+
 class LogbookController extends Controller {
 
     public function studentIndex() {
@@ -14,7 +13,7 @@ class LogbookController extends Controller {
         
         $data = [
             'entries' => $entries,
-            'hasAttachment' => ($entries !== null),
+            'hasAttachment' => !empty($entries),
             'title' => 'My Logbook',
             'page' => 'logbook',
             'page_css' => ['student-dashboard.css', 'logbook.css']

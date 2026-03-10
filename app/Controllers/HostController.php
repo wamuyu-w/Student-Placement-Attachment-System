@@ -23,7 +23,6 @@ class HostController extends Controller {
         
         $this->view('host/dashboard', $data);
     }
-// this function gets the students attached to a host organization and their details, including the status of their attachment and passes it to the view
     public function viewStudents() {
         $this->requireAuth('host_org');
         $hostModel = $this->model('Host');
@@ -36,7 +35,6 @@ class HostController extends Controller {
         ];
         $this->view('host/students', $data);
     }
-    // this function supervision() retrieves the students attached to a host organization along with their attachment details
     // and passes this information to the supervision view,
     // allowing the host organization to manage and oversee the students under their supervision effectively
     public function supervision() {
@@ -51,7 +49,6 @@ class HostController extends Controller {
         ];
         $this->view('host/supervision', $data);
     }
-    // this function generates a unique 6-character alphanumeric code for an attachment, ensuring that the attachment belongs to the host organization before updating the record with the new code
     public function generateCode() {
         $this->requireAuth('host_org');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

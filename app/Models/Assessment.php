@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// The Assessment class provides methods to manage assessments related to student attachments, including creating new assessments, scheduling them, and retrieving assessment details for students and specific assessment IDs.
+
 class Assessment {
     private $db;
     private $conn;
@@ -23,40 +23,44 @@ class Assessment {
     }
 
     public function getAssessmentCount($attachmentId) {
-        $stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ?");
+        $stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ? AND Status = 'Conducted'");
         $stmt->bind_param("i", $attachmentId);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc()['count'];
     }
 
     public function create($data) {
-        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores) 
-                VALUES (?, ?, ?, ?, ?, CURDATE(), ?)";
-        
+        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores, Status)
+                VALUES (?, ?, ?, ?, ?, CURDATE(), ?, 'Conducted')";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("iisdss", 
-            $data['attachment_id'], 
-            $data['lecturer_id'], 
-            $data['assessment_type'], 
-            $data['marks'], 
-            $data['remarks'], 
+        $stmt->bind_param("iisdss",
+            $data['attachment_id'],
+            $data['lecturer_id'],
+            $data['assessment_type'],
+            $data['marks'],
+            $data['remarks'],
             $data['criteria_scores']
         );
-        
         return $stmt->execute();
     }
-    // this function schedules an assessment for a student's attachment by inserting a new record into the assessment table with the provided details,
-    // including the attachment ID, lecturer ID, assessment type, date, and any remarks
+
     public function schedule($data) {
-        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, AssessmentDate, Remarks) 
-                VALUES (?, ?, ?, ?, ?)";
+        $supervisionComments = $data['supervision_comments'] ?? '';
+        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, AssessmentDate, SupervisionComments, Status)
+                VALUES (?, ?, ?, ?, ?, 'Scheduled')";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("iisss", $data['attachment_id'], $data['lecturer_id'], $data['assessment_type'], $data['assessment_date'], $data['remarks']);
+        $stmt->bind_param("iisss",
+            $data['attachment_id'],
+            $data['lecturer_id'],
+            $data['assessment_type'],
+            $data['assessment_date'],
+            $supervisionComments
+        );
         return $stmt->execute();
     }
 
     public function getById($assessmentId) {
-        $sql = "SELECT 
+        $sql = "SELECT
                     a.AssessmentDate, a.AssessmentType, a.Marks, a.Remarks, a.CriteriaScores,
                     s.FirstName, s.LastName, u.Username as AdmissionNumber, s.Course, s.Faculty,
                     ho.OrganizationName,
@@ -69,7 +73,6 @@ class Assessment {
                 JOIN hostorganization ho ON att.HostOrgID = ho.HostOrgID
                 LEFT JOIN lecturer l ON a.LecturerID = l.LecturerID
                 WHERE a.AssessmentID = ?";
-        
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $assessmentId);
         $stmt->execute();
@@ -77,15 +80,15 @@ class Assessment {
     }
 
     public function getStudentAssessments($studentId) {
-        $sql = "SELECT 
+        $sql = "SELECT
                     a.AssessmentID, a.AssessmentDate, a.AssessmentType, a.Marks,
+                    a.Status, a.SupervisionComments,
                     l.Name as AssessorName
                 FROM assessment a
                 JOIN attachment att ON a.AttachmentID = att.AttachmentID
                 LEFT JOIN lecturer l ON a.LecturerID = l.LecturerID
                 WHERE att.StudentID = ?
                 ORDER BY a.AssessmentDate DESC";
-        
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $studentId);
         $stmt->execute();

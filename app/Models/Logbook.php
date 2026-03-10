@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// This model manages logbook entries for attachments, allowing students to create weekly entries and staff/hosts to review them.
 class Logbook {
     private $db;
     private $conn;
@@ -58,21 +57,30 @@ class Logbook {
         }
     }
 
-    // Student: Get entries
+    // Student / Print: Get entries (returns array for compatibility with print view and foreach loops)
     public function getEntriesByStudent($studentId) {
-        // First get AttachmentID
-        $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
+        // Ensure SubmittedAt column exists for accurate date tracking
+        $this->conn->query("ALTER TABLE logbook ADD COLUMN IF NOT EXISTS SubmittedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+
+        // Get most recent attachment (Ongoing or Completed) for student
+        $stmt = $this->conn->prepare(
+            "SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus IN ('Ongoing','Completed') ORDER BY StartDate DESC LIMIT 1"
+        );
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
         $res = $stmt->get_result();
-        if ($res->num_rows === 0) return null; // No active attachment
+        if ($res->num_rows === 0) return []; // No attachment at all
         
         $attachmentId = $res->fetch_assoc()['AttachmentID'];
 
-        $stmt = $this->conn->prepare("SELECT LogbookID, WeekNumber, StartDate, EndDate, Activities as Description, Status, EntryDate, AcademicSupervisorComments, HostSupervisorComments FROM logbook WHERE AttachmentID = ? ORDER BY WeekNumber DESC");
+        $stmt = $this->conn->prepare(
+            "SELECT LogbookID, WeekNumber, StartDate, EndDate, Activities as Description, Status,
+                    SubmittedAt as EntryDate, AcademicSupervisorComments, HostSupervisorComments
+             FROM logbook WHERE AttachmentID = ? ORDER BY WeekNumber ASC"
+        );
         $stmt->bind_param("i", $attachmentId);
         $stmt->execute();
-        return $stmt->get_result();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     // Student: Create entry
@@ -96,7 +104,15 @@ class Logbook {
             return ['success' => false, 'message' => 'Entry for this week already exists.'];
         }
 
-        $stmt = $this->conn->prepare("INSERT INTO logbook (AttachmentID, WeekNumber, StartDate, EndDate, Activities, Status, EntryDate) VALUES (?, ?, ?, ?, ?, 'Pending', NOW())");
+        // Enforce 12-week cap
+        if ((int)$data['week_number'] > 12) {
+            return ['success' => false, 'message' => 'Logbook is closed. Attachment duration is capped at 12 weeks.'];
+        }
+
+        $stmt = $this->conn->prepare(
+            "INSERT INTO logbook (AttachmentID, WeekNumber, StartDate, EndDate, Activities, Status, SubmittedAt) 
+             VALUES (?, ?, ?, ?, ?, 'Pending', NOW())"
+        );
         $stmt->bind_param("iisss", $attachmentId, $data['week_number'], $data['start_date'], $data['end_date'], $data['description']);
         
         if ($stmt->execute()) {

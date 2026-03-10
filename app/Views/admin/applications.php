@@ -29,18 +29,30 @@
                             <td><?php echo htmlspecialchars($row['OrganizationName'] ?? 'Not Specified'); ?></td>
                             <td>
                                 <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['ApplicationStatus']); ?></span>
+                                <?php if (!empty($row['FinancialClearanceStatus'])): ?>
+                                    <br><small style="color:#64748b;">Finance: <?= htmlspecialchars($row['FinancialClearanceStatus']) ?></small>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($row['ApplicationStatus'] == 'Pending'): ?>
-                                <form action="<?= Helpers::baseUrl('/admin/applications/program-status') ?>" method="POST" class="status-form">
+                                <form action="<?= Helpers::baseUrl('/admin/applications/program-status') ?>" method="POST">
                                     <input type="hidden" name="application_id" value="<?php echo $row['ApplicationID']; ?>">
-                                    <div style="display: flex; gap: 8px;">
-                                        <button type="submit" name="status" value="Approved" title="Approve" style="background: none; border: none; cursor: pointer; color: var(--success-color);">
-                                            <i class="fas fa-check-circle fa-lg"></i>
-                                        </button>
-                                        <button type="submit" name="status" value="Rejected" title="Reject" style="background: none; border: none; cursor: pointer; color: var(--danger-color);">
-                                            <i class="fas fa-times-circle fa-lg"></i>
-                                        </button>
+                                    <input type="hidden" name="org_name" value="<?php echo htmlspecialchars($row['OrganizationName'] ?? ''); ?>">
+                                    <div style="display:flex;flex-direction:column;gap:6px;min-width:200px;">
+                                        <select name="financial_clearance" style="padding:4px 8px;border-radius:6px;border:1px solid #e2e8f0;font-size:0.85rem;">
+                                            <option value="Cleared">Finance: Cleared</option>
+                                            <option value="Pending">Finance: Pending</option>
+                                            <option value="Not Cleared">Finance: Not Cleared</option>
+                                        </select>
+                                        <textarea name="rejection_reason" placeholder="Rejection reason (if rejecting)..." rows="2" style="padding:4px 8px;border-radius:6px;border:1px solid #e2e8f0;font-size:0.85rem;resize:vertical;"></textarea>
+                                        <div style="display:flex;gap:6px;">
+                                            <button type="submit" name="status" value="Approved" style="flex:1;padding:6px;background:#16a34a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                            <button type="submit" name="status" value="Rejected" style="flex:1;padding:6px;background:#dc2626;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
                                     </div>
                                 </form>
                                 <?php else: ?>

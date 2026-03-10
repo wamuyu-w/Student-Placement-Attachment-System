@@ -2,7 +2,6 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// The SettingsController class manages user settings and profile updates for different user roles (student, staff, admin, host organization) in the application.
 // It includes methods for displaying settings pages, updating profile information, changing passwords, and handling the first login process where users must complete their profile and change their default password.
 class SettingsController extends Controller {
 
@@ -129,7 +128,6 @@ class SettingsController extends Controller {
             }
         }
     }
-    // this function firstLogin() checks if the user is authenticated and retrieves their profile information based on their role, 
     //then loads the first-login view with the appropriate data and layout for the user to complete their profile and change their default password
     public function firstLogin() {
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -152,7 +150,6 @@ class SettingsController extends Controller {
         
         $this->view('auth/first-login', ['profile' => $profile, 'role' => $role], 'auth');
     }
-    // this function processFirstLogin() handles the form submission from the first-login view,
     // updating the user's password and profile information based on their role, and then redirects them to their respective dashboard upon successful completion
     public function processFirstLogin() {
         if (session_status() === PHP_SESSION_NONE) session_start();

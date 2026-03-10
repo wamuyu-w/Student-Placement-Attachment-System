@@ -2,8 +2,7 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// The ReportController class manages the generation and display of various reports for different user roles (admin, staff, host organizations, and students). 
-//It includes methods for displaying reports, handling report uploads, and generating printable certificates, while ensuring proper authentication
+
 class ReportController extends Controller {
 
     public function adminIndex() {
@@ -31,7 +30,8 @@ class ReportController extends Controller {
         $data = [
             'schedule' => $reportModel->getAssessmentSchedule(),
             'title' => 'Assessment Schedule Report',
-            'page' => 'reports'
+            'page' => 'reports',
+            'page_css' => 'admin-dashboard.css'
         ];
         $this->view('reports/assessment-schedule', $data);
     }
@@ -42,7 +42,8 @@ class ReportController extends Controller {
         $data = [
             'stats' => $reportModel->getSupervisorStats(),
             'title' => 'Supervisor Statistics',
-            'page' => 'reports'
+            'page' => 'reports',
+            'page_css' => 'admin-dashboard.css'
         ];
         $this->view('reports/supervisor-stats', $data);
     }
@@ -70,7 +71,8 @@ class ReportController extends Controller {
         $data = [
             'grades' => $reportModel->getLecturerGrades($_SESSION['LecturerID']),
             'title' => 'Student Performance Summary',
-            'page' => 'reports'
+            'page' => 'reports',
+            'page_css' => 'staff-dashboard.css'
         ];
         $this->view('reports/lecturer-grades', $data);
     }
@@ -98,7 +100,8 @@ class ReportController extends Controller {
         $data = [
             'performance' => $reportModel->getHostPerformanceReport($_SESSION['host_org_id']),
             'title' => 'Host Performance Report',
-            'page' => 'reports'
+            'page' => 'reports',
+            'page_css' => 'host-org-dashboard.css'
         ];
         $this->view('reports/host-performance', $data);
     }

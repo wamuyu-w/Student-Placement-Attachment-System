@@ -2,7 +2,6 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// Controller for managing opportunities (student view, admin/host management)
 class OpportunityController extends Controller {
 
     public function index() {
@@ -14,7 +13,7 @@ class OpportunityController extends Controller {
         $studentId = $_SESSION['student_id'];
 
         $student = $studentModel->getById($studentId);
-        $hasActivePlacement = $appModel->hasActiveAttachment($studentId) || ($student['EligibilityStatus'] === 'Cleared');
+        $hasActivePlacement = $appModel->hasActiveAttachment($studentId) || (!empty($student) && $student['EligibilityStatus'] === 'Cleared');
         
         $data = [
             'opportunities' => $opportunityModel->getAllActive(),
@@ -79,7 +78,6 @@ class OpportunityController extends Controller {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 
-    // --- Admin Management ---
     public function adminManage() {
         $this->requireAuth('admin');
         $oppModel = $this->model('Opportunity');
@@ -93,7 +91,6 @@ class OpportunityController extends Controller {
         $this->view('admin/opportunities', $data);
     }
 
-    // --- Host Management ---
     public function hostManage() {
         $this->requireAuth('host_org');
         $oppModel = $this->model('Opportunity');
@@ -106,7 +103,6 @@ class OpportunityController extends Controller {
         $this->view('host/opportunities', $data);
     }
 
-    // --- Shared Actions ---
     public function save() {
         // Auth check (Admin or Host)
         if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['admin', 'host_org'])) {
