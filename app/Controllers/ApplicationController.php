@@ -97,6 +97,10 @@ class ApplicationController extends Controller {
         $hasPendingOrApproved = $appModel->hasPendingOrApprovedApp($studentId);
         $hasActiveAttachment = $appModel->hasActiveAttachment($studentId);
         
+        $studentModel = $this->model('Student');
+        $student = $studentModel->getById($studentId);
+        $hasActivePlacement = $hasActiveAttachment || ($student['EligibilityStatus'] === 'Cleared');
+        
         // Check for approved app to show registration form
         $hasApproved = false;
         foreach ($applications as $app) {
@@ -112,6 +116,7 @@ class ApplicationController extends Controller {
             'applications' => $applications,
             'hasPendingOrApproved' => $hasPendingOrApproved,
             'hasActiveAttachment' => $hasActiveAttachment,
+            'hasActivePlacement' => $hasActivePlacement,
             'hasApproved' => $hasApproved,
             'hosts' => $appModel->getAllHosts(),
             'title' => 'My Applications',
@@ -123,8 +128,21 @@ class ApplicationController extends Controller {
 
     public function applySession() {
         $this->requireActiveStudent();
+        
+        $studentId = $_SESSION['student_id'];
+        $appModel = $this->model('Application');
+        
+        // Block if already has active placement or is cleared
+        $hasActiveAttachment = $appModel->hasActiveAttachment($studentId);
+        $studentModel = $this->model('Student');
+        $student = $studentModel->getById($studentId);
+        
+        if ($hasActiveAttachment || ($student['EligibilityStatus'] === 'Cleared')) {
+            header("Location: " . Helpers::baseUrl('/student/applications?error=You already have an active placement or are cleared.'));
+            exit();
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $appModel = $this->model('Application');
             $result = $appModel->createSessionApplication($_SESSION['student_id'], $_POST);
             
             $param = $result['success'] ? 'success=applied' : 'error=db_error&message=' . urlencode($result['message']);

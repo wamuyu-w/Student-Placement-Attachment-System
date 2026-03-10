@@ -1,6 +1,94 @@
 <?php use App\Core\Helpers; ?>
 
+<style>
+    .active-placement-notice {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 30px;
+        grid-column: 1 / -1;
+    }
+    .notice-icon {
+        width: 80px;
+        height: 80px;
+        background: #ecfdf5;
+        color: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 24px;
+    }
+    .notice-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+    .notice-text {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .notice-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+    }
+    .btn-notice {
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-logbook {
+        background: #8B1538;
+        color: white;
+    }
+    .btn-logbook:hover {
+        background: #71112e;
+        transform: translateY(-2px);
+    }
+    .btn-supervision {
+        background: #f8fafc;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+    }
+    .btn-supervision:hover {
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+</style>
+
 <div class="split-layout">
+    <?php if (isset($hasActivePlacement) && $hasActivePlacement): ?>
+        <div class="active-placement-notice">
+            <div class="notice-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="notice-title">Placement Already Active</h2>
+            <p class="notice-text">You are currently in an ongoing attachment session. New applications are disabled until this session is completed.</p>
+            <div class="notice-actions">
+                <a href="<?= Helpers::baseUrl('/student/logbook') ?>" class="btn-notice btn-logbook">
+                    <i class="fas fa-book"></i> Access Logbook
+                </a>
+                <a href="<?= Helpers::baseUrl('/student/supervisor') ?>" class="btn-notice btn-supervision">
+                    <i class="fas fa-user-tie"></i> Supervision Portal
+                </a>
+            </div>
+        </div>
+    <?php endif; ?>
     <!-- Left Column: Application Actions -->
     <div class="layout-col">
         <!-- Apply Section -->
@@ -12,7 +100,11 @@
                 </div>
             </div>
             
-            <?php if ($hasPendingOrApproved): ?>
+            <?php if ($hasActivePlacement): ?>
+                <div class="alert alert-info" style="margin-top: 10px; border-radius: 8px;">
+                    <i class="fas fa-info-circle"></i> You have an ongoing placement.
+                </div>
+            <?php elseif ($hasPendingOrApproved): ?>
                 <button class="btn-submit btn-disabled" disabled title="You already have an active application" style="width: 100%; justify-content: center;">
                     <i class="fas fa-check-circle"></i> Application Submitted
                 </button>

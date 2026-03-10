@@ -1,9 +1,93 @@
-<?php use App\Core\Helpers; ?>
-
 <link rel="stylesheet" href="<?= Helpers::baseUrl('assets/css/opportunities.css') ?>">
 
+<style>
+    .active-placement-notice {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        margin: 20px 0;
+    }
+    .notice-icon {
+        width: 80px;
+        height: 80px;
+        background: #ecfdf5;
+        color: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 24px;
+    }
+    .notice-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+    .notice-text {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .notice-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+    }
+    .btn-notice {
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-logbook {
+        background: #8B1538;
+        color: white;
+    }
+    .btn-logbook:hover {
+        background: #71112e;
+        transform: translateY(-2px);
+    }
+    .btn-supervision {
+        background: #f8fafc;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+    }
+    .btn-supervision:hover {
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+</style>
 
-    <div class="opportunities-section">
+<div class="opportunities-section">
+    <?php if (isset($hasActivePlacement) && $hasActivePlacement): ?>
+        <div class="active-placement-notice">
+            <div class="notice-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="notice-title">Ongoing Attachment Session</h2>
+            <p class="notice-text">You already have an active placement or have been cleared for completion. You cannot apply for new opportunities at this time.</p>
+            <div class="notice-actions">
+                <a href="<?= Helpers::baseUrl('/student/logbook') ?>" class="btn-notice btn-logbook">
+                    <i class="fas fa-book"></i> Update Logbook
+                </a>
+                <a href="<?= Helpers::baseUrl('/student/supervisor') ?>" class="btn-notice btn-supervision">
+                    <i class="fas fa-user-tie"></i> Check Supervision
+                </a>
+            </div>
+        </div>
+    <?php else: ?>
     <div class="section-header">
         <div>
             <h2><i class="fas fa-briefcase"></i> Active Opportunities</h2>
@@ -68,6 +152,7 @@
             <h3>No Active Opportunities</h3>
             <p>There are currently no active opportunities available. Please check back later.</p>
         </div>
+    <?php endif; ?>
     <?php endif; ?>
 </div>
 

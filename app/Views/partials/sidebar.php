@@ -30,6 +30,10 @@ $userType = $_SESSION['user_type'] ?? 'guest';
             <i class="fas fa-users"></i>
             <span>Supervisors</span>
         </a>
+        <a href="<?= Helpers::baseUrl('/admin/supervision/bulk') ?>" class="nav-item <?= ($page === 'bulk-supervision') ? 'active' : '' ?>">
+            <i class="fas fa-layer-group"></i>
+            <span>Bulk Assignment</span>
+        </a>
         <a href="<?= Helpers::baseUrl('/admin/students') ?>" class="nav-item <?= ($page === 'students') ? 'active' : '' ?>">
             <i class="fas fa-graduation-cap"></i>
             <span>Students</span>

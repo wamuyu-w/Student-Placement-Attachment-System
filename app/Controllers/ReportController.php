@@ -13,15 +13,38 @@ class ReportController extends Controller {
             $data = [
                 'placementStats' => $reportModel->getPlacementStats(),
                 'hostStats' => $reportModel->getHostStats(),
-                'title' => 'System Reports',
+                'systemStats' => $reportModel->getSystemStats(),
+                'title' => 'System Reports Center',
                 'page' => 'reports',
                 'page_css' => 'admin-dashboard.css'
             ];
             $this->view('admin/reports', $data);
         } catch (\Throwable $e) {
             error_log("Report Error: " . $e->getMessage());
-            echo "<div style='padding:20px;color:red;'>An error occurred while loading reports. Please check the logs.</div>";
+            echo "<div style='padding:20px;color:red;'>An error occurred. check logs.</div>";
         }
+    }
+
+    public function assessmentSchedule() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'schedule' => $reportModel->getAssessmentSchedule(),
+            'title' => 'Assessment Schedule Report',
+            'page' => 'reports'
+        ];
+        $this->view('reports/assessment-schedule', $data);
+    }
+
+    public function supervisorStats() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'stats' => $reportModel->getSupervisorStats(),
+            'title' => 'Supervisor Statistics',
+            'page' => 'reports'
+        ];
+        $this->view('reports/supervisor-stats', $data);
     }
 
     public function staffIndex() {
@@ -30,15 +53,26 @@ class ReportController extends Controller {
             $reportModel = $this->model('Report');
             $data = [
                 'students' => $reportModel->getSupervisedStats($_SESSION['LecturerID']),
-                'title' => 'Student Reports',
+                'title' => 'Supervision Reports',
                 'page' => 'reports',
                 'page_css' => 'staff-dashboard.css'
             ];
             $this->view('staff/reports', $data);
         } catch (\Throwable $e) {
             error_log("Report Error: " . $e->getMessage());
-            echo "<div style='padding:20px;color:red;'>An error occurred while loading reports. Please check the logs.</div>";
+            echo "<div style='padding:20px;color:red;'>An error occurred.</div>";
         }
+    }
+
+    public function lecturerGrades() {
+        $this->requireAuth('staff');
+        $reportModel = $this->model('Report');
+        $data = [
+            'grades' => $reportModel->getLecturerGrades($_SESSION['LecturerID']),
+            'title' => 'Student Performance Summary',
+            'page' => 'reports'
+        ];
+        $this->view('reports/lecturer-grades', $data);
     }
 
     public function hostIndex() {
@@ -54,8 +88,19 @@ class ReportController extends Controller {
             $this->view('host/reports', $data);
         } catch (\Throwable $e) {
             error_log("Report Error: " . $e->getMessage());
-            echo "<div style='padding:20px;color:red;'>An error occurred while loading reports. Please check the logs.</div>";
+            echo "<div style='padding:20px;color:red;'>An error occurred.</div>";
         }
+    }
+
+    public function hostPerformance() {
+        $this->requireAuth('host_org');
+        $reportModel = $this->model('Report');
+        $data = [
+            'performance' => $reportModel->getHostPerformanceReport($_SESSION['host_org_id']),
+            'title' => 'Host Performance Report',
+            'page' => 'reports'
+        ];
+        $this->view('reports/host-performance', $data);
     }
 
     public function studentIndex() {
@@ -63,15 +108,15 @@ class ReportController extends Controller {
         try {
             $reportModel = $this->model('Report');
             $data = [
-                'progress' => $reportModel->getStudentProgress($_SESSION['student_id']),
-                'title' => 'My Reports',
+                'sessions' => $reportModel->getStudentProgress($_SESSION['student_id']),
+                'title' => 'My Progress Reports',
                 'page' => 'reports',
                 'page_css' => 'student-dashboard.css'
             ];
             $this->view('student/reports', $data);
         } catch (\Throwable $e) {
             error_log("Report Error: " . $e->getMessage());
-            echo "<div style='padding:20px;color:red;'>An error occurred while loading reports. Please check the logs.</div>";
+            echo "<div style='padding:20px;color:red;'>An error occurred.</div>";
         }
     }
 
@@ -90,8 +135,7 @@ class ReportController extends Controller {
             }
         }
     }
-    // the function printCompletion() generates a printable completion certificate for a student based on their attachment progress, 
-    //ensuring that only authorized users can access the report and view the relevant data in a print-friendly format
+
     public function printCompletion() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['user_id'])) { header("Location: " . Helpers::baseUrl('/')); exit(); }
@@ -105,7 +149,7 @@ class ReportController extends Controller {
         $reportModel = $this->model('Report');
         $studentModel = $this->model('Student');
 
-        $data = ['progress' => $reportModel->getStudentProgress($studentId), 'student' => $studentModel->getById($studentId)];
+        $data = ['sessions' => $reportModel->getStudentProgress($studentId), 'student' => $studentModel->getById($studentId)];
         $this->view('reports/print-completion', $data, false);
     }
 

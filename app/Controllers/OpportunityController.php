@@ -9,9 +9,16 @@ class OpportunityController extends Controller {
         $this->requireAuth('student');
 
         $opportunityModel = $this->model('Opportunity');
+        $appModel = $this->model('Application');
+        $studentModel = $this->model('Student');
+        $studentId = $_SESSION['student_id'];
+
+        $student = $studentModel->getById($studentId);
+        $hasActivePlacement = $appModel->hasActiveAttachment($studentId) || ($student['EligibilityStatus'] === 'Cleared');
         
         $data = [
             'opportunities' => $opportunityModel->getAllActive(),
+            'hasActivePlacement' => $hasActivePlacement,
             'title' => 'Available Opportunities',
             'page' => 'opportunities',
             'page_css' => 'student-dashboard.css'
@@ -25,6 +32,16 @@ class OpportunityController extends Controller {
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->isAjax()) {
             $this->json(['success' => false, 'message' => 'Invalid request.']);
+            return;
+        }
+
+        $studentId = $_SESSION['student_id'] ?? null;
+        $appModel = $this->model('Application');
+        $studentModel = $this->model('Student');
+        $student = $studentModel->getById($studentId);
+
+        if ($appModel->hasActiveAttachment($studentId) || ($student['EligibilityStatus'] === 'Cleared')) {
+            $this->json(['success' => false, 'message' => 'You already have an active placement or are cleared.']);
             return;
         }
 

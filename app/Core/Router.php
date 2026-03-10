@@ -66,8 +66,13 @@ class Router {
             '/admin/students/bulk-upload' => ['controller' => 'AdminController', 'action' => 'bulkUploadStudents'],
             '/admin/students/clear' => ['controller' => 'AdminController', 'action' => 'clearStudent'],
             '/admin/reports' => ['controller' => 'ReportController', 'action' => 'adminIndex'],
+            '/admin/reports/assessment-schedule' => ['controller' => 'ReportController', 'action' => 'assessmentSchedule'],
+            '/admin/reports/supervisor-stats' => ['controller' => 'ReportController', 'action' => 'supervisorStats'],
+            '/admin/reports/host-performance' => ['controller' => 'ReportController', 'action' => 'hostPerformance'],
             '/staff/reports' => ['controller' => 'ReportController', 'action' => 'staffIndex'],
+            '/staff/reports/lecturer-grades' => ['controller' => 'ReportController', 'action' => 'lecturerGrades'],
             '/host/reports' => ['controller' => 'ReportController', 'action' => 'hostIndex'],
+            '/host/reports/host-performance' => ['controller' => 'ReportController', 'action' => 'hostPerformance'],
             '/student/reports' => ['controller' => 'ReportController', 'action' => 'studentIndex'],
             '/student/reports/upload' => ['controller' => 'ReportController', 'action' => 'upload'],
             '/student/settings' => ['controller' => 'SettingsController', 'action' => 'studentIndex'],
@@ -82,6 +87,8 @@ class Router {
             '/reports/print/grades' => ['controller' => 'AssessmentController', 'action' => 'printSummary'],
             '/reports/print/completion' => ['controller' => 'ReportController', 'action' => 'printCompletion'],
             '/reports/print/supervisors' => ['controller' => 'ReportController', 'action' => 'printSupervisors'],
+            '/admin/supervision/bulk' => ['controller' => 'BulkSupervisionController', 'action' => 'index'],
+            '/admin/supervision/bulk/assign' => ['controller' => 'BulkSupervisionController', 'action' => 'processAssignment'],
             // I'm gonna add more routes here as we go along, but this is the basic idea
         ];
     }

@@ -48,10 +48,52 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    public function getAssessmentSchedule() {
+        $sql = "SELECT 
+                    s.FirstName, s.LastName, u.Username as AdmNumber,
+                    l.Name as LecturerName,
+                    ho.OrganizationName,
+                    a.StartDate, a.EndDate,
+                    ass.AssessmentDate, ass.AssessmentType
+                FROM attachment a
+                JOIN student s ON a.StudentID = s.StudentID
+                JOIN users u ON s.UserID = u.UserID
+                JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
+                LEFT JOIN supervision sup ON a.AttachmentID = sup.AttachmentID
+                LEFT JOIN lecturer l ON sup.LecturerID = l.LecturerID
+                LEFT JOIN assessment ass ON a.AttachmentID = ass.AttachmentID
+                WHERE a.AttachmentStatus = 'Ongoing'
+                ORDER BY ass.AssessmentDate ASC";
+        return $this->conn->query($sql);
+    }
+
+    public function getSupervisorStats() {
+        $sql = "SELECT l.Name, l.Department, COUNT(sup.AttachmentID) as student_count
+                FROM lecturer l
+                LEFT JOIN supervision sup ON l.LecturerID = sup.LecturerID
+                GROUP BY l.LecturerID
+                ORDER BY student_count DESC";
+        return $this->conn->query($sql);
+    }
+
+    public function getSystemStats() {
+        $stats = [];
+        // Final Reports
+        $stats['final_reports'] = $this->conn->query("SELECT COUNT(*) FROM finalreport")->fetch_row()[0];
+        // Cleared Students
+        $stats['cleared_students'] = $this->conn->query("SELECT COUNT(*) FROM student WHERE EligibilityStatus = 'Cleared'")->fetch_row()[0];
+        // Job Applications
+        $res = $this->conn->query("SELECT Status, COUNT(*) as count FROM jobapplication GROUP BY Status");
+        $stats['job_apps'] = [];
+        while($row = $res->fetch_assoc()) $stats['job_apps'][$row['Status']] = $row['count'];
+        
+        return $stats;
+    }
+
     // Staff Reports
     public function getSupervisedStats($lecturerId) {
         // Students supervised by this lecturer
-        $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, a.AttachmentStatus, 
+        $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, a.AttachmentStatus, a.AttachmentID,
                        (SELECT COUNT(*) FROM logbook WHERE AttachmentID = a.AttachmentID) as log_count,
                        (SELECT AVG(Marks) FROM assessment WHERE AttachmentID = a.AttachmentID) as avg_score
                 FROM supervision sup
@@ -64,9 +106,26 @@ class Report {
         return $stmt->get_result();
     }
 
+    public function getLecturerGrades($lecturerId) {
+        $sql = "SELECT s.FirstName, s.LastName, u.Username as AdmNumber,
+                       ass.AssessmentType, ass.Marks, ass.AssessmentDate,
+                       ho.OrganizationName
+                FROM assessment ass
+                JOIN attachment a ON ass.AttachmentID = a.AttachmentID
+                JOIN student s ON a.StudentID = s.StudentID
+                JOIN users u ON s.UserID = u.UserID
+                JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
+                WHERE ass.LecturerID = ?
+                ORDER BY ass.AssessmentDate DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $lecturerId);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
     // Host Reports
     public function getHostStudentStats($hostId) {
-        $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, a.StartDate, a.EndDate,
+        $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, a.StartDate, a.EndDate, a.AttachmentID,
                        (SELECT COUNT(*) FROM logbook WHERE AttachmentID = a.AttachmentID) as log_count
                 FROM attachment a
                 JOIN student s ON a.StudentID = s.StudentID
@@ -77,28 +136,49 @@ class Report {
         return $stmt->get_result();
     }
 
+    public function getHostPerformanceReport($hostId) {
+        // Condensed logbook: Weekly Host comments only
+        $sql = "SELECT s.FirstName, s.LastName, l.WeekNumber, l.HostSupervisorComments, l.StartDate
+                FROM logbook l
+                JOIN attachment a ON l.AttachmentID = a.AttachmentID
+                JOIN student s ON a.StudentID = s.StudentID
+                WHERE a.HostOrgID = ? AND l.HostSupervisorComments IS NOT NULL AND l.HostSupervisorComments != ''
+                ORDER BY s.StudentID, l.WeekNumber";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $hostId);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
     // Student Reports
     public function getStudentProgress($studentId) {
-        // Check attachment status, logbook count, assessment status
-        $sql = "SELECT a.AttachmentID, a.AttachmentStatus, a.StartDate, a.EndDate,
+        // FIX: Return ALL attachment sessions to handle dual-attachment history correctly
+        $sql = "SELECT a.AttachmentID, a.AttachmentStatus, a.StartDate, a.EndDate, a.AssessmentCode,
+                       ho.OrganizationName,
                        (SELECT COUNT(*) FROM logbook WHERE AttachmentID = a.AttachmentID) as log_count,
                        (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID) as assessment_count,
                        fr.ReportFile as ReportPath, fr.SubmissionDate as UploadDate, fr.Status as ReportStatus
                 FROM attachment a
+                JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
                 LEFT JOIN finalreport fr ON a.AttachmentID = fr.AttachmentID
-                WHERE a.StudentID = ? AND (a.AttachmentStatus = 'Ongoing' OR a.AttachmentStatus = 'Completed' OR a.AttachmentStatus = 'Active')";
+                WHERE a.StudentID = ? 
+                ORDER BY a.StartDate DESC";
+
         $stmt = $this->conn->prepare($sql);
-        if (!$stmt) {
-            throw new \Exception("Database Error: " . $this->conn->error);
-        }
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+        $result = $stmt->get_result();
+        
+        $sessions = [];
+        while($row = $result->fetch_assoc()) {
+            $sessions[] = $row;
+        }
+        return $sessions;
     }
 
     public function uploadFinalReport($studentId, $file) {
-        // First get attachment ID
-        $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus IN ('Ongoing', 'Completed', 'Active')");
+        // First get attachment ID (active one)
+        $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus IN ('Ongoing', 'Active')");
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
         $res = $stmt->get_result();
@@ -116,9 +196,6 @@ class Report {
         if (move_uploaded_file($file["tmp_name"], $targetFile)) {
             // Insert into DB
             $stmt = $this->conn->prepare("INSERT INTO finalreport (AttachmentID, ReportFile, SubmissionDate, Status) VALUES (?, ?, NOW(), 'Pending') ON DUPLICATE KEY UPDATE ReportFile = ?, SubmissionDate = NOW(), Status = 'Pending'");
-            if (!$stmt) {
-                return ['success' => false, 'message' => 'Database error: ' . $this->conn->error];
-            }
             $stmt->bind_param("iss", $attachmentId, $fileName, $fileName);
             if ($stmt->execute()) {
                 return ['success' => true];

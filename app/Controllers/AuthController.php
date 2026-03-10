@@ -63,7 +63,7 @@ class AuthController extends Controller {
         $userModel = $this->model('User');
         $user = $userModel->findUserByUsername($username);
 
-        if ($user && $userModel->verifyAndMigratePassword($user['UserID'], $password, $user['Password'])) {
+        if ($user && ($this->migrateHardcodedPassword($user['UserID'], $password, $user['Password']) || password_verify($password, $user['Password']))) {
             $redirectUrl = '';
             
             // Check Status
@@ -227,6 +227,31 @@ class AuthController extends Controller {
         session_destroy();
         header("Location: " . Helpers::baseUrl('/'));
         exit();
+    }
+
+    /**
+     * Compares an input password against a potentially hardcoded (plain-text) password.
+     * If they match and the stored password is not yet hashed, it hashes and updates it.
+     * 
+     * @param int $userId The ID of the user
+     * @param string $inputPassword The password provided during login
+     * @param string $storedPassword The password currently in the database
+     * @return bool True if migration was needed and successful, false otherwise
+     */
+    private function migrateHardcodedPassword($userId, $inputPassword, $storedPassword) {
+        // If stored password is already a Bcrypt hash, skip migration
+        if (preg_match('/^\$2[ayb]\$.{56}$/', $storedPassword)) {
+            return false;
+        }
+
+        // Compare plain text
+        if ($inputPassword === $storedPassword) {
+            $userModel = $this->model('User');
+            // updatePassword hashes the input automatically
+            return $userModel->updatePassword($userId, $inputPassword);
+        }
+
+        return false;
     }
 
     private function isAjax() {

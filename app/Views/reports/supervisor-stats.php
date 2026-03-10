@@ -1,0 +1,40 @@
+<?php use App\Core\Helpers; ?>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Lecturer Name</th>
+                <th>Department</th>
+                <th>Current Workload</th>
+                <th>Workload Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($stats && $stats->num_rows > 0): ?>
+                <?php while($row = $stats->fetch_assoc()): ?>
+                    <tr>
+                        <td style="font-weight: 600;"><?= htmlspecialchars($row['Name']) ?></td>
+                        <td style="font-size: 13px;"><?= htmlspecialchars($row['Department'] ?? 'Academic Staff') ?></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 700; color: #8B1538;"><?= $row['student_count'] ?></span>
+                                <span style="font-size: 11px; color: #6b7280;">Students Assigned</span>
+                            </div>
+                        </td>
+                        <td>
+                            <?php 
+                            $count = $row['student_count'];
+                            if ($count >= 10) echo '<span class="status-badge status-rejected" style="font-size:11px;">High Load</span>';
+                            elseif ($count >= 5) echo '<span class="status-badge status-pending" style="font-size:11px;">Average</span>';
+                            else echo '<span class="status-badge status-approved" style="font-size:11px;">Under Capacity</span>';
+                            ?>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr><td colspan="4" style="text-align: center; padding: 40px; color: #9ca3af;">No supervisor statistics available.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>

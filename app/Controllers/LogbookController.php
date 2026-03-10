@@ -121,9 +121,9 @@ class LogbookController extends Controller {
 
         $studentId = $_GET['id'] ?? ($_SESSION['user_type'] === 'student' ? $_SESSION['student_id'] : 0);
         
-        // Basic Access Control
-        if ($_SESSION['user_type'] === 'student' && $studentId != $_SESSION['student_id']) {
-            die("Unauthorized access.");
+        // Restricted Access Control: No Host Orgs allowed to print full logbooks per user request
+        if ($_SESSION['user_type'] === 'host_org' || ($_SESSION['user_type'] === 'student' && $studentId != $_SESSION['student_id'])) {
+            die("Unauthorized access. Host organizations cannot print student logbooks.");
         }
 
         $logbookModel = $this->model('Logbook');
