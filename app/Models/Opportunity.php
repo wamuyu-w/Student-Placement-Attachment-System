@@ -168,6 +168,13 @@ class Opportunity {
                     $hostStmt->bind_param("iss", $userId, $orgName, $defaultEmail);
                     $hostStmt->execute();
                     $hostOrgId = $this->conn->insert_id;
+
+                    $newHostDetails = [
+                        'email'    => $defaultEmail,
+                        'orgName'  => $orgName,
+                        'username' => $username,
+                        'password' => $tempPassword
+                    ];
                 }
             }
 
@@ -201,6 +208,11 @@ class Opportunity {
             if (!$stmt->execute()) throw new \Exception($stmt->error);
             
             $this->conn->commit();
+
+            if (isset($newHostDetails)) {
+                \App\Core\Mailer::sendHostCredentials($newHostDetails['email'], $newHostDetails['orgName'], $newHostDetails['username'], $newHostDetails['password']);
+            }
+
             return ['success' => true];
 
         } catch (\Exception $e) {

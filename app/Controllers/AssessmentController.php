@@ -135,6 +135,45 @@ class AssessmentController extends Controller {
             ];
             
             if ($assessmentModel->schedule($data)) {
+                
+                // Fetch details for email
+                $db = (new \App\Config\Database())->connect();
+                $stmt = $db->prepare("
+                    SELECT s.Email as StudentEmail, s.FirstName, s.LastName,
+                           h.Email as HostEmail, h.OrganizationName
+                    FROM attachment a
+                    JOIN student s ON a.StudentID = s.StudentID
+                    JOIN hostorganization h ON a.HostOrgID = h.HostOrgID
+                    WHERE a.AttachmentID = ?
+                ");
+                $stmt->bind_param("i", $attachmentId);
+                $stmt->execute();
+                $info = $stmt->get_result()->fetch_assoc();
+                
+                if ($info) {
+                    $studentFullName = trim($info['FirstName'] . ' ' . $info['LastName']);
+                    $dateFormatted = date('l, F j, Y', strtotime($_POST['assessment_date']));
+                    
+                    if (!empty($info['StudentEmail'])) {
+                        \App\Core\Mailer::notifyAssessmentScheduled(
+                            $info['StudentEmail'], 
+                            $studentFullName, 
+                            $studentFullName, 
+                            $dateFormatted, 
+                            $type
+                        );
+                    }
+                    if (!empty($info['HostEmail'])) {
+                        \App\Core\Mailer::notifyAssessmentScheduled(
+                            $info['HostEmail'], 
+                            $info['OrganizationName'], 
+                            $studentFullName, 
+                            $dateFormatted, 
+                            $type
+                        );
+                    }
+                }
+
                 $this->json(['success' => true, 'message' => "$type scheduled successfully"]);
             } else {
                 $this->json(['success' => false, 'message' => 'Failed to schedule assessment']);

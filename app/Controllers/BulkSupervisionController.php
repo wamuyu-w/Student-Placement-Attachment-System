@@ -99,6 +99,29 @@ class BulkSupervisionController extends Controller {
                     if ($result['success']) {
                         $successCount++;
                         $assigned = true;
+
+                        // Fetch details and send email
+                        $db = (new \App\Config\Database())->connect();
+                        // Student Details
+                        $stmt = $db->prepare("SELECT s.Email, s.FirstName, s.LastName FROM student s JOIN attachment a ON s.StudentID = a.StudentID WHERE a.AttachmentID = ?");
+                        $stmt->bind_param("i", $attachmentId);
+                        $stmt->execute();
+                        $studentInfo = $stmt->get_result()->fetch_assoc();
+                        
+                        // Lecturer Details
+                        $stmtL = $db->prepare("SELECT u.Username, l.Name FROM lecturer l JOIN users u ON l.UserID = u.UserID WHERE l.LecturerID = ?");
+                        $stmtL->bind_param("i", $lecturerId);
+                        $stmtL->execute();
+                        $lecInfo = $stmtL->get_result()->fetch_assoc();
+                        
+                        if ($studentInfo && $lecInfo && !empty($studentInfo['Email'])) {
+                            \App\Core\Mailer::notifySupervisorAssigned(
+                                $studentInfo['Email'],
+                                trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
+                                $lecInfo['Name'],
+                                $lecInfo['Username'] . '@example.com' // Placeholder email
+                            );
+                        }
                     }
                 }
                 $attempts++;

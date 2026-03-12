@@ -97,6 +97,11 @@ class Host {
             $hostStmt->close();
 
             $this->conn->commit();
+            
+            if (!empty($data['email'])) {
+                \App\Core\Mailer::sendHostCredentials($data['email'], $data['org_name'], $data['username'], $data['password']);
+            }
+
             return ['success' => true];
         } catch (\Exception $e) {
             $this->conn->rollback();

@@ -44,9 +44,18 @@
                                         <button class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openScheduleModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')">
                                             <i class="fas fa-calendar-plus"></i> Schedule
                                         </button>
-                                        <button class="btn btn-primary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')">
-                                            <i class="fas fa-clipboard-check"></i> Assess
-                                        </button>
+                                        <?php if ($row['AssessmentCount'] > 0): ?>
+                                            <button disabled class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.85rem; opacity: 0.6; cursor: not-allowed;">
+                                                <i class="fas fa-check"></i> Assessed
+                                            </button>
+                                            <a href="<?= Helpers::baseUrl('/assessment/print-summary?id=' . $row['StudentID']) ?>" target="_blank" class="btn btn-outline" style="padding: 6px 10px; font-size: 0.85rem;">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        <?php else: ?>
+                                            <button class="btn btn-primary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')">
+                                                <i class="fas fa-clipboard-check"></i> Assess
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

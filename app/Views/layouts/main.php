@@ -8,6 +8,7 @@
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/global.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/table-sort-filter.css') ?>?v=<?= time() ?>">
     <?php 
     if (isset($page_css)): 
         $css_files = is_array($page_css) ? $page_css : [$page_css];
@@ -27,5 +28,6 @@
         <?php require_once __DIR__ . '/../partials/header.php'; ?>
         <?= $content; ?>
     </div>
+    <script src="<?= Helpers::baseUrl('../assets/js/table-sort-filter.js') ?>?v=<?= time() ?>"></script>
 </body>
 </html>

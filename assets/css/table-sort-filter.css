@@ -1,0 +1,73 @@
+/* global table sort/filter styles */
+
+/* Search Container */
+.table-filter-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.table-filter-input {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 300px;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    color: #334155;
+}
+
+.table-filter-input:focus {
+    outline: none;
+    border-color: #8B1538;
+    box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+}
+
+.table-filter-input::placeholder {
+    color: #94a3b8;
+}
+
+/* Sortable Headers */
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 25px !important; /* Make room for the pseudo-element icon */
+    transition: background-color 0.2s;
+}
+
+th.sortable:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle hover effect */
+}
+
+/* Default sort indicator (unsorted) */
+th.sortable::after {
+    content: '\21C5'; /* Up/Down Arrow */
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    color: #cbd5e1;
+}
+
+/* Ascending indicator */
+th.sortable.sort-asc::after {
+    content: '\2191'; /* Upwards Arrow */
+    color: #8B1538;
+}
+
+/* Descending indicator */
+th.sortable.sort-desc::after {
+    content: '\2193'; /* Downwards Arrow */
+    color: #8B1538;
+}
+
+/* Ensure table container has some breathing room if we dynamically inject stuff */
+.table-wrapper-dynamic {
+    width: 100%;
+    margin-bottom: 30px;
+}

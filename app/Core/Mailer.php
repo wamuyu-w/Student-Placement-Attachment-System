@@ -1,15 +1,44 @@
 <?php
 namespace App\Core;
 
+require_once __DIR__ . '/PHPMailer/Exception.php';
+require_once __DIR__ . '/PHPMailer/PHPMailer.php';
+require_once __DIR__ . '/PHPMailer/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 /**
- * Simple Mailer utility using PHP's built-in mail().
- * Requires a working SMTP relay configured in php.ini (or via sendmail).
- * For production, replace with PHPMailer/SwiftMailer + SMTP credentials.
+ * Mailer utility using PHPMailer with Gmail SMTP.
+ * Falls back to PHP's built-in mail() if .env credentials are not found.
  */
 class Mailer {
 
-    private static string $fromEmail = 'noreply@cuea-attachment.ac.ke';
-    private static string $fromName  = 'CUEA Attachment System';
+    private static function getEnvVars() {
+        $envFile = __DIR__ . '/../../.env';
+        $credentials = ['host' => 'smtp.gmail.com', 'port' => 465, 'username' => '', 'password' => ''];
+        
+        if (file_exists($envFile)) {
+            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                // Tolerate commented out credentials in .env based on the user's current format
+                $line = ltrim(trim($line), '#');
+                if (strpos($line, 'APP_KEY=') !== false) {
+                    $parts = explode('=', $line, 2);
+                    if (count($parts) == 2) {
+                        $credentials['password'] = trim(str_replace(['"', "'"], '', $parts[1]));
+                    }
+                }
+                if (strpos($line, 'USER_MAIL=') !== false) {
+                    $parts = explode('=', $line, 2);
+                    if (count($parts) == 2) {
+                        $credentials['username'] = trim(str_replace(['"', "'"], '', $parts[1]));
+                    }
+                }
+            }
+        }
+        return $credentials;
+    }
 
     /**
      * Core send method.
@@ -20,25 +49,51 @@ class Mailer {
             return false;
         }
 
-        $headers  = "MIME-Version: 1.0\r\n";
-        $headers .= "Content-type: text/html; charset=UTF-8\r\n";
-        $headers .= "From: " . self::$fromName . " <" . self::$fromEmail . ">\r\n";
-        $headers .= "X-Mailer: PHP/" . phpversion();
-
-        $result = mail($to, $subject, self::wrapHtml($subject, $htmlBody), $headers);
-
-        if (!$result) {
-            error_log("Mailer: Failed to send email to $to — Subject: $subject");
+        $env = self::getEnvVars();
+        if (empty($env['username']) || empty($env['password'])) {
+            error_log("Mailer: SMTP credentials missing in .env. Falling back to built-in mail().");
+            $fromEmail = 'michellewachira25@gmail.com';
+            $fromName  = 'CUEA Attachment System';
+            $headers  = "MIME-Version: 1.0\r\n";
+            $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+            $headers .= "From: $fromName <$fromEmail>\r\n";
+            $headers .= "X-Mailer: PHP/" . phpversion();
+            $result = mail($to, $subject, self::wrapHtml($subject, $htmlBody), $headers);
+            if (!$result) {
+                error_log("Mailer: Failed to send email to $to via mail() — Subject: $subject");
+            }
+            return $result;
         }
 
-        return $result;
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = $env['host'];
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $env['username'];
+            $mail->Password   = $env['password'];
+            // Using SMTPS on port 465
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = $env['port'];
+
+            $mail->setFrom($env['username'], 'CUEA Attachment System');
+            $mail->addAddress($to);
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = self::wrapHtml($subject, $htmlBody);
+            
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Mailer could not send email to $to. Error: {$mail->ErrorInfo}");
+            return false;
+        }
     }
 
     // ─── Notification Methods ───────────────────────────────────────────────
 
-    /**
-     * Notify a student that their attachment application was approved.
-     */
+    // Notify a student that their attachment application was approved
     public static function notifyStudentApproved(string $email, string $studentName, string $orgName): bool {
         $subject = "Attachment Application Approved";
         $body = "
@@ -97,6 +152,44 @@ class Mailer {
                 <li><strong>Password:</strong> " . htmlspecialchars($password) . "</li>
             </ul>
             <p style='color:#b45309;'><strong>Important:</strong> You will be required to change your password on first login.</p>
+            <p>Best regards,<br>CUEA Attachment Office</p>
+        ";
+        return self::send($email, $subject, $body);
+    }
+
+    /**
+     * Notify a student about their assigned supervisor.
+     */
+    public static function notifySupervisorAssigned(string $studentEmail, string $studentName, string $lecturerName, string $lecturerEmail): bool {
+        $subject = "Your Attachment Supervisor Has Been Assigned";
+        $body = "
+            <p>Dear <strong>" . htmlspecialchars($studentName) . "</strong>,</p>
+            <p>A university supervisor has been assigned to oversee your industrial attachment.</p>
+            <p><strong>Supervisor Details:</strong></p>
+            <ul>
+                <li><strong>Name:</strong> " . htmlspecialchars($lecturerName) . "</li>
+                <li><strong>Email:</strong> " . htmlspecialchars($lecturerEmail) . "</li>
+            </ul>
+            <p>Please log into the portal to review any further details and ensure your logbook is kept up-to-date for their review.</p>
+            <p>Best regards,<br>CUEA Attachment Office</p>
+        ";
+        return self::send($studentEmail, $subject, $body);
+    }
+
+    /**
+     * Notify a student and/or host about an upcoming scheduled assessment.
+     */
+    public static function notifyAssessmentScheduled(string $email, string $recipientName, string $studentName, string $assessmentDate, string $assessmentType): bool {
+        $subject = "Upcoming Assessment Scheduled: $assessmentType";
+        $body = "
+            <p>Dear <strong>" . htmlspecialchars($recipientName) . "</strong>,</p>
+            <p>This is a formal notification that an attachment assessment has been scheduled.</p>
+            <ul>
+                <li><strong>Student:</strong> " . htmlspecialchars($studentName) . "</li>
+                <li><strong>Assessment Type:</strong> " . htmlspecialchars($assessmentType) . "</li>
+                <li><strong>Scheduled Date:</strong> " . htmlspecialchars($assessmentDate) . "</li>
+            </ul>
+            <p>Please ensure all necessary preparations are made prior to this date. The host organization will need to generate a unique assessment code from their portal for the supervisor to conduct the assessment.</p>
             <p>Best regards,<br>CUEA Attachment Office</p>
         ";
         return self::send($email, $subject, $body);

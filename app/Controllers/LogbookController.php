@@ -8,12 +8,13 @@ class LogbookController extends Controller {
     public function studentIndex() {
         $this->requireAuth('student');
         $logbookModel = $this->model('Logbook');
+        $appModel = $this->model('Application');
         
         $entries = $logbookModel->getEntriesByStudent($_SESSION['student_id']);
         
         $data = [
             'entries' => $entries,
-            'hasAttachment' => !empty($entries),
+            'hasAttachment' => $appModel->hasActiveAttachment($_SESSION['student_id']),
             'title' => 'My Logbook',
             'page' => 'logbook',
             'page_css' => ['student-dashboard.css', 'logbook.css']

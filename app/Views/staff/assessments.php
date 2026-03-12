@@ -32,14 +32,23 @@
                             <td style="padding: 12px; color: #6b7280;"><?= htmlspecialchars($row['RegistrationNumber']) ?></td>
                             <td style="padding: 12px;"><?= htmlspecialchars($row['OrganizationName']) ?></td>
                             <td style="padding: 12px;">
-                                <span class="status-badge status-neutral">
-                                    <?= $row['AssessmentCount'] == 0 ? 'First Assessment' : 'Final Assessment' ?>
+                                <span class="status-badge <?= $row['AssessmentCount'] > 0 ? 'status-active' : 'status-pending' ?>">
+                                    <?= $row['AssessmentCount'] > 0 ? 'Assessment Completed' : 'Pending Assessment' ?>
                                 </span>
                             </td>
-                            <td style="padding: 12px;">
-                                <button onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'])) ?>')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.9em;">
-                                    <i class="fas fa-clipboard-check"></i> Assess
-                                </button>
+                            <td style="padding: 12px; display: flex; gap: 8px;">
+                                <?php if ($row['AssessmentCount'] > 0): ?>
+                                    <button disabled class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.9em; opacity: 0.6; cursor: not-allowed;">
+                                        <i class="fas fa-check"></i> Assessed
+                                    </button>
+                                    <a href="<?= Helpers::baseUrl('/assessment/print-summary?id=' . $row['StudentID']) ?>" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.9em;">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                <?php else: ?>
+                                    <button onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'])) ?>')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.9em;">
+                                        <i class="fas fa-clipboard-check"></i> Assess
+                                    </button>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>

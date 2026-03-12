@@ -162,4 +162,18 @@ class ReportController extends Controller {
         $data = ['supervisors' => $supervisorModel->getAllSupervisors()];
         $this->view('reports/print-supervisors', $data, false);
     }
+
+    public function printAssessmentSchedule() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = ['schedule' => $reportModel->getAssessmentSchedule()];
+        $this->view('reports/print-assessment-schedule', $data, false);
+    }
+
+    public function printSupervisorStats() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = ['stats' => $reportModel->getSupervisorStats()];
+        $this->view('reports/print-supervisor-stats', $data, false);
+    }
 }

@@ -180,6 +180,13 @@ class Application {
                     $insertHost->bind_param("isss", $newUserId, $intendedHost, $contactPerson, $contactEmail);
                     $insertHost->execute();
                     $hostOrgId = $this->conn->insert_id;
+
+                    $newHostDetails = [
+                        'email'    => $contactEmail,
+                        'orgName'  => $intendedHost,
+                        'username' => $newUsername,
+                        'password' => $rawPassword
+                    ];
                 }
             }
 
@@ -196,6 +203,11 @@ class Application {
             if (!$stmt->execute()) throw new \Exception("Failed to submit application");
             
             $this->conn->commit();
+
+            if (isset($newHostDetails) && !empty($newHostDetails['email'])) {
+                \App\Core\Mailer::sendHostCredentials($newHostDetails['email'], $newHostDetails['orgName'], $newHostDetails['username'], $newHostDetails['password']);
+            }
+
             return ['success' => true];
 
         } catch (\Exception $e) {

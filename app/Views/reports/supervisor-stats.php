@@ -1,5 +1,12 @@
 <?php use App\Core\Helpers; ?>
 
+<div class="table-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Supervisor Workloads</h2>
+    <a href="<?= Helpers::baseUrl('/admin/reports/print-supervisor-stats') ?>" target="_blank" class="btn-submit" style="text-decoration: none; font-size: 0.9rem; padding: 10px 16px;">
+        <i class="fas fa-print"></i> Export / Print PDF
+    </a>
+</div>
+
 <div class="table-container">
     <table>
         <thead>
