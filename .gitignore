@@ -19,11 +19,14 @@ desktop.ini
 # return the .env file to the .gitignore file so that it doesn't get pushed to github.
 
 #it was here!!
-env
+*.env
 config/local.php
+
+
 
 #composer files - Mailer.php
 composer.phar
+
 
 # Uploads (if any)
 uploads/*
