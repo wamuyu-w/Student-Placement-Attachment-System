@@ -176,4 +176,54 @@ class ReportController extends Controller {
         $data = ['stats' => $reportModel->getSupervisorStats()];
         $this->view('reports/print-supervisor-stats', $data, false);
     }
+
+    public function assessmentSummary() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'summary' => $reportModel->getAssessmentSummary(),
+            'title' => 'Student Assessment Summary',
+            'page' => 'reports',
+            'page_css' => 'admin-dashboard.css'
+        ];
+        $this->view('reports/assessment-summary', $data);
+    }
+
+    public function effectiveness() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'stats' => $reportModel->getSystemEffectiveness(),
+            'lecturerStats' => $reportModel->getLecturerAssessedStats(),
+            'title' => 'System Effectiveness Report',
+            'page' => 'reports',
+            'page_css' => 'admin-dashboard.css'
+        ];
+        $this->view('reports/effectiveness', $data);
+    }
+
+    public function printAssessmentSummary() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = ['summary' => $reportModel->getAssessmentSummary()];
+        $this->view('reports/print-assessment-summary', $data, false);
+    }
+
+    public function printEffectiveness() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'stats' => $reportModel->getSystemEffectiveness(),
+            'lecturerStats' => $reportModel->getLecturerAssessedStats()
+        ];
+        $this->view('reports/print-effectiveness', $data, false);
+    }
+
+    public function printHostPerformance() {
+        $this->requireAuth('admin');
+        $hostId = $_GET['host_id'] ?? 0;
+        $reportModel = $this->model('Report');
+        $data = ['performance' => $reportModel->getHostPerformanceReport($hostId)];
+        $this->view('reports/print-host-performance', $data, false);
+    }
 }

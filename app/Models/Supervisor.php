@@ -78,6 +78,8 @@ class Supervisor {
         $sql = "SELECT LecturerID, Name FROM lecturer WHERE Role = 'Supervisor' OR Role = 'Admin'";
         return $this->conn->query($sql);
     }
+
+    //function that assigns lecturers and students
     public function assign($attachmentId, $lecturerId) {
         if (empty($attachmentId) || empty($lecturerId)) {
             return ['success' => false, 'message' => 'Missing data'];

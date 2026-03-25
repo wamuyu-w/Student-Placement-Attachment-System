@@ -37,6 +37,8 @@ class BulkSupervisionController extends Controller {
                 s.LastName, 
                 u.Username as AdmNumber,
                 ho.OrganizationName,
+                (SELECT COUNT(*) FROM supervision WHERE AttachmentID = a.AttachmentID) as SupCount,
+                (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID) as AssessCount,
                 (SELECT GROUP_CONCAT(sup_old.LecturerID) 
                  FROM supervision sup_old 
                  JOIN attachment a_old ON sup_old.AttachmentID = a_old.AttachmentID 
@@ -45,10 +47,9 @@ class BulkSupervisionController extends Controller {
             JOIN student s ON a.StudentID = s.StudentID
             JOIN users u ON s.UserID = u.UserID
             JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
-            LEFT JOIN supervision sup_curr ON a.AttachmentID = sup_curr.AttachmentID
             WHERE a.AttachmentStatus = 'Ongoing'
             GROUP BY a.AttachmentID
-            HAVING COUNT(sup_curr.LecturerID) < 1
+            HAVING SupCount = 0 OR (SupCount = 1 AND AssessCount >= 1)
         ";
         
         $result = $db->query($sql);

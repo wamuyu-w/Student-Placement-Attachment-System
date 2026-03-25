@@ -203,4 +203,42 @@ class Report {
         }
         return ['success' => false, 'message' => 'Upload failed.'];
     }
+
+    public function getAssessmentSummary() {
+        $sql = "SELECT 
+                    s.FirstName, s.LastName, u.Username as AdmNumber,
+                    a.AttachmentStatus,
+                    (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'First Assessment' AND Status = 'Completed' LIMIT 1) as FirstScore,
+                    (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'Final Assessment' AND Status = 'Completed' LIMIT 1) as SecondScore,
+                    (SELECT AVG(Marks) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Completed') as AverageScore
+                FROM attachment a
+                JOIN student s ON a.StudentID = s.StudentID
+                JOIN users u ON s.UserID = u.UserID
+                WHERE a.AttachmentStatus != 'Pending'
+                ORDER BY s.LastName, s.FirstName";
+        return $this->conn->query($sql);
+    }
+
+    public function getSystemEffectiveness() {
+        $stats = [];
+        $stats['totalStudents'] = $this->conn->query("SELECT COUNT(*) FROM student")->fetch_row()[0];
+        $stats['placedStudents'] = $this->conn->query("SELECT COUNT(DISTINCT StudentID) FROM attachment WHERE AttachmentStatus != 'Cancelled'")->fetch_row()[0];
+        $stats['totalOpportunities'] = $this->conn->query("SELECT COUNT(*) FROM attachmentopportunity")->fetch_row()[0];
+        $stats['completedAttachments'] = $this->conn->query("SELECT COUNT(*) FROM attachment WHERE AttachmentStatus = 'Completed'")->fetch_row()[0];
+        
+        // Placements over time (by month)
+        $stats['placementsByMonth'] = $this->conn->query("SELECT DATE_FORMAT(StartDate, '%Y-%m') as Month, COUNT(*) as count FROM attachment GROUP BY Month ORDER BY Month DESC LIMIT 6");
+        
+        return $stats;
+    }
+
+    public function getLecturerAssessedStats() {
+        $sql = "SELECT l.Name, COUNT(DISTINCT a.AttachmentID) as students_assessed, AVG(a.Marks) as avg_marks_given
+                FROM lecturer l
+                JOIN assessment a ON l.LecturerID = a.LecturerID
+                WHERE a.Status = 'Completed'
+                GROUP BY l.LecturerID
+                ORDER BY students_assessed DESC";
+        return $this->conn->query($sql);
+    }
 }

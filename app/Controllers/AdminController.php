@@ -164,12 +164,30 @@ class AdminController extends Controller {
         // Get basic student info
         $student = $studentModel->getById($studentId);
         
-        // Get attachment & report status
-        $progress = $reportModel->getStudentProgress($studentId);
+        // Get attachment & report status (extract most recent session)
+        $progressArray = $reportModel->getStudentProgress($studentId);
+        $progress = !empty($progressArray) ? $progressArray[0] : null;
+
+        $hostOrg = $progress['OrganizationName'] ?? 'Not Assigned';
+
+        // Fetch Supervisor Details if attached
+        $supervisor = 'Not Assigned';
+        if ($progress && !empty($progress['AttachmentID'])) {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT l.Name FROM supervision s JOIN lecturer l ON s.LecturerID = l.LecturerID WHERE s.AttachmentID = ?");
+            $stmt->bind_param("i", $progress['AttachmentID']);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            if ($row = $res->fetch_assoc()) {
+                $supervisor = $row['Name'];
+            }
+        }
 
         $data = [
             'student' => $student,
             'progress' => $progress,
+            'hostOrgName' => $hostOrg,
+            'supervisorName' => $supervisor,
             'assessments' => $assessmentModel->getStudentAssessments($studentId),
             'logbookEntries' => $logbookModel->getEntriesByStudent($studentId),
             'title' => 'Student Progress',
@@ -187,6 +205,31 @@ class AdminController extends Controller {
             
             $supervisorModel = $this->model('Supervisor');
             $result = $supervisorModel->assign($attachmentId, $lecturerId);
+
+            if ($result['success']) {
+                // Fetch details and send email
+                $db = (new \App\Config\Database())->connect();
+                // Student Details
+                $stmt = $db->prepare("SELECT s.Email, s.FirstName, s.LastName FROM student s JOIN attachment a ON s.StudentID = a.StudentID WHERE a.AttachmentID = ?");
+                $stmt->bind_param("i", $attachmentId);
+                $stmt->execute();
+                $studentInfo = $stmt->get_result()->fetch_assoc();
+                
+                // Lecturer Details
+                $stmtL = $db->prepare("SELECT u.Username, l.Name FROM lecturer l JOIN users u ON l.UserID = u.UserID WHERE l.LecturerID = ?");
+                $stmtL->bind_param("i", $lecturerId);
+                $stmtL->execute();
+                $lecInfo = $stmtL->get_result()->fetch_assoc();
+                
+                if ($studentInfo && $lecInfo && !empty($studentInfo['Email'])) {
+                    \App\Core\Mailer::notifySupervisorAssigned(
+                        $studentInfo['Email'],
+                        trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
+                        $lecInfo['Name'],
+                        $lecInfo['Username'] . '@example.com' // Using username as email if real email isn't in DB
+                    );
+                }
+            }
 
             $param = $result['success'] ? 'success=Supervisor assigned successfully' : 'error=' . urlencode($result['message']);
             header("Location: " . Helpers::baseUrl('/admin/supervisors?' . $param));

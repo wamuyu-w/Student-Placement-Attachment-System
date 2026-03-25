@@ -45,7 +45,7 @@ class User {
     }
 
     public function getStaffProfile($userId) {
-        // Staff/Lecturer/Admin
+        // Staff/Lecturer/Admin - The student_id/Staff_Number is used for login/extracting details
         $stmt = $this->conn->prepare("SELECT * FROM lecturer WHERE UserID = ?");
         $stmt->bind_param("i", $userId);
         $stmt->execute();
@@ -53,9 +53,7 @@ class User {
     }
 
     public function getHostProfile($userId) {
-        // Host Organization
-        // Note: Host Org table structure might link via UserID or have email as username
-        // Assuming UserID link exists based on schema pattern
+        // Host Organization - identified as H001/H002/H003
         $stmt = $this->conn->prepare("SELECT * FROM hostorganization WHERE UserID = ?");
         $stmt->bind_param("i", $userId);
         $stmt->execute();

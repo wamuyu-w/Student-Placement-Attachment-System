@@ -1,10 +1,6 @@
 <?php
 namespace App\Core;
 
-require_once __DIR__ . '/PHPMailer/Exception.php';
-require_once __DIR__ . '/PHPMailer/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer/SMTP.php';
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -15,7 +11,10 @@ use PHPMailer\PHPMailer\Exception;
 class Mailer {
 
     private static function getEnvVars() {
+        // get the .env variable
         $envFile = __DIR__ . '/../../.env';
+        
+        //provide auth credentials such as host, port, username and password
         $credentials = ['host' => 'smtp.gmail.com', 'port' => 465, 'username' => '', 'password' => ''];
         
         if (file_exists($envFile)) {
@@ -26,7 +25,8 @@ class Mailer {
                 if (strpos($line, 'APP_KEY=') !== false) {
                     $parts = explode('=', $line, 2);
                     if (count($parts) == 2) {
-                        $credentials['password'] = trim(str_replace(['"', "'"], '', $parts[1]));
+                        // Gmail App Passwords do not have spaces
+                        $credentials['password'] = str_replace(' ', '', trim(str_replace(['"', "'"], '', $parts[1])));
                     }
                 }
                 if (strpos($line, 'USER_MAIL=') !== false) {
@@ -100,7 +100,7 @@ class Mailer {
             <p>Dear <strong>" . htmlspecialchars($studentName) . "</strong>,</p>
             <p>Your attachment application to <strong>" . htmlspecialchars($orgName) . "</strong> has been <span style='color:#16a34a;font-weight:600'>approved</span>.</p>
             <p>You may now log into your student portal to access your logbook and view your supervision details.</p>
-            <p>Best regards,<br>CUEA Attachment Office</p>
+            <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
         ";
         return self::send($email, $subject, $body);
     }
@@ -115,7 +115,7 @@ class Mailer {
             <p>Unfortunately, your attachment application has been <span style='color:#dc2626;font-weight:600'>declined</span>.</p>
             <p><strong>Reason:</strong> " . htmlspecialchars($reason) . "</p>
             <p>Please contact the Attachment Office for further assistance.</p>
-            <p>Best regards,<br>CUEA Attachment Office</p>
+            <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
         ";
         return self::send($email, $subject, $body);
     }
@@ -124,7 +124,7 @@ class Mailer {
      * Notify a host organization that a student has been placed with them.
      */
     public static function notifyHostPlacement(string $email, string $orgName, string $studentName, string $startDate, string $endDate): bool {
-        $subject = "New Student Placement — Action Required";
+        $subject = "New Student Placement: Action Required";
         $body = "
             <p>Dear <strong>" . htmlspecialchars($orgName) . "</strong> Team,</p>
             <p>A student has been approved for attachment at your organization:</p>
@@ -133,7 +133,7 @@ class Mailer {
                 <li><strong>Period:</strong> " . htmlspecialchars($startDate) . " to " . htmlspecialchars($endDate) . "</li>
             </ul>
             <p>Please log into your portal to review their logbook and provide weekly feedback.</p>
-            <p>Best regards,<br>CUEA Attachment Office</p>
+            <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
         ";
         return self::send($email, $subject, $body);
     }
@@ -142,7 +142,7 @@ class Mailer {
      * Send new host organization login credentials.
      */
     public static function sendHostCredentials(string $email, string $orgName, string $username, string $password): bool {
-        $subject = "Your Portal Login Credentials — CUEA Attachment System";
+        $subject = "Your Portal Login Credentials: CUEA Attachment System";
         $body = "
             <p>Dear <strong>" . htmlspecialchars($orgName) . "</strong>,</p>
             <p>An account has been created for your organization on the CUEA Student Attachment Portal.</p>
@@ -152,7 +152,7 @@ class Mailer {
                 <li><strong>Password:</strong> " . htmlspecialchars($password) . "</li>
             </ul>
             <p style='color:#b45309;'><strong>Important:</strong> You will be required to change your password on first login.</p>
-            <p>Best regards,<br>CUEA Attachment Office</p>
+            <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
         ";
         return self::send($email, $subject, $body);
     }
@@ -171,7 +171,7 @@ class Mailer {
                 <li><strong>Email:</strong> " . htmlspecialchars($lecturerEmail) . "</li>
             </ul>
             <p>Please log into the portal to review any further details and ensure your logbook is kept up-to-date for their review.</p>
-            <p>Best regards,<br>CUEA Attachment Office</p>
+            <p>Best regards,<br>CUEA Industrial Attachment Department</p>
         ";
         return self::send($studentEmail, $subject, $body);
     }
@@ -190,7 +190,7 @@ class Mailer {
                 <li><strong>Scheduled Date:</strong> " . htmlspecialchars($assessmentDate) . "</li>
             </ul>
             <p>Please ensure all necessary preparations are made prior to this date. The host organization will need to generate a unique assessment code from their portal for the supervisor to conduct the assessment.</p>
-            <p>Best regards,<br>CUEA Attachment Office</p>
+            <p>Best regards,<br>CUEA Industrial Attachment Department</p>
         ";
         return self::send($email, $subject, $body);
     }

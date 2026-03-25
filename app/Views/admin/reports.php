@@ -53,6 +53,24 @@
                 <i class="fas fa-chevron-right" style="font-size: 12px; color: #d1d5db;"></i>
             </a>
 
+            <a href="<?= Helpers::baseUrl('/admin/reports/assessment-summary') ?>" class="action-btn">
+                <i class="fas fa-list-ol" style="color: #d97706;"></i>
+                <div style="flex: 1;">
+                    <span style="display: block; font-weight: bold;">Assessment Summary</span>
+                    <small style="color: #6b7280;">Student Grades & Averages</small>
+                </div>
+                <i class="fas fa-chevron-right" style="font-size: 12px; color: #d1d5db;"></i>
+            </a>
+
+            <a href="<?= Helpers::baseUrl('/admin/reports/effectiveness') ?>" class="action-btn">
+                <i class="fas fa-chart-line" style="color: #7c3aed;"></i>
+                <div style="flex: 1;">
+                    <span style="display: block; font-weight: bold;">System Effectiveness</span>
+                    <small style="color: #6b7280;">Placement Impact Analytics</small>
+                </div>
+                <i class="fas fa-chevron-right" style="font-size: 12px; color: #d1d5db;"></i>
+            </a>
+
             <a href="<?= Helpers::baseUrl('/admin/users') ?>" class="action-btn">
                 <i class="fas fa-check-double" style="color: #059669;"></i>
                 <div style="flex: 1;">

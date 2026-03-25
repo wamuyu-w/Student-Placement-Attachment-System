@@ -54,14 +54,13 @@ class AssessmentController extends Controller {
             exit();
         }
 
-        // Get student details for the form header (reusing Staff model logic or creating a specific method)
-        // For simplicity, we'll pass the ID and let the view/model handle fetching details if needed, 
-        // but ideally we fetch student name here.
-        // Let's assume the view will display a generic form or we fetch basic info.
+        $assessmentModel = $this->model('Assessment');
+        $scheduled = $assessmentModel->getScheduled($attachmentId);
         
         $data = [
             'attachment_id' => $attachmentId,
             'lecturer_id' => $_SESSION['LecturerID'],
+            'scheduled' => $scheduled,
             'title' => 'Conduct Assessment',
             'page' => 'assessment',
             'page_css' => 'staff-dashboard.css'
@@ -82,19 +81,29 @@ class AssessmentController extends Controller {
             }
 
             $assessmentModel = $this->model('Assessment');
-            $count = $assessmentModel->getAssessmentCount($attachmentId);
-            $type = ($count == 0) ? 'First Assessment' : 'Final Assessment';
-
+            
+            // Check for a scheduled assessment first
+            $scheduled = $assessmentModel->getScheduled($attachmentId);
+            
             $data = [
                 'attachment_id' => $attachmentId,
                 'lecturer_id' => $_SESSION['LecturerID'],
-                'assessment_type' => $type,
                 'marks' => $_POST['total_score'],
                 'remarks' => Helpers::sanitize($_POST['comments']),
                 'criteria_scores' => json_encode($_POST['criteria'] ?? [])
             ];
 
-            if ($assessmentModel->create($data)) {
+            if ($scheduled) {
+                // Update the scheduled assessment
+                $result = $assessmentModel->update($scheduled['AssessmentID'], $data);
+            } else {
+                // Ad-hoc submission: create new
+                $count = $assessmentModel->getAssessmentCount($attachmentId);
+                $data['assessment_type'] = ($count == 0) ? 'First Assessment' : 'Final Assessment';
+                $result = $assessmentModel->create($data);
+            }
+
+            if ($result) {
                 unset($_SESSION['authorized_assessment_' . $attachmentId]);
                 header("Location: " . Helpers::baseUrl('/staff/assessments?success=Assessment submitted'));
             } else {
@@ -131,7 +140,7 @@ class AssessmentController extends Controller {
                 'lecturer_id'   => $_SESSION['LecturerID'],
                 'assessment_type' => $type,
                 'assessment_date' => $_POST['assessment_date'],
-                'supervision_comments' => Helpers::sanitize($_POST['supervision_comments'] ?? '')
+                'supervision_comments' => Helpers::sanitize($_POST['remarks'] ?? '')
             ];
             
             if ($assessmentModel->schedule($data)) {
@@ -210,16 +219,30 @@ class AssessmentController extends Controller {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['user_id'])) { header("Location: " . Helpers::baseUrl('/')); exit(); }
 
-        $studentId = $_GET['id'] ?? ($_SESSION['user_type'] === 'student' ? $_SESSION['student_id'] : 0);
-        
-        if ($_SESSION['user_type'] === 'student' && $studentId != $_SESSION['student_id']) {
-            die("Unauthorized access.");
-        }
+        $id = $_GET['id'] ?? ($_SESSION['user_type'] === 'student' ? $_SESSION['student_id'] : 0);
+        $studentId = 0;
 
         $assessmentModel = $this->model('Assessment');
         $studentModel = $this->model('Student');
 
-        $data = ['assessments' => $assessmentModel->getStudentAssessments($studentId), 'student' => $studentModel->getById($studentId)];
+        // Check if $id is an AssessmentID by trying to fetch it
+        $assessment = $assessmentModel->getById($id);
+        if ($assessment) {
+            // If it's a valid assessment, use the associated student ID
+            $studentId = $assessment['StudentID'];
+        } else {
+            // Otherwise, treat it as a student ID
+            $studentId = $id;
+        }
+
+        if ($_SESSION['user_type'] === 'student' && $studentId != $_SESSION['student_id']) {
+            die("Unauthorized access.");
+        }
+
+        $data = [
+            'assessments' => $assessmentModel->getStudentAssessments($studentId), 
+            'student' => $studentModel->getById($studentId)
+        ];
         $this->view('reports/print-grades', $data, false);
     }
 }

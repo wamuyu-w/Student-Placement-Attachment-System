@@ -21,6 +21,7 @@ class ApplicationController extends Controller {
     }
 
     public function updateProgramStatus() {
+        // the admin will be required in this session
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $appId  = $_POST['application_id'];
@@ -36,10 +37,41 @@ class ApplicationController extends Controller {
                 if ($result['success']) {
                     $studentModel = $this->model('Student');
                     $student = $studentModel->getById($result['student_id']);
+                    
+                    // Fetch Host Org Details
+                    $db = (new \App\Config\Database())->connect();
+                    $stmtHost = $db->prepare("SELECT OrganizationName, Email FROM hostorganization WHERE HostOrgID = ?");
+                    $stmtHost->bind_param("i", $result['host_org_id']);
+                    $stmtHost->execute();
+                    $host = $stmtHost->get_result()->fetch_assoc();
+
+                    // Get Dates from Application or fallback
+                    $appModel = $this->model('Application');
+                    $appData = $appModel->getApplicationById($appId);
+                    $startDate = $appData['StartDate'] ?: date('Y-m-d');
+                    $endDate   = $appData['EndDate']   ?: date('Y-m-d', strtotime($startDate . ' +84 days'));
+
+                    $orgName = $host ? $host['OrganizationName'] : ($_POST['org_name'] ?? 'your host organization');
+
+                    // 1. Notify Student
                     if ($student && !empty($student['Email'])) {
-                        $orgName = $_POST['org_name'] ?? 'your host organization';
                         Mailer::notifyStudentApproved($student['Email'], $student['FirstName'] . ' ' . $student['LastName'], $orgName);
+                        error_log("Student Approval Email Sent to " . $student['Email']);
+                    } else {
+                        error_log("Failed to send Student Approval Email: Student object missing or Email empty. Student ID: " . $result['student_id']);
                     }
+
+                    // 2. Notify Host Organization
+                    if ($host && !empty($host['Email']) && $student) {
+                        Mailer::notifyHostPlacement(
+                            $host['Email'], 
+                            $host['OrganizationName'], 
+                            $student['FirstName'] . ' ' . $student['LastName'], 
+                            $startDate, 
+                            $endDate
+                        );
+                    }
+
                     header("Location: " . Helpers::baseUrl('/admin/applications?success=Application+approved+and+attachment+created'));
                 } else {
                     header("Location: " . Helpers::baseUrl('/admin/applications?error=' . urlencode($result['message'])));

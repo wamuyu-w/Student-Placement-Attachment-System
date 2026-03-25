@@ -3,6 +3,11 @@
 
 session_start();
 
+// Include Composer autoloader - this will be used for emails
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
+
 // Autoloader (Simple version for manual structure)
 spl_autoload_register(function ($className) {
     // Convert namespace to file path

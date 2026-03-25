@@ -32,27 +32,46 @@
                                     </span>
                                 </td>
                                 <td style="padding: 12px;">
-                                    <?php if ($row['LastAssessment']): ?>
-                                        <div style="font-size: 0.9em;">Last: <?= date('M d', strtotime($row['LastAssessment'])) ?></div>
+                                    <?php if ($row['AssessmentCount'] > 0 || !empty($row['NextAssessmentDate'])): ?>
+                                        <?php if (!empty($row['NextAssessmentDate'])): ?>
+                                            <div style="font-size: 0.9em; color: #d97706; font-weight: 500;">Scheduled: <?= date('M d', strtotime($row['NextAssessmentDate'])) ?></div>
+                                        <?php endif; ?>
+                                        <?php if ($row['LastAssessment']): ?>
+                                            <div style="font-size: 0.9em;">Last: <?= date('M d', strtotime($row['LastAssessment'])) ?></div>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <span style="color: #9ca3af; font-size: 0.9em;">None</span>
                                     <?php endif; ?>
-                                    <div style="font-size: 0.85em; color: #6b7280;">Total: <?= $row['AssessmentCount'] ?></div>
+                                    <div style="font-size: 0.85em; color: #6b7280;">Total Details: <?= $row['AssessmentCount'] ?></div>
                                 </td>
                                 <td style="padding: 12px;">
                                     <div style="display: flex; gap: 8px;">
                                         <button class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openScheduleModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')">
                                             <i class="fas fa-calendar-plus"></i> Schedule
                                         </button>
-                                        <?php if ($row['AssessmentCount'] > 0): ?>
-                                            <button disabled class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.85rem; opacity: 0.6; cursor: not-allowed;">
+                                        <a href="<?= Helpers::baseUrl('/assessment/print-summary?id=' . $row['StudentID']) ?>" target="_blank" class="btn btn-outline" style="padding: 6px 10px; font-size: 0.85rem;" title="View Assessment Summary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <?php 
+                                        // Button logic:
+                                        // 1. If an assessment is scheduled, show "Assess" (it will update the scheduled record)
+                                        // 2. If no assessment is scheduled and total completed < 2, show "Schedule" or "Assess" (ad-hoc)
+                                        // 3. If 2 assessments completed, show "Assessed"
+                                        ?>
+                                        <?php if ($row['AssessmentCount'] >= 2): ?>
+                                            <button disabled class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.85rem; opacity: 0.6; cursor: not-allowed;" title="All assessments completed">
                                                 <i class="fas fa-check"></i> Assessed
                                             </button>
-                                            <a href="<?= Helpers::baseUrl('/assessment/print-summary?id=' . $row['StudentID']) ?>" target="_blank" class="btn btn-outline" style="padding: 6px 10px; font-size: 0.85rem;">
-                                                <i class="fas fa-eye"></i> View
-                                            </a>
                                         <?php else: ?>
-                                            <button class="btn btn-primary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')">
+                                            <?php 
+                                            $canAssess = true;
+                                            $assessTitle = "Assess Student";
+                                            if (!empty($row['NextAssessmentDate']) && strtotime($row['NextAssessmentDate']) > time()) {
+                                                // If scheduled for future, we still allow but warn
+                                                $assessTitle = "Assessment scheduled for " . date('M d, Y', strtotime($row['NextAssessmentDate']));
+                                            }
+                                            ?>
+                                            <button class="btn btn-primary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')" title="<?= $assessTitle ?>">
                                                 <i class="fas fa-clipboard-check"></i> Assess
                                             </button>
                                         <?php endif; ?>

@@ -70,10 +70,17 @@ $criteriaScores = json_decode($assessment['CriteriaScores'], true) ?: [];
             </tbody>
         </table>
 
-        <div style="margin-bottom: 30px;">
-            <strong>General Remarks:</strong>
-            <div style="border: 1px solid #ddd; padding: 15px; min-height: 80px; margin-top: 10px; background: #fff; border-radius: 4px;"><?= nl2br(htmlspecialchars($assessment['Remarks'])) ?></div>
+        <div style="margin-bottom: 20px;">
+            <strong>Assessor's Remarks:</strong>
+            <div style="border: 1px solid #ddd; padding: 15px; min-height: 60px; margin-top: 10px; background: #fff; border-radius: 4px;"><?= nl2br(htmlspecialchars($assessment['Remarks'] ?? 'None')) ?></div>
         </div>
+
+        <?php if (!empty($assessment['SupervisionComments'])): ?>
+        <div style="margin-bottom: 30px;">
+            <strong>Supervision Instructions / Comments:</strong>
+            <div style="border: 1px solid #ddd; padding: 15px; min-height: 60px; margin-top: 10px; background: #f9fafb; border-radius: 4px;"><?= nl2br(htmlspecialchars($assessment['SupervisionComments'])) ?></div>
+        </div>
+        <?php endif; ?>
 
         <div class="footer-signatures">
             <div class="sig-block">

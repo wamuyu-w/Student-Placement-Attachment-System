@@ -23,7 +23,7 @@ class Assessment {
     }
 
     public function getAssessmentCount($attachmentId) {
-        $stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ? AND Status = 'Conducted'");
+        $stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ? AND Status = 'Completed'");
         $stmt->bind_param("i", $attachmentId);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc()['count'];
@@ -31,7 +31,7 @@ class Assessment {
 
     public function create($data) {
         $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores, Status)
-                VALUES (?, ?, ?, ?, ?, CURDATE(), ?, 'Conducted')";
+                VALUES (?, ?, ?, ?, ?, CURDATE(), ?, 'Completed')";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iisdss",
             $data['attachment_id'],
@@ -45,23 +45,23 @@ class Assessment {
     }
 
     public function schedule($data) {
-        $supervisionComments = $data['supervision_comments'] ?? '';
-        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, AssessmentDate, SupervisionComments, Status)
-                VALUES (?, ?, ?, ?, ?, 'Scheduled')";
+        // Now using SupervisionComments and Status columns.
+        $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, AssessmentDate, Marks, Status, SupervisionComments)
+                VALUES (?, ?, ?, ?, 0, 'Scheduled', ?)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iisss",
             $data['attachment_id'],
             $data['lecturer_id'],
             $data['assessment_type'],
             $data['assessment_date'],
-            $supervisionComments
+            $data['supervision_comments']
         );
         return $stmt->execute();
     }
 
     public function getById($assessmentId) {
         $sql = "SELECT
-                    a.AssessmentDate, a.AssessmentType, a.Marks, a.Remarks, a.CriteriaScores,
+                    a.AssessmentDate, a.AssessmentType, a.Marks, a.Remarks, a.CriteriaScores, a.SupervisionComments, a.Status,
                     s.FirstName, s.LastName, u.Username as AdmissionNumber, s.Course, s.Faculty,
                     ho.OrganizationName,
                     l.Name as AssessorName, l.Department as AssessorDept,
@@ -82,7 +82,6 @@ class Assessment {
     public function getStudentAssessments($studentId) {
         $sql = "SELECT
                     a.AssessmentID, a.AssessmentDate, a.AssessmentType, a.Marks,
-                    a.Status, a.SupervisionComments,
                     l.Name as AssessorName
                 FROM assessment a
                 JOIN attachment att ON a.AttachmentID = att.AttachmentID
@@ -93,5 +92,32 @@ class Assessment {
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
         return $stmt->get_result();
+    }
+
+    public function getScheduled($attachmentId) {
+        $stmt = $this->conn->prepare("SELECT * FROM assessment WHERE AttachmentID = ? AND Status = 'Scheduled' LIMIT 1");
+        $stmt->bind_param("i", $attachmentId);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+    public function update($assessmentId, $data) {
+        $sql = "UPDATE assessment SET 
+                Marks = ?, 
+                Remarks = ?, 
+                CriteriaScores = ?, 
+                Status = 'Completed', 
+                AssessmentDate = CURDATE(),
+                LecturerID = ?
+                WHERE AssessmentID = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("dssii", 
+            $data['marks'], 
+            $data['remarks'], 
+            $data['criteria_scores'], 
+            $data['lecturer_id'],
+            $assessmentId
+        );
+        return $stmt->execute();
     }
 }

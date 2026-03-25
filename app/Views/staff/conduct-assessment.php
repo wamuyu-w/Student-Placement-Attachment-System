@@ -10,6 +10,13 @@
         <form action="<?= Helpers::baseUrl('/assessment/submit') ?>" method="POST" id="assessmentForm">
             <input type="hidden" name="attachment_id" value="<?= $attachment_id ?>">
             
+            <?php if (isset($scheduled) && !empty($scheduled['SupervisionComments'])): ?>
+                <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; color: #92400e; font-size: 0.95rem;"><i class="fas fa-info-circle"></i> Scheduled Instructions / Comments:</h4>
+                    <p style="margin: 0; color: #b45309; font-size: 0.9rem; line-height: 1.5;"><?= nl2br(htmlspecialchars($scheduled['SupervisionComments'])) ?></p>
+                </div>
+            <?php endif; ?>
+            
             <div class="criteria-section">
                 <h3 style="font-size: 1.1rem; color: #8B1538; margin-bottom: 15px; border-left: 4px solid #8B1538; padding-left: 10px;">Performance Criteria (Score 1-10)</h3>
                 

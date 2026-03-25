@@ -38,7 +38,14 @@
                                 <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
                                     <input type="checkbox" name="student_attachments[]" value="<?= $student['AttachmentID'] ?>" style="margin-top: 4px;">
                                     <div>
-                                        <div style="font-weight: 600; color: #1f2937;"><?= htmlspecialchars($student['FirstName'] . " " . $student['LastName']) ?></div>
+                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                                            <span style="font-weight: 600; color: #1f2937;"><?= htmlspecialchars($student['FirstName'] . " " . $student['LastName']) ?></span>
+                                            <?php if ($student['SupCount'] == 0): ?>
+                                                <span style="background: #ecfdf5; color: #065f46; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; font-weight: 600; border: 1px solid #d1fae5;">1st Assessment</span>
+                                            <?php else: ?>
+                                                <span style="background: #fff7ed; color: #9a3412; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; font-weight: 600; border: 1px solid #ffedd5;">Final Assessment</span>
+                                            <?php endif; ?>
+                                        </div>
                                         <div style="font-size: 0.85rem; color: #6b7280;">
                                             <span style="background: #eef2ff; color: #4338ca; padding: 1px 6px; border-radius: 4px; font-weight: 600; font-size: 0.75rem;"><?= htmlspecialchars($student['AdmNumber']) ?></span>
                                             <span style="margin-left: 5px;">at <?= htmlspecialchars($student['OrganizationName']) ?></span>

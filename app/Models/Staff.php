@@ -52,10 +52,11 @@ class Staff {
 
     public function getSupervisedStudents($staffId) {
         $stmt = $this->conn->prepare("
-            SELECT s.FirstName, s.LastName, u.Username as RegistrationNumber, s.Course, 
+            SELECT s.StudentID, s.FirstName, s.LastName, u.Username as RegistrationNumber, s.Course, 
                    ho.OrganizationName, a.AttachmentID, a.AttachmentStatus,
-                   (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID) as AssessmentCount,
-                   (SELECT MAX(AssessmentDate) FROM assessment WHERE AttachmentID = a.AttachmentID) as LastAssessment
+                   (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Completed') as AssessmentCount,
+                   (SELECT MAX(AssessmentDate) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Completed') as LastAssessment,
+                   (SELECT MIN(AssessmentDate) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Scheduled') as NextAssessmentDate
             FROM supervision sup
             JOIN attachment a ON sup.AttachmentID = a.AttachmentID
             JOIN student s ON a.StudentID = s.StudentID

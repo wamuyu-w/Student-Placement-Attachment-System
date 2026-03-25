@@ -193,6 +193,14 @@ class AuthController extends Controller {
         $result = $hostModel->createFromRegistration($data);
 
         if ($result['success']) {
+            // Send welcome email with credentials
+            \App\Core\Mailer::sendHostCredentials(
+                $data['email'], 
+                $data['org_name'], 
+                $data['username'], 
+                $data['password']
+            );
+            
             header("Location: " . Helpers::baseUrl('/login/host?success=Registration successful. Please login.'));
         } else {
             header("Location: " . Helpers::baseUrl('/register/host?error=' . urlencode($result['message'])));
