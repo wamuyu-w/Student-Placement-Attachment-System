@@ -20,12 +20,16 @@ desktop.ini
 
 #it was here!!
 *.env
+.env
 config/local.php
 
 
 
 #composer files - Mailer.php
 composer.phar
+composer.json
+composer.lock
+vendor/
 
 
 # Uploads (if any)
