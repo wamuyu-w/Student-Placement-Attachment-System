@@ -42,6 +42,7 @@ class SettingsController extends Controller {
         $role = $_SESSION['user_type'] ?? '';
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $success = false;
             
             if ($role === 'student') {
@@ -98,6 +99,8 @@ class SettingsController extends Controller {
         if (session_status() === PHP_SESSION_NONE) session_start();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
+
             $current = $_POST['current_password'];
             $new = $_POST['new_password'];
             $confirm = $_POST['confirm_password'];
@@ -130,13 +133,12 @@ class SettingsController extends Controller {
     }
     //then loads the first-login view with the appropriate data and layout for the user to complete their profile and change their default password
     public function firstLogin() {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['user_id'])) {
+        $role = $_SESSION['user_type'] ?? null;
+        if (!$role) {
             header("Location: " . Helpers::baseUrl('/'));
             exit();
         }
-        
-        $role = $_SESSION['user_type'];
+        $this->requireAuth($role);
         $userModel = $this->model('User');
         $profile = [];
         
@@ -157,6 +159,8 @@ class SettingsController extends Controller {
             header("Location: " . Helpers::baseUrl('/auth/first-login'));
             exit();
         }
+
+        $this->verifyCsrf();
 
         $role = $_SESSION['user_type'];
         $userId = $_SESSION['user_id'];

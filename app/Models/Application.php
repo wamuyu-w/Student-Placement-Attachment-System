@@ -168,7 +168,7 @@ class Application {
                     }
                     $num = intval(substr($lastUsername, 1));
                     $newUsername = 'H' . str_pad($num + 1, 3, '0', STR_PAD_LEFT);
-                    $rawPassword = 'Changeme123!';
+                    $rawPassword = bin2hex(random_bytes(8));
                     $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
 
                     $insertUser = $this->conn->prepare("INSERT INTO users (Username, Password, Role, Status) VALUES (?, ?, 'Host Organization', 'Active')");

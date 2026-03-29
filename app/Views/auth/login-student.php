@@ -20,6 +20,7 @@
 
             <form action="<?= Helpers::baseUrl('/auth/login') ?>" method="POST" class="login-form">
                 <input type="hidden" name="role" value="student">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 
                 <div class="form-group">
                     <label for="username" class="form-label">Registration Number</label>

@@ -13,6 +13,7 @@
         <?php endif; ?>
 
         <form action="<?= Helpers::baseUrl('/auth/register/host') ?>" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group">
                 <label for="org_name">Organization Name</label>
                 <input type="text" id="org_name" name="org_name" required>

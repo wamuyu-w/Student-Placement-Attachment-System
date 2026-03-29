@@ -54,15 +54,36 @@ class AuthController extends Controller {
             exit();
         }
 
+        $this->verifyCsrf();
+
         $username = Helpers::sanitize($_POST['username'] ?? '');
         $password = trim($_POST['password'] ?? '');
         $role = $_POST['role'] ?? ''; // 'student', 'staff', 'host_org'
+
+        // --- Rate Limiting ---
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $key = 'login_fail_' . md5($ip);
+        if (!isset($_SESSION[$key])) $_SESSION[$key] = ['count' => 0, 'time' => time()];
+        // Reset window every 10 minutes
+        if (time() - $_SESSION[$key]['time'] > 600) {
+            $_SESSION[$key] = ['count' => 0, 'time' => time()];
+        }
+        if ($_SESSION[$key]['count'] >= 10) {
+            $this->redirectWithError($role, 'Too many failed login attempts. Please try again later.');
+        }
 
         $userModel = $this->model('User');
         $user = $userModel->findUserByUsername($username);
 
         if ($user && ($this->migrateHardcodedPassword($user['UserID'], $password, $user['Password']) || password_verify($password, $user['Password']))) {
+            // Reset failed login counter on success
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+            $key = 'login_fail_' . md5($ip);
+            unset($_SESSION[$key]);
+
+            $this->regenerateSession();
             $redirectUrl = '';
+
             
             // Check Status
             if ($user['Status'] !== 'Active') {
@@ -157,6 +178,11 @@ class AuthController extends Controller {
             }
 
         } else {
+            // Increment failed login counter
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+            $key = 'login_fail_' . md5($ip);
+            if (!isset($_SESSION[$key])) $_SESSION[$key] = ['count' => 0, 'time' => time()];
+            $_SESSION[$key]['count']++;
             $this->redirectWithError($role, "Invalid username or password.");
         }
     }
@@ -166,6 +192,8 @@ class AuthController extends Controller {
             header("Location: " . Helpers::baseUrl('/register/host'));
             exit();
         }
+
+        $this->verifyCsrf();
 
         $data = [
             'org_name' => Helpers::sanitize($_POST['org_name'] ?? ''),

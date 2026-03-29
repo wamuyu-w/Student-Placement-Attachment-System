@@ -25,6 +25,24 @@ class Controller {
         exit();
     }
 
+    // SECURITY MEASURES - verify tokens and a function preventing session fixation attacks
+    // Validate the CSRF token submitted with a POST request.
+    protected function verifyCsrf() {
+        $token = $_POST['csrf_token'] ?? '';
+        if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                $this->json(['success' => false, 'message' => 'Invalid or missing CSRF token.']);
+            }
+            http_response_code(403);
+            exit('Forbidden: CSRF token mismatch.');
+        }
+    }
+
+    // Call after a successful login to prevent session fixation.
+    protected function regenerateSession() {
+        session_regenerate_id(true);
+    }
+
     protected function requireAuth($role) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();

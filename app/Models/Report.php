@@ -186,11 +186,21 @@ class Report {
         
         $attachmentId = $res->fetch_assoc()['AttachmentID'];
 
+        // Validate MIME type — reject anything that isn't a real PDF
+        $allowedMimeTypes = ['application/pdf'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($mimeType, $allowedMimeTypes)) {
+            return ['success' => false, 'message' => 'Only PDF files are allowed.'];
+        }
+
         // File upload logic
         $targetDir = __DIR__ . "/../../public/uploads/reports/";
-        if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
+        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
         
-        $fileName = "report_" . $studentId . "_" . time() . "." . pathinfo($file["name"], PATHINFO_EXTENSION);
+        // Force .pdf extension regardless of client-supplied name
+        $fileName = "report_" . $studentId . "_" . time() . ".pdf";
         $targetFile = $targetDir . $fileName;
         
         if (move_uploaded_file($file["tmp_name"], $targetFile)) {

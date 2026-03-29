@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?? '' ?>">
     <title><?= $title ?? 'CUEA Attachment System' ?></title>
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>?v=<?= time() ?>">

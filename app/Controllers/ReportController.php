@@ -144,9 +144,33 @@ class ReportController extends Controller {
         if (!isset($_SESSION['user_id'])) { header("Location: " . Helpers::baseUrl('/')); exit(); }
 
         $studentId = $_GET['id'] ?? ($_SESSION['user_type'] === 'student' ? $_SESSION['student_id'] : 0);
+        $userType  = $_SESSION['user_type'];
         
-        if ($_SESSION['user_type'] === 'student' && $studentId != $_SESSION['student_id']) {
-            die("Unauthorized access.");
+        // Student: only own record
+        if ($userType === 'student' && $studentId != $_SESSION['student_id']) {
+            http_response_code(403); exit('Unauthorized access.');
+        }
+
+        // Host org: restrict to students attached to their org
+        if ($userType === 'host_org') {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT 1 FROM attachment WHERE StudentID = ? AND HostOrgID = ? LIMIT 1");
+            $stmt->bind_param("ii", $studentId, $_SESSION['host_org_id']);
+            $stmt->execute();
+            if ($stmt->get_result()->num_rows === 0) {
+                http_response_code(403); exit('Unauthorized access.');
+            }
+        }
+
+        // Staff: restrict to supervised students
+        if ($userType === 'staff') {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT 1 FROM supervision sup JOIN attachment a ON sup.AttachmentID = a.AttachmentID WHERE a.StudentID = ? AND sup.LecturerID = ? LIMIT 1");
+            $stmt->bind_param("ii", $studentId, $_SESSION['LecturerID']);
+            $stmt->execute();
+            if ($stmt->get_result()->num_rows === 0) {
+                http_response_code(403); exit('Unauthorized access.');
+            }
         }
 
         $reportModel = $this->model('Report');

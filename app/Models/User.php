@@ -68,7 +68,11 @@ class User {
     }
 
     public function verifyPassword($userId, $password) {
-        $user = $this->conn->query("SELECT Password FROM users WHERE UserID = $userId")->fetch_assoc();
+        $user =$this->conn->query("SELECT Password FROM users WHERE UserID = $userId")->fetch_assoc();
+        $stmt = $this->conn->prepare("SELECT Password FROM users WHERE UserID = ?");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
         return $user ? password_verify($password, $user['Password']) : false;
     }
 }

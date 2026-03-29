@@ -28,6 +28,7 @@ class AssessmentController extends Controller {
         }
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $attachmentId = $_POST['attachment_id'];
             $enteredCode = Helpers::sanitize($_POST['assessment_code']);
             
@@ -73,6 +74,7 @@ class AssessmentController extends Controller {
         $this->requireAuth('staff');
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $attachmentId = $_POST['attachment_id'];
             
             if (!isset($_SESSION['authorized_assessment_' . $attachmentId])) {
@@ -203,13 +205,37 @@ class AssessmentController extends Controller {
         $assessmentModel = $this->model('Assessment');
         $assessment = $assessmentModel->getById($assessmentId);
 
-        // Security check: Student can only view their own
-        if ($_SESSION['user_type'] === 'student' && $assessment['StudentID'] != $_SESSION['student_id']) {
-            echo "Unauthorized access.";
-            exit();
+        if (!$assessment) { http_response_code(404); exit('Not found.'); }
+
+        $userType = $_SESSION['user_type'];
+
+        // Student: only own assessment
+        if ($userType === 'student' && $assessment['StudentID'] != $_SESSION['student_id']) {
+            http_response_code(403); exit('Unauthorized access.');
         }
 
-        // Render the print view directly (no layout)
+        // Host org: only students attached to their organisation
+        if ($userType === 'host_org') {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT 1 FROM attachment WHERE AttachmentID = ? AND HostOrgID = ? LIMIT 1");
+            $stmt->bind_param("ii", $assessment['AttachmentID'], $_SESSION['host_org_id']);
+            $stmt->execute();
+            if ($stmt->get_result()->num_rows === 0) {
+                http_response_code(403); exit('Unauthorized access.');
+            }
+        }
+
+        // Staff: only supervised students
+        if ($userType === 'staff') {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT 1 FROM supervision WHERE AttachmentID = ? AND LecturerID = ? LIMIT 1");
+            $stmt->bind_param("ii", $assessment['AttachmentID'], $_SESSION['LecturerID']);
+            $stmt->execute();
+            if ($stmt->get_result()->num_rows === 0) {
+                http_response_code(403); exit('Unauthorized access.');
+            }
+        }
+
         $data = ['assessment' => $assessment];
         $this->view('reports/print-assessment', $data, false);
     }
@@ -228,15 +254,38 @@ class AssessmentController extends Controller {
         // Check if $id is an AssessmentID by trying to fetch it
         $assessment = $assessmentModel->getById($id);
         if ($assessment) {
-            // If it's a valid assessment, use the associated student ID
             $studentId = $assessment['StudentID'];
         } else {
-            // Otherwise, treat it as a student ID
             $studentId = $id;
         }
 
-        if ($_SESSION['user_type'] === 'student' && $studentId != $_SESSION['student_id']) {
-            die("Unauthorized access.");
+        $userType = $_SESSION['user_type'];
+
+        // Student: only their own
+        if ($userType === 'student' && $studentId != $_SESSION['student_id']) {
+            http_response_code(403); exit('Unauthorized access.');
+        }
+
+        // Host org: only students attached to their org
+        if ($userType === 'host_org') {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT 1 FROM attachment WHERE StudentID = ? AND HostOrgID = ? LIMIT 1");
+            $stmt->bind_param("ii", $studentId, $_SESSION['host_org_id']);
+            $stmt->execute();
+            if ($stmt->get_result()->num_rows === 0) {
+                http_response_code(403); exit('Unauthorized access.');
+            }
+        }
+
+        // Staff: only supervised students
+        if ($userType === 'staff') {
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT 1 FROM supervision sup JOIN attachment a ON sup.AttachmentID = a.AttachmentID WHERE a.StudentID = ? AND sup.LecturerID = ? LIMIT 1");
+            $stmt->bind_param("ii", $studentId, $_SESSION['LecturerID']);
+            $stmt->execute();
+            if ($stmt->get_result()->num_rows === 0) {
+                http_response_code(403); exit('Unauthorized access.');
+            }
         }
 
         $data = [

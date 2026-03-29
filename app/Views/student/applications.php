@@ -110,6 +110,7 @@
                 </button>
             <?php else: ?>
                 <form action="<?= Helpers::baseUrl('/student/applications/apply-session') ?>" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     <!-- Host Organization -->
                     <div class="form-group mb-3">
                         <label class="form-label">Intended Host Organization <span style="color:#9ca3af;font-weight:400;">(Optional)</span></label>

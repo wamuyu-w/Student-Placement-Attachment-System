@@ -11,6 +11,7 @@
     <div class="card mb-4">
         <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Organization Profile</h2>
         <form action="<?= Helpers::baseUrl('/settings/update-profile') ?>" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group" style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Organization Name</label>
                 <input type="text" name="org_name" value="<?= htmlspecialchars($profile['OrganizationName']) ?>" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
@@ -36,6 +37,7 @@
     <div class="card">
         <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Change Password</h2>
         <form action="<?= Helpers::baseUrl('/settings/update-password') ?>" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group" style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Current Password</label>
                 <input type="password" name="current_password" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">

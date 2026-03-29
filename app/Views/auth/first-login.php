@@ -18,6 +18,7 @@
             <?php endif; ?>
 
             <form action="<?= Helpers::baseUrl('/auth/first-login/save') ?>" method="POST" class="first-login-form">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 <h3 style="border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; color: #374151;">Security</h3>
                 <div class="form-group">
                     <label class="form-label">New Password</label>

@@ -160,6 +160,7 @@ function openScheduleModal(id, name) {
 document.getElementById('codeForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
+    formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
     fetch('<?= Helpers::baseUrl('/assessment/verify-code') ?>', { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => data.success ? window.location.href = data.redirect : alert(data.message));
@@ -168,6 +169,7 @@ document.getElementById('codeForm').addEventListener('submit', function(e) {
 document.getElementById('scheduleForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
+    formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
     fetch('<?= Helpers::baseUrl('/staff/assessments/schedule') ?>', { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {

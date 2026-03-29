@@ -90,6 +90,7 @@
                 formData.append('opportunity_id', opportunityId);
                 formData.append('student_id', studentId);
                 formData.append('status', status);
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
 
                 fetch('<?= Helpers::baseUrl('/host/applications/update-status') ?>', {
                     method: 'POST',
