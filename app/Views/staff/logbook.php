@@ -56,6 +56,7 @@
                             </td>
                             <td style="padding: 12px;">
                                 <form action="<?= Helpers::baseUrl('/logbook/review') ?>" method="POST">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <input type="hidden" name="logbook_id" value="<?= $row['LogbookID'] ?>">
                                     <div class="form-group" style="margin-bottom: 8px;">
                                         <textarea name="comment" class="form-control" rows="1" placeholder="Add optional feedback..."></textarea>

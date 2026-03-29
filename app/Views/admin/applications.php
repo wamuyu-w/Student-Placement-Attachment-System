@@ -36,6 +36,7 @@
                             <td>
                                 <?php if ($row['ApplicationStatus'] == 'Pending'): ?>
                                 <form action="<?= Helpers::baseUrl('/admin/applications/program-status') ?>" method="POST">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <input type="hidden" name="application_id" value="<?php echo $row['ApplicationID']; ?>">
                                     <input type="hidden" name="org_name" value="<?php echo htmlspecialchars($row['OrganizationName'] ?? ''); ?>">
                                     <div style="display:flex;flex-direction:column;gap:6px;min-width:200px;">
@@ -100,6 +101,7 @@
                                 <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['Status']); ?></span>
                                 
                                 <form action="<?= Helpers::baseUrl('/admin/applications/job-status') ?>" method="POST" class="status-form">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <input type="hidden" name="opportunity_id" value="<?php echo $row['OpportunityID']; ?>">
                                     <input type="hidden" name="student_id" value="<?php echo $row['StudentID']; ?>">
                                     <select name="status" class="status-select" onchange="this.form.submit()">

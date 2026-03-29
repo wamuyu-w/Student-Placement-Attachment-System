@@ -9,6 +9,7 @@
 
         <form action="<?= Helpers::baseUrl('/assessment/submit') ?>" method="POST" id="assessmentForm">
             <input type="hidden" name="attachment_id" value="<?= $attachment_id ?>">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             
             <?php if (isset($scheduled) && !empty($scheduled['SupervisionComments'])): ?>
                 <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">

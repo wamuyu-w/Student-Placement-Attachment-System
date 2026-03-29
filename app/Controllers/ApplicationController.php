@@ -24,6 +24,7 @@ class ApplicationController extends Controller {
         // the admin will be required in this session
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $appId  = $_POST['application_id'];
             $status = $_POST['status'];
             $rejectionReason = Helpers::sanitize($_POST['rejection_reason'] ?? '');
@@ -96,6 +97,7 @@ class ApplicationController extends Controller {
     public function updateJobStatusAdmin() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $oppId = $_POST['opportunity_id'];
             $studentId = $_POST['student_id'];
             $status = $_POST['status'];
@@ -201,6 +203,7 @@ class ApplicationController extends Controller {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             // Validate financial clearance is declared
             $allowedStatuses = ['Cleared', 'Pending', 'Not Cleared'];
             $financialStatus = $_POST['financial_clearance_status'] ?? '';
@@ -234,6 +237,7 @@ class ApplicationController extends Controller {
     public function registerPlacement() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $appModel = $this->model('Application');
             $result = $appModel->registerPlacement($_SESSION['student_id'], $_POST);
             

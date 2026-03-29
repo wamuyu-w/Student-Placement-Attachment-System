@@ -54,6 +54,7 @@
                             <td style="padding: 12px;">
                                 <?php if ($status == 'Eligible' || $status == 'Attachment Ongoing'): ?>
                                     <form action="<?= Helpers::baseUrl('/admin/students/clear') ?>" method="POST" onsubmit="return confirm('Are you sure you want to clear this student? This will complete their attachment process.');" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                         <input type="hidden" name="student_id" value="<?php echo $row['StudentID']; ?>">
                                         <button type="submit" style="background-color: #10b981; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
                                             <i class="fas fa-check"></i> Clear
@@ -86,6 +87,7 @@
             <span onclick="document.getElementById('addStudentModal').style.display='none'" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
         </div>
         <form action="<?= Helpers::baseUrl('/admin/students/create') ?>" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admission Number (Username)</label>
                 <input type="text" name="admNumber" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
@@ -109,6 +111,7 @@
             <span onclick="document.getElementById('bulkUploadModal').style.display='none'" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
         </div>
         <form action="<?= Helpers::baseUrl('/admin/students/bulk-upload') ?>" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select Faculty</label>
                 <select name="faculty" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">

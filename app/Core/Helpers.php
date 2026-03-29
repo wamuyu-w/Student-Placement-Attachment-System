@@ -21,11 +21,11 @@ class Helpers {
         
         return $dir . $path;
     }
-    // Sanitize input data
+    // Sanitize input data — strips whitespace and magic-quote slashes only.
+    // Output encoding (htmlspecialchars) must be done at render time in views.
     public static function sanitize($data) {
         $data = trim($data ?? '');
         $data = stripslashes($data);
-        $data = htmlspecialchars($data);
         return $data;
     }
     // Hash a password

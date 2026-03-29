@@ -87,6 +87,7 @@
         <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">Upload Final Report</h2>
         <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 24px;">Upload your compiled logbook and final report in PDF format for university verification.</p>
         <form action="<?= Helpers::baseUrl('/student/reports/upload') ?>" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group">
                 <label class="form-label">Choose PDF File</label>
                 <input type="file" name="final_report" accept=".pdf" required class="form-control">

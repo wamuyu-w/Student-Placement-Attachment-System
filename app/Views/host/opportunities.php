@@ -47,6 +47,7 @@
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         <form action="<?= Helpers::baseUrl('/opportunities/delete') ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this posting?');" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                             <input type="hidden" name="id" value="<?= $opp['OpportunityID'] ?>">
                             <button type="submit" class="btn btn-delete" title="Delete Posting">
                                 <i class="fas fa-trash"></i>
@@ -75,6 +76,7 @@
             </button>
         </div>
         <form action="<?= Helpers::baseUrl('/opportunities/save') ?>" method="POST" style="padding: 24px;">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <input type="hidden" name="opportunity_id" id="oppId">
             
             <div class="form-group">

@@ -126,6 +126,7 @@ class ReportController extends Controller {
     public function upload() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['final_report'])) {
+            $this->verifyCsrf();
             try {
                 $reportModel = $this->model('Report');
                 $result = $reportModel->uploadFinalReport($_SESSION['student_id'], $_FILES['final_report']);

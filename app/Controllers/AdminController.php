@@ -44,6 +44,7 @@ class AdminController extends Controller {
         $this->requireAuth('admin');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $staffNumber = Helpers::sanitize($_POST['staffNumber'] ?? '');
 
             if (empty($staffNumber)) {
@@ -86,6 +87,7 @@ class AdminController extends Controller {
     public function createStudent() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $admNumber = Helpers::sanitize($_POST['admNumber']);
             $studentModel = $this->model('Student');
             
@@ -101,6 +103,7 @@ class AdminController extends Controller {
     public function bulkUploadStudents() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile']) && $_FILES['csvFile']['error'] === UPLOAD_ERR_OK) {
+            $this->verifyCsrf();
             $file = $_FILES['csvFile']['tmp_name'];
             $handle = fopen($file, "r");
             $studentModel = $this->model('Student');
@@ -136,6 +139,7 @@ class AdminController extends Controller {
     public function clearStudent() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $id = $_POST['student_id'];
             $studentModel = $this->model('Student');
             $result = $studentModel->clearStudent($id);
@@ -200,6 +204,7 @@ class AdminController extends Controller {
     public function assignSupervisor() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $attachmentId = Helpers::sanitize($_POST['attachment_id']);
             $lecturerId = Helpers::sanitize($_POST['lecturer_id']);
             
@@ -239,6 +244,7 @@ class AdminController extends Controller {
     public function bulkUploadSupervisors() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
+            $this->verifyCsrf();
             $file = $_FILES['csvFile']['tmp_name'];
             $faculty = Helpers::sanitize($_POST['faculty'] ?? '');
 

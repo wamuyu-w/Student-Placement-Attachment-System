@@ -52,6 +52,7 @@ class HostController extends Controller {
     public function generateCode() {
         $this->requireAuth('host_org');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $attachmentId = $_POST['attachment_id'];
             $hostModel = $this->model('Host');
             

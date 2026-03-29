@@ -18,6 +18,7 @@
                     </div>
                     <div class="logbook-controls">
                         <form id="submissionForm" action="<?= Helpers::baseUrl('/student/logbook/create') ?>" method="POST" style="display: flex; flex-direction: column; width: 100%;">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                         <div class="week-selector">
                             <label for="week_number" style="font-weight: 600; font-size: 0.9rem; color: #4b5563;">Week No.</label>
                             <input type="number" name="week_number" id="week_number" min="1" max="52" required style="width: 70px;">

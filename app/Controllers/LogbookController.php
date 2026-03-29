@@ -25,6 +25,7 @@ class LogbookController extends Controller {
     public function createEntry() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $data = [
                 'week_number' => $_POST['week_number'],
                 'start_date' => $_POST['start_date'],
@@ -102,6 +103,7 @@ class LogbookController extends Controller {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $logbookId = $_POST['logbook_id'];
             $comment = Helpers::sanitize($_POST['comment'] ?? '');
             $status = $_POST['status'] ?? 'Pending'; // e.g., 'Approved'

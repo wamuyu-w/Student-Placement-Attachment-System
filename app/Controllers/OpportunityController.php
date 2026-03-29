@@ -34,6 +34,13 @@ class OpportunityController extends Controller {
             return;
         }
 
+        // CSRF check — return JSON error instead of dying to preserve AJAX contract
+        $token = $_POST['csrf_token'] ?? '';
+        if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+            $this->json(['success' => false, 'message' => 'Invalid CSRF token.']);
+            return;
+        }
+
         $studentId = $_SESSION['student_id'] ?? null;
         $appModel = $this->model('Application');
         $studentModel = $this->model('Student');
@@ -111,6 +118,7 @@ class OpportunityController extends Controller {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $data = [
                 'opportunity_id' => $_POST['opportunity_id'] ?? null,
                 'description' => Helpers::sanitize($_POST['description']),
@@ -143,6 +151,7 @@ class OpportunityController extends Controller {
 
     public function delete() {
         // Similar auth check...
+        $this->verifyCsrf();
         $id = $_POST['id'] ?? null;
         $oppModel = $this->model('Opportunity');
         $result = $oppModel->delete($id);

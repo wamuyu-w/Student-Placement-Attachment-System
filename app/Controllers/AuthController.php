@@ -14,16 +14,16 @@ class AuthController extends Controller {
         // Get JSON input
         $data = json_decode(file_get_contents('php://input'), true);
         
-        // Validation Logic (Moved from process-signup-student.php)
+        // Validation Logic
         $errors = [];
         if (empty($data['email'])) $errors['email'] = 'Email required';
-        // ... more validation
-
+        
+        //if not, bring an error
         if (!empty($errors)) {
             $this->json(['success' => false, 'errors' => $errors]);
         }
 
-        // Call Model
+        // Call Model 
         $studentModel = $this->model('Student');
         if ($studentModel->emailExists($data['email'])) {
             $this->json(['success' => false, 'message' => 'Email exists']);
@@ -32,10 +32,12 @@ class AuthController extends Controller {
         // Proceed to register...
     }
 
+
+    //login functions for all the users in the system
     public function loginStudent() {
         $this->view('auth/login-student', ['title' => 'Student Login'], 'auth');
     }
-
+//admin and lecturers have the same login, just different endpoints
     public function loginStaff() {
         $this->view('auth/login-staff', ['title' => 'Staff Login'], 'auth');
     }
@@ -54,11 +56,13 @@ class AuthController extends Controller {
             exit();
         }
 
+        //verify CSRF Token - prevent CSRF Attacks
         $this->verifyCsrf();
 
+        //fetch the username and passwords, plus the role
         $username = Helpers::sanitize($_POST['username'] ?? '');
         $password = trim($_POST['password'] ?? '');
-        $role = $_POST['role'] ?? ''; // 'student', 'staff', 'host_org'
+        $role = $_POST['role'] ?? ''; // this can either be'student', 'staff', 'host_org'
 
         // --- Rate Limiting ---
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';

@@ -21,6 +21,7 @@
     </div>
 
     <form action="<?= Helpers::baseUrl('/admin/supervision/bulk/assign') ?>" method="POST">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             
             <!-- Student Selection -->

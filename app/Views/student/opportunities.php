@@ -216,6 +216,7 @@
 
         <form id="applicationForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" id="opportunityId" name="opportunity_id" value="">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             
             <!-- Personal & Academic Details (Read-only Summary) -->
             <div class="form-section">

@@ -69,6 +69,7 @@
                                 </td>
                                 <td>
                                     <form action="<?= Helpers::baseUrl('/host/supervision/generate') ?>" method="POST">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                         <input type="hidden" name="attachment_id" value="<?= $row['AttachmentID'] ?>">
                                         <button type="submit" class="btn-generate">
                                             <?= $row['AssessmentCode'] ? 'Regenerate Code' : 'Generate Code' ?>

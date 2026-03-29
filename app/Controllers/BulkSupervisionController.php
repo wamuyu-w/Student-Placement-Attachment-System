@@ -68,6 +68,7 @@ class BulkSupervisionController extends Controller {
             header("Location: " . Helpers::baseUrl('/admin/supervision/bulk'));
             exit();
         }
+        $this->verifyCsrf();
         
         $studentAttachmentIds = $_POST['student_attachments'] ?? [];
         $lecturerIds = $_POST['lecturer_ids'] ?? [];

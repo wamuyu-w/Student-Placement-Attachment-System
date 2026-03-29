@@ -21,6 +21,7 @@
     <div class="card mb-4">
         <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Assign Supervisor to Student</h2>
         <form action="<?= Helpers::baseUrl('/admin/supervisors/assign') ?>" method="POST" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div>
                 <label class="form-label">Select Student (Ongoing Attachment)</label>
                 <select name="attachment_id" required class="form-control">
@@ -92,6 +93,7 @@
             <span onclick="document.getElementById('addSupervisorModal').style.display='none'" class="modal-close" style="cursor: pointer; float: right; font-size: 1.5rem;">&times;</span>
         </div>
         <form action="<?= Helpers::baseUrl('/admin/supervisors/create') ?>" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group">
                 <label>Staff Number</label>
                 <input type="text" name="staffNumber" required class="form-control">
@@ -113,6 +115,7 @@
             <span onclick="document.getElementById('bulkUploadModal').style.display='none'" class="modal-close" style="cursor: pointer; float: right; font-size: 1.5rem;">&times;</span>
         </div>
         <form action="<?= Helpers::baseUrl('/admin/supervisors/bulk-upload') ?>" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group">
                 <label>Select Faculty</label>
                 <select name="faculty" required class="form-control">
