@@ -66,14 +66,26 @@
                                             <?php 
                                             $canAssess = true;
                                             $assessTitle = "Assess Student";
-                                            if (!empty($row['NextAssessmentDate']) && strtotime($row['NextAssessmentDate']) > time()) {
-                                                // If scheduled for future, we still allow but warn
-                                                $assessTitle = "Assessment scheduled for " . date('M d, Y', strtotime($row['NextAssessmentDate']));
+                                            if (!empty($row['NextAssessmentDate'])) {
+                                                // Convert to midnight stamps to compare the absolute days
+                                                $assessmentDay = strtotime(date('Y-m-d', strtotime($row['NextAssessmentDate'])));
+                                                $today = strtotime(date('Y-m-d'));
+                                                
+                                                if ($today < $assessmentDay) {
+                                                    $canAssess = false;
+                                                    $assessTitle = "Assessment opens on " . date('M d, Y', strtotime($row['NextAssessmentDate']));
+                                                }
                                             }
                                             ?>
-                                            <button class="btn btn-primary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')" title="<?= $assessTitle ?>">
-                                                <i class="fas fa-clipboard-check"></i> Assess
-                                            </button>
+                                            <?php if (!$canAssess): ?>
+                                                <button disabled class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.85rem; opacity: 0.6; cursor: not-allowed;" title="<?= $assessTitle ?>">
+                                                    <i class="fas fa-lock"></i> Wait
+                                                </button>
+                                            <?php else: ?>
+                                                <button class="btn btn-primary" style="padding: 6px 10px; font-size: 0.85rem;" onclick="openCodeModal(<?= $row['AttachmentID'] ?>, '<?= htmlspecialchars(addslashes($row['FirstName'] . ' ' . $row['LastName'])) ?>')" title="<?= $assessTitle ?>">
+                                                    <i class="fas fa-clipboard-check"></i> Assess
+                                                </button>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
                                 </td>

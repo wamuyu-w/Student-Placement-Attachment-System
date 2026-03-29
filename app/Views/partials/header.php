@@ -19,7 +19,12 @@ if ($userType === 'student') {
 }
 ?>
 <header class="main-header">
-    <h1 class="page-title"><?= $title ?? 'Dashboard' ?></h1>
+    <div class="header-left">
+        <button class="mobile-menu-toggle js-menu-toggle" aria-label="Toggle Menu">
+            <i class="fa fa-bars"></i>
+        </button>
+        <h1 class="page-title"><?= $title ?? 'Dashboard' ?></h1>
+    </div>
     <div class="header-actions">
         <?php if(isset($headerActions)) echo $headerActions; ?>
         

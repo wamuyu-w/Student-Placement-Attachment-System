@@ -94,20 +94,7 @@ class ApplicationController extends Controller {
         }
     }
 
-    public function updateJobStatusAdmin() {
-        $this->requireAuth('admin');
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->verifyCsrf();
-            $oppId = $_POST['opportunity_id'];
-            $studentId = $_POST['student_id'];
-            $status = $_POST['status'];
-            
-            $appModel = $this->model('Application');
-            $appModel->updateJobStatus($oppId, $studentId, $status);
-            
-            header("Location: " . Helpers::baseUrl('/admin/applications'));
-        }
-    }
+
 
     public function hostIndex() {
         $this->requireAuth('host_org');

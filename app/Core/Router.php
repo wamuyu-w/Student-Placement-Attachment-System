@@ -39,7 +39,6 @@ class Router {
             '/opportunities/delete' => ['controller' => 'OpportunityController', 'action' => 'delete'],
             '/admin/applications' => ['controller' => 'ApplicationController', 'action' => 'adminIndex'],
             '/admin/applications/program-status' => ['controller' => 'ApplicationController', 'action' => 'updateProgramStatus'],
-            '/admin/applications/job-status' => ['controller' => 'ApplicationController', 'action' => 'updateJobStatusAdmin'],
             '/host/applications' => ['controller' => 'ApplicationController', 'action' => 'hostIndex'],
             '/host/applications/update-status' => ['controller' => 'ApplicationController', 'action' => 'updateJobStatusHost'],
             '/student/applications' => ['controller' => 'ApplicationController', 'action' => 'studentIndex'],

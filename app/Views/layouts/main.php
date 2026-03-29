@@ -30,5 +30,37 @@
         <?= $content; ?>
     </div>
     <script src="<?= Helpers::baseUrl('../assets/js/table-sort-filter.js') ?>?v=<?= time() ?>"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.js-menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('active');
+                });
+                
+                // Auto close when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                            sidebar.classList.remove('active');
+                        }
+                    }
+                });
+
+                // Auto close on link click (as requested)
+                const sidebarLinks = sidebar.querySelectorAll('a');
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                       if (window.innerWidth <= 768) {
+                           sidebar.classList.remove('active');
+                       }
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

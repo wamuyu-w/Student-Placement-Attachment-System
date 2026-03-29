@@ -37,6 +37,7 @@
                     <div class="alert alert-error" style="margin: 0 0 24px 0; border-radius: 6px; padding: 12px; background: #fee2e2; color: #991b1b;"><i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i><?= htmlspecialchars($_GET['error']) ?></div>
                 <?php endif; ?>
 
+                <div class="table-responsive">
                 <table class="weekly-logbook-table">
                     <thead>
                         <tr>
@@ -67,6 +68,7 @@
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
 
                 <div class="feedback-grid">
                     <div class="feedback-panel">
@@ -131,6 +133,7 @@
                         
                         <div class="history-card-body" style="padding: 24px;">
                             <?php if ($isJson): ?>
+                                <div class="table-responsive">
                                 <table class="read-only-table" style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
                                     <thead>
                                         <tr>
@@ -158,6 +161,7 @@
                                         ?>
                                     </tbody>
                                 </table>
+                                </div>
                             <?php else: ?>
                                 <div class="legacy-description" style="color: #334155; line-height: 1.6; white-space: pre-line; padding: 16px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
                                     <?= nl2br(htmlspecialchars($row['Description'])) ?>

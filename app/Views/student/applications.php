@@ -199,6 +199,7 @@
             </div>
             
             <?php if ($applications && $applications->num_rows > 0): ?>
+                <div class="table-responsive">
                 <table class="history-table">
                     <thead>
                         <tr>
@@ -230,6 +231,7 @@
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                </div>
             <?php else: ?>
                 <div class="empty-state" style="text-align: center; padding: 32px 0;">
                     <i class="fas fa-file-signature" style="font-size: 32px; color: var(--text-secondary); margin-bottom: 12px;"></i>

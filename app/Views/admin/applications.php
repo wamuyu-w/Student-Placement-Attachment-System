@@ -99,17 +99,6 @@
                             <td><?php echo htmlspecialchars($row['OrganizationName']); ?></td>
                             <td>
                                 <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['Status']); ?></span>
-                                
-                                <form action="<?= Helpers::baseUrl('/admin/applications/job-status') ?>" method="POST" class="status-form">
-                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-                                    <input type="hidden" name="opportunity_id" value="<?php echo $row['OpportunityID']; ?>">
-                                    <input type="hidden" name="student_id" value="<?php echo $row['StudentID']; ?>">
-                                    <select name="status" class="status-select" onchange="this.form.submit()">
-                                        <option value="" disabled selected>Update</option>
-                                        <option value="Approved">Approve</option>
-                                        <option value="Rejected">Reject</option>
-                                    </select>
-                                </form>
                             </td>
                         </tr>
                     <?php endwhile; ?>
