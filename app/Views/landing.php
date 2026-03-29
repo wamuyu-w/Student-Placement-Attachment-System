@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Global Styles -->
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>">
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/global.css') ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/global.css') ?>?v=<?= time() ?>">
     <!-- Page Specific Styles -->
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/index.css') ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/index.css') ?>?v=<?= time() ?>">
     <title>Student Placement and Attachment System - CUEA </title>
 </head>
 <body>
