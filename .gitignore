@@ -24,7 +24,8 @@ config/local.php
 # Debug/test scripts
 test_*.php
 
-
+# vendor files
+vendor/
 
 #composer files - Mailer.php
 composer.phar
