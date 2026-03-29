@@ -45,7 +45,6 @@ Student-Placement-Attachment-System/
 ├── public/               # Document root
 │   └── index.php         # Application entry point/front controller
 ├── attachmentmanagementsystem.sql # Database schema and initial data dump
-├── .env                  # Environment configuration variables
 └── README.md             # Project documentation (this file)
 ```
 
