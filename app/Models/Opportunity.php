@@ -11,6 +11,7 @@ class Opportunity {
         $this->conn = $this->db->connect();
     }
 
+    //get all opportunities
     public function getAll() {
         $sql = "SELECT ao.*, COALESCE(ho.OrganizationName, 'Unknown') as OrganizationName 
                 FROM attachmentopportunity ao
@@ -22,7 +23,6 @@ class Opportunity {
     public function getHostOrganizations() {
         return $this->conn->query("SELECT HostOrgID, OrganizationName FROM hostorganization ORDER BY OrganizationName");
     }
-
     public function getAllActive() {
         $sql = "SELECT ao.*, ho.OrganizationName 
                 FROM attachmentopportunity ao
@@ -47,7 +47,7 @@ class Opportunity {
     }
 
     public function hasApplied($studentId, $opportunityId) {
-        $stmt = $this->conn->prepare("SELECT ApplicationID FROM jobapplication WHERE StudentID = ? AND OpportunityID = ?");
+        $stmt = $this->conn->prepare("SELECT OpportunityID FROM jobapplication WHERE StudentID = ? AND OpportunityID = ?");
         $stmt->bind_param("ii", $studentId, $opportunityId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -152,17 +152,23 @@ class Opportunity {
                 if ($row = $res->fetch_assoc()) {
                     $hostOrgId = $row['HostOrgID'];
                 } else {
-                    // Create User & Host Org
+                    // Create a Host Organization if it does nto exist
                     $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $orgName));
+
+                    //assign a username in the format Hxxx THEN GENERATE A RANDOM PASSWORD
                     $username = $baseUsername . '_' . bin2hex(random_bytes(2));
                     $tempPassword = bin2hex(random_bytes(4));
                     $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
                     
+
+                    //Add the new user to the db 
                     $userStmt = $this->conn->prepare("INSERT INTO users (Username, Password, Role, Status) VALUES (?, ?, 'Host Organization', 'Active')");
                     $userStmt->bind_param("ss", $username, $hashedPassword);
                     $userStmt->execute();
                     $userId = $this->conn->insert_id;
 
+                    //send an email to the specified address about their new account creation in the system
+                    //this is necessary for viewing job applications from CUEA
                     $defaultEmail = $username . '@example.com';
                     $hostStmt = $this->conn->prepare("INSERT INTO hostorganization (UserID, OrganizationName, Email, PhoneNumber) VALUES (?, ?, ?, 'Pending')");
                     $hostStmt->bind_param("iss", $userId, $orgName, $defaultEmail);

@@ -72,6 +72,8 @@ class Router {
             '/admin/reports/effectiveness' => ['controller' => 'ReportController', 'action' => 'effectiveness'],
             '/admin/reports/supervisor-stats' => ['controller' => 'ReportController', 'action' => 'supervisorStats'],
             '/admin/reports/host-performance' => ['controller' => 'ReportController', 'action' => 'hostPerformance'],
+            '/admin/reports/placement-completions' => ['controller' => 'ReportController', 'action' => 'placementCompletions'],
+            '/admin/reports/placement-impact' => ['controller' => 'ReportController', 'action' => 'placementImpact'],
             '/staff/reports' => ['controller' => 'ReportController', 'action' => 'staffIndex'],
             '/staff/reports/lecturer-grades' => ['controller' => 'ReportController', 'action' => 'lecturerGrades'],
             '/host/reports' => ['controller' => 'ReportController', 'action' => 'hostIndex'],
@@ -96,6 +98,8 @@ class Router {
             '/reports/print/assessment-schedule' => ['controller' => 'ReportController', 'action' => 'printAssessmentSchedule'],
             '/reports/print/supervisor-stats' => ['controller' => 'ReportController', 'action' => 'printSupervisorStats'],
             '/reports/print/host-performance' => ['controller' => 'ReportController', 'action' => 'printHostPerformance'],
+            '/reports/print/placement-completions' => ['controller' => 'ReportController', 'action' => 'printPlacementCompletions'],
+            '/reports/print/placement-impact' => ['controller' => 'ReportController', 'action' => 'printPlacementImpact'],
             '/admin/supervision/bulk' => ['controller' => 'BulkSupervisionController', 'action' => 'index'],
             '/admin/supervision/bulk/assign' => ['controller' => 'BulkSupervisionController', 'action' => 'processAssignment'],
             // I'm gonna add more routes here as we go along, but this is the basic idea

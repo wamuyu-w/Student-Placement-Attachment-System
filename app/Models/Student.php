@@ -13,7 +13,7 @@ class Student {
 
     public function getAll() {
         // Join with users to get Admission Number (Username)
-        return $this->conn->query("SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.Faculty, s.YearOfStudy, s.Email, s.EligibilityStatus, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID ORDER BY s.StudentID DESC");
+        return $this->conn->query("SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.Faculty, s.Department, s.YearOfStudy, s.Email, s.EligibilityStatus, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID ORDER BY s.StudentID DESC");
     }
     public function getById($studentId) {
         $stmt = $this->conn->prepare("SELECT s.*, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID WHERE s.StudentID = ?");
@@ -74,9 +74,10 @@ class Student {
             $firstName = $data['firstName'] ?? 'New';
             $lastName = $data['lastName'] ?? 'Student';
             $faculty = $data['faculty'] ?? 'Unknown';
+            $department = $data['department'] ?? 'Unknown';
 
-            $stmt2 = $this->conn->prepare("INSERT INTO student (UserID, FirstName, LastName, Faculty, EligibilityStatus) VALUES (?, ?, ?, ?, 'Pending')");
-            $stmt2->bind_param("isss", $userId, $firstName, $lastName, $faculty);
+            $stmt2 = $this->conn->prepare("INSERT INTO student (UserID, FirstName, LastName, Faculty, Department, EligibilityStatus) VALUES (?, ?, ?, ?, ?, 'Pending')");
+            $stmt2->bind_param("isssss", $userId, $firstName, $lastName, $faculty, $department);
             $stmt2->execute();
 
             $this->conn->commit();

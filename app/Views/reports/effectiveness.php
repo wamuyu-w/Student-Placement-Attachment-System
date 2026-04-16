@@ -1,3 +1,4 @@
+<?php use App\Core\Helpers; ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0;">System Effectiveness Dashboard</h1>
@@ -51,7 +52,7 @@
                             <tr>
                                 <td style="font-weight: 600;"><?= htmlspecialchars($row['Name']) ?></td>
                                 <td style="text-align: center;">
-                                    <span class="status-badge" style="background: #e0f2fe; color: #0369a1;"><?= $row['students_assessed'] ?> Students</span>
+                                    <span class="status-badge" style="background: #f0e6ea; color: #8B1538;"><?= $row['students_assessed'] ?> Students</span>
                                 </td>
                                 <td style="text-align: center; font-weight: bold;">
                                     <?= number_format($row['avg_marks_given'], 1) ?>%
@@ -77,10 +78,10 @@
                     <div style="margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
                             <span style="font-weight: 600;"><?= date('F Y', strtotime($row['Month'] . '-01')) ?></span>
-                            <span style="color: #7c3aed; font-weight: bold;"><?= $row['count'] ?> Placements</span>
+                            <span style="color: #8B1538; font-weight: bold;"><?= $row['count'] ?> Placements</span>
                         </div>
                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 4px;">
-                            <div style="background: #7c3aed; height: 100%; width: <?= min(($row['count'] / 20) * 100, 100) ?>%;"></div>
+                            <div style="background: #8B1538; height: 100%; width: <?= min(($row['count'] / 20) * 100, 100) ?>%;"></div>
                         </div>
                     </div>
                 <?php endwhile; ?>

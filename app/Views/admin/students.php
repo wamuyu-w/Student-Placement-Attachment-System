@@ -89,6 +89,23 @@
         <form action="<?= Helpers::baseUrl('/admin/students/create') ?>" method="POST">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select Faculty</label>
+                <select name="faculty" id="singleFaculty" onchange="updateDepartments('singleFaculty', 'singleDepartment')" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
+                    <option value="">-- Choose Faculty --</option>
+                    <option value="Science">Science</option>
+                    <option value="Law">Law</option>
+                    <option value="Business">Business & Economics</option>
+                    <option value="Arts & Social Sciences">Arts & Social Sciences</option>
+                    <option value="Education">Education</option>
+                    <option value="Theology">Theology</option>
+                    <option value="Nursing">Nursing</option>
+                </select>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select Department</label>
+                <select name="department" id="singleDepartment" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
+                    <option value="">-- Choose Department --</option>
+                </select>
+
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admission Number (Username)</label>
                 <input type="text" name="admNumber" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 <p style="font-size: 0.85rem; color: #6b7280; margin-top: 5px;">
@@ -114,7 +131,7 @@
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select Faculty</label>
-                <select name="faculty" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
+                <select name="faculty" id="bulkFaculty" onchange="updateDepartments('bulkFaculty', 'bulkDepartment')" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
                     <option value="">-- Choose Faculty --</option>
                     <option value="Science">Science</option>
                     <option value="Law">Law</option>
@@ -125,6 +142,11 @@
                     <option value="Nursing">Nursing</option>
                 </select>
                 
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select Department</label>
+                <select name="department" id="bulkDepartment" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
+                    <option value="">-- Choose Department --</option>
+                </select>
+
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Select CSV File</label>
                 <input type="file" name="csvFile" required accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 <div style="background-color: #f8fafc; padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 0.9em; color: #64748b;">
@@ -140,3 +162,32 @@
         </form>
     </div>
 </div>
+<script>
+const facultyDepartments = {
+    'Science': ['Computer Science', 'Mathematics', 'Physics', 'Biology'],
+    'Law': ['Public Law', 'Private Law'],
+    'Business': ['Accounting', 'Finance', 'Management'],
+    'Business & Economics': ['Accounting', 'Finance', 'Management'],
+    'Arts & Social Sciences': ['Sociology', 'History', 'Literature'],
+    'Education': ['Early Childhood', 'Special Needs'],
+    'Theology': ['Biblical Studies', 'Pastoral Theology'],
+    'Nursing': ['Midwifery', 'General Nursing']
+};
+
+function updateDepartments(facultySelectId, departmentSelectId) {
+    const faculty = document.getElementById(facultySelectId).value;
+    const deptSelect = document.getElementById(departmentSelectId);
+    
+    // Clear existing
+    deptSelect.innerHTML = '<option value="">-- Choose Department --</option>';
+    
+    if (faculty && facultyDepartments[faculty]) {
+        facultyDepartments[faculty].forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept;
+            option.textContent = dept;
+            deptSelect.appendChild(option);
+        });
+    }
+}
+</script>

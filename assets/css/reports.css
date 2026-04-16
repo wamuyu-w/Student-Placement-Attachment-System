@@ -1,140 +1,202 @@
-/* Common Styles for Printable Reports */
+/* Common Styles for Printable Reports - Modernized Premium Aesthetic */
 @page {
-    size: A4;
-    margin: 20mm;
+    size: A4 portrait;
+    margin: 18mm 14mm;
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    font-family: 'Times New Roman', serif;
-    color: #000;
+    font-family: 'Arial', sans-serif;
+    color: #1a1a2e;
     background: #fff;
-    padding: 0;
-    margin: 0;
-    line-height: 1.6;
+    font-size: 9.5pt;
+    line-height: 1.5;
 }
 
 .report-container {
-    padding: 20px;
-}
-
-.report-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 2px solid #8B1538;
-    padding-bottom: 15px;
-    margin-bottom: 30px;
-    gap: 30px;
-}
-
-.logo-container img {
-    height: 100px;
-    width: auto;
-}
-
-.header-text {
-    text-align: center;
-}
-
-.header-text h1 {
-    margin: 0;
-    font-size: 18pt;
-    color: #8B1538;
-    text-transform: uppercase;
-}
-
-.header-text h2 {
-    margin: 5px 0 0 0;
-    font-size: 14pt;
-    color: #333;
-}
-
-.info-table,
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 25px;
-    font-size: 11pt;
-}
-
-.info-table td {
-    padding: 6px 0;
-    vertical-align: top;
-}
-
-.info-label {
-    font-weight: bold;
-    width: 30%;
-}
-
-.info-value {
-    border-bottom: 1px dotted #ccc;
-    width: 70%;
-}
-
-.data-table th,
-.data-table td {
-    border: 1px solid #ddd;
     padding: 10px;
-    text-align: left;
+    width: 100%;
 }
 
-.data-table th {
-    background-color: #f8f9fa;
-    color: #333;
+/* Header */
+.report-header, .header { 
+    display: flex; 
+    align-items: center; 
+    border-bottom: 3px solid #8B1538; 
+    padding-bottom: 10px; 
+    margin-bottom: 16px; 
+}
+.report-header img, .logo-container img, .header img { 
+    height: 52px; 
+    width: auto;
+    margin-right: 14px; 
+}
+.header-text {
+    flex: 1;
+}
+.header-text h1 { 
+    font-size: 15pt; 
+    color: #8B1538; 
+    font-weight: 800; 
+    line-height: 1.2; 
+    margin: 0;
+}
+.header-text h2 { 
+    font-size: 12pt; 
+    color: #333; 
+    margin: 4px 0 2px 0;
+}
+.header-text p { 
+    font-size: 8pt; 
+    color: #4b5563; 
+    margin: 0;
+}
+
+/* KPI Row */
+.kpi-row { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 16px; 
+    flex-wrap: wrap; 
+}
+.kpi-box { 
+    flex: 1; 
+    min-width: 90px; 
+    border: 1.5px solid #e5e7eb; 
+    border-radius: 6px; 
+    padding: 8px 10px; 
+    text-align: center; 
+}
+.kpi-box .num { 
+    font-size: 16pt; 
+    font-weight: 800; 
+    color: #8B1538; 
+}
+.kpi-box .lbl { 
+    font-size: 7.5pt; 
+    color: #6b7280; 
+    margin-top: 2px; 
+}
+
+/* Section Headings */
+.section-heading, h3 { 
+    font-size: 11pt; 
+    font-weight: 800; 
+    color: #1f2937; 
+    margin: 16px 0 8px; 
+    border-left: 4px solid #8B1538; 
+    padding-left: 8px; 
+    border-bottom: none !important;
+}
+
+/* Grid/Columns */
+.two-col { display: flex; gap: 16px; margin-bottom: 16px; }
+.col { flex: 1; }
+
+/* Bar charts / Tracks */
+.bar-row { margin-bottom: 10px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 8pt; margin-bottom: 3px; }
+.bar-label .name  { font-weight: 700; color: #374151; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-label .value { color: #8B1538; font-weight: 700; }
+.bar-track { width: 100%; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 4px; }
+
+/* Tables */
+.data-table, table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 8pt; 
+    margin-bottom: 20px;
+}
+.data-table thead tr, table thead tr { 
+    background: #8B1538; 
+    color: #fff; 
+}
+.data-table thead th, table thead th { 
+    padding: 6px 6px; 
+    text-align: left; 
+    font-size: 7.5pt; 
+    white-space: nowrap; 
     font-weight: bold;
-    text-transform: uppercase;
-    font-size: 10pt;
+}
+.data-table tbody tr:nth-child(even), table tbody tr:nth-child(even) { background: #f9f9f9; }
+.data-table tbody tr:hover, table tbody tr:hover { background: #fdf2f5; }
+.data-table tbody td, table tbody td { 
+    padding: 5px 6px; 
+    border-bottom: 1px solid #f1f5f9; 
+    vertical-align: middle; 
 }
 
+/* Helpers */
+.center { text-align: center; }
+
+/* Badges */
+.badge { padding: 2px 7px; border-radius: 20px; font-size: 7pt; font-weight: 700; white-space: nowrap; display: inline-block; }
+.badge-cleared, .badge-green   { background: #d1fae5; color: #065f46; }
+.badge-notcleared, .badge-amber{ background: #fef3c7; color: #92400e; }
+.badge-approved, .badge-blue  { background: #dbeafe; color: #1e40af; }
+.badge-submitted { background: #ede9fe; color: #5b21b6; }
+.badge-none, .badge-gray      { background: #f3f4f6; color: #6b7280; }
+
+/* Score Cues */
+.score-hi  { color: #059669; font-weight: 700; }
+.score-mid { color: #2563eb; font-weight: 700; }
+.score-low { color: #d97706; font-weight: 700; }
+
+/* Signatures */
 .footer-signatures {
-    margin-top: 50px;
+    margin-top: 40px;
     display: flex;
     justify-content: space-between;
 }
-
 .sig-block {
-    width: 40%;
+    width: 35%;
     text-align: center;
 }
-
 .sig-line {
-    border-bottom: 1px solid #000;
-    margin-bottom: 8px;
-    height: 40px;
+    border-bottom: 1px solid #1f2937;
+    margin-bottom: 5px;
+    height: 30px;
 }
 
-.print-btn {
+/* Footer note */
+.footer { 
+    margin-top: 16px; 
+    font-size: 7.5pt; 
+    color: #9ca3af; 
+    text-align: center; 
+    border-top: 1px solid #e5e7eb; 
+    padding-top: 8px; 
+}
+
+/* Print Buttons */
+.print-btn, .no-print {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 14px;
+    right: 14px;
     background: #8B1538;
     color: #fff;
     border: none;
-    padding: 10px 25px;
-    border-radius: 5px;
+    padding: 10px 22px;
+    border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     transition: all 0.3s ease;
 }
-
-.print-btn:hover {
+.print-btn:hover, .no-print:hover {
     background: #6b0f2a;
     transform: translateY(-2px);
 }
 
 @media print {
-    .print-btn {
-        display: none;
+    .print-btn, .no-print {
+        display: none !important;
     }
-
-    body {
+    body, .report-container {
         padding: 0;
-    }
-
-    .report-container {
-        padding: 0;
+        margin: 0;
     }
 }

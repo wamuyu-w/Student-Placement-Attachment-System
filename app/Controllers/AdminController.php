@@ -62,6 +62,7 @@ class AdminController extends Controller {
             $result = $supervisorModel->create($staffNumber);
 
             if ($result['success']) {
+                //login credentials for the new supervisor should be their staff number and their default password
                 $msg = "Supervisor added successfully. Login Credentials -> Username: " . $result['username'] . " | Password: " . $result['password'];
                 header("Location: ../supervisors?success=" . urlencode($msg));
             } else {
@@ -87,12 +88,17 @@ class AdminController extends Controller {
     public function createStudent() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            //verigy csrf token
             $this->verifyCsrf();
+
+            // add department and faculty when creating students = bulk assignment
             $admNumber = Helpers::sanitize($_POST['admNumber']);
+            $department = Helpers::sanitize($_POST['department'] ?? '');
+            $faculty = Helpers::sanitize($_POST['faculty'] ?? '');
             $studentModel = $this->model('Student');
             
             try {
-                $studentModel->createFromAdmin(['admNumber' => $admNumber]);
+                $studentModel->createFromAdmin(['admNumber' => $admNumber, 'department' => $department, 'faculty' => $faculty]);
                 header("Location: " . Helpers::baseUrl('/admin/students?success=Student added'));
             } catch (\Exception $e) {
                 header("Location: " . Helpers::baseUrl('/admin/students?error=' . urlencode($e->getMessage())));
@@ -108,6 +114,7 @@ class AdminController extends Controller {
             $handle = fopen($file, "r");
             $studentModel = $this->model('Student');
             $faculty = Helpers::sanitize($_POST['faculty'] ?? '');
+            $department = Helpers::sanitize($_POST['department'] ?? '');
             
             $successCount = 0;
             $row = 0;
@@ -124,6 +131,7 @@ class AdminController extends Controller {
                         'firstName' => Helpers::sanitize($data[1] ?? ''),
                         'lastName' => Helpers::sanitize($data[2] ?? ''),
                         'faculty' => $faculty,
+                        'department' => $department,
                         'is_bulk' => true
                     ];
                     if ($studentModel->createFromAdmin($studentData)) $successCount++;

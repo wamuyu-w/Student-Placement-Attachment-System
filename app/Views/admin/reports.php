@@ -71,11 +71,20 @@
                 <i class="fas fa-chevron-right" style="font-size: 12px; color: #d1d5db;"></i>
             </a>
 
-            <a href="<?= Helpers::baseUrl('/admin/users') ?>" class="action-btn">
+            <a href="<?= Helpers::baseUrl('/admin/reports/placement-completions') ?>" class="action-btn">
                 <i class="fas fa-check-double" style="color: #059669;"></i>
                 <div style="flex: 1;">
                     <span style="display: block; font-weight: bold;">Placement Completions</span>
                     <small style="color: #6b7280;">Verified Attachment Ends</small>
+                </div>
+                <i class="fas fa-chevron-right" style="font-size: 12px; color: #d1d5db;"></i>
+            </a>
+
+            <a href="<?= Helpers::baseUrl('/admin/reports/placement-impact') ?>" class="action-btn">
+                <i class="fas fa-globe-africa" style="color: #db2777;"></i>
+                <div style="flex: 1;">
+                    <span style="display: block; font-weight: bold;">Placement Impact Analysis</span>
+                    <small style="color: #6b7280;">Faculty & Host Performance Metrics</small>
                 </div>
                 <i class="fas fa-chevron-right" style="font-size: 12px; color: #d1d5db;"></i>
             </a>

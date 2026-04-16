@@ -30,37 +30,38 @@ class Supervisor {
     public function create($staffNumber) {
         $this->conn->begin_transaction();
         try {
-            // 1. Generate L-Username (Find highest Lxxx and increment)
-            $result = $this->conn->query("SELECT Username FROM users WHERE Username LIKE 'L%' ORDER BY CAST(SUBSTRING(Username, 2) AS UNSIGNED) DESC LIMIT 1");
-            
-            $nextNum = 1;
-            if ($result && $result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                $nextNum = (int)substr($row['Username'], 1) + 1;
-            }
-            
-            $newUsername = 'L' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+            //generate their new username as their staff numbeer -> this will be used for logging in
+            $newUsername = $staffNumber;
+
+            // default password is set since all the staff are based in CUEA.
+            // Once intergrated, they'll use the same password as the one in the ERP
             $defaultPassword = 'Changeme123!';
             $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);
             
-            // 2. Create User Account
+            // 2.Create User Account WITH THE NEW DETAILS AND ADD TO THE DB
             $stmt = $this->conn->prepare("INSERT INTO users (Username, Password, Role, Status) VALUES (?, ?, 'Lecturer', 'Active')");
             $stmt->bind_param("ss", $newUsername, $hashedPassword);
             if (!$stmt->execute()) throw new \Exception($stmt->error);
             $userId = $this->conn->insert_id;
 
-            // 3. Create Lecturer Record
+            // 3. Create Lecturer Record - sepearate from the user table and set their credentials as Supervisors
+
+            // administrators are added directly from the database since they are few in number
             $stmt = $this->conn->prepare("INSERT INTO lecturer (UserID, StaffNumber, Role) VALUES (?, ?, 'Supervisor')");
             $stmt->bind_param("is", $userId, $staffNumber);
             if (!$stmt->execute()) throw new \Exception($stmt->error);
 
             $this->conn->commit();
+            // success message
             return ['success' => true, 'username' => $newUsername, 'password' => $defaultPassword];
         } catch (\Exception $e) {
+            // if any error occurs, rollback the transaction - Aprevent issues later on e.g. duplicate lecturers
             $this->conn->rollback();
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
+
+    //get the number of students that need to be assigned for supervision
     public function getStudentsForAssignment() {
         $sql = "
             SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName,

@@ -98,7 +98,7 @@ if (applicationForm) {
             setTimeout(() => {
                 closeApplicationForm();
                 location.reload();
-            }, 2000);
+            }, 500);
         } else {
             showAlert(data.message, 'error');
             submitBtn.disabled = false;

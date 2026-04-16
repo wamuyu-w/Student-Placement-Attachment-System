@@ -511,19 +511,19 @@ tr:hover {
 }
 
 .status-pending {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #f5f5f5;
+    color: #4b5563;
 }
 
 .status-approved,
 .status-active {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: #f0e6ea;
+    color: #8B1538;
 }
 
 .status-rejected {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: #f0f0f0;
+    color: #1a1a1a;
 }
 
 .status-select {

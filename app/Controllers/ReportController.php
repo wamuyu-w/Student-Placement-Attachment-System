@@ -251,4 +251,42 @@ class ReportController extends Controller {
         $data = ['performance' => $reportModel->getHostPerformanceReport($hostId)];
         $this->view('reports/print-host-performance', $data, false);
     }
+
+    public function placementCompletions() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'report'   => $reportModel->getPlacementCompletions(),
+            'title'    => 'Placement Completions Report',
+            'page'     => 'reports',
+            'page_css' => 'admin-dashboard.css'
+        ];
+        $this->view('reports/placement-completions', $data);
+    }
+
+    public function printPlacementCompletions() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = ['report' => $reportModel->getPlacementCompletions()];
+        $this->view('reports/print-placement-completions', $data, false);
+    }
+
+    public function placementImpact() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = [
+            'impact'   => $reportModel->getPlacementImpact(),
+            'title'    => 'Placement Impact Analysis',
+            'page'     => 'reports',
+            'page_css' => 'admin-dashboard.css'
+        ];
+        $this->view('reports/placement-impact', $data);
+    }
+
+    public function printPlacementImpact() {
+        $this->requireAuth('admin');
+        $reportModel = $this->model('Report');
+        $data = ['impact' => $reportModel->getPlacementImpact()];
+        $this->view('reports/print-placement-impact', $data, false);
+    }
 }

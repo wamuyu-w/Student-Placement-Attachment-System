@@ -1,5 +1,5 @@
 <?php use App\Core\Helpers; ?>
-<link rel="stylesheet" href="<?= Helpers::baseUrl('assets/css/opportunities.css') ?>">
+<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/opportunities.css') ?>">
 
 <style>
     .active-placement-notice {
@@ -229,31 +229,31 @@
                     <div class="summary-row">
                         <div class="summary-item">
                             <span class="label">Full Name</span>
-                            <span class="value"><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
+                            <span class="value"><?php echo htmlspecialchars(($_SESSION['first_name'] ?? '') . ' ' . ($_SESSION['last_name'] ?? '')); ?></span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Admission Number</span>
-                            <span class="value"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                            <span class="value"><?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?></span>
                         </div>
                     </div>
                     <div class="summary-row">
                         <div class="summary-item">
                             <span class="label">Email</span>
-                            <span class="value"><?php echo htmlspecialchars($_SESSION['email']); ?></span>
+                            <span class="value"><?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?></span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Phone</span>
-                            <span class="value"><?php echo htmlspecialchars($_SESSION['phone']); ?></span>
+                            <span class="value"><?php echo htmlspecialchars($_SESSION['phone'] ?? ''); ?></span>
                         </div>
                     </div>
                     <div class="summary-row">
                         <div class="summary-item">
                             <span class="label">Program</span>
-                            <span class="value"><?php echo htmlspecialchars($_SESSION['course']); ?></span>
+                            <span class="value"><?php echo htmlspecialchars($_SESSION['course'] ?? ''); ?></span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Year of Study</span>
-                            <span class="value"><?php echo htmlspecialchars($_SESSION['year_of_study']); ?></span>
+                            <span class="value"><?php echo htmlspecialchars($_SESSION['year_of_study'] ?? ''); ?></span>
                         </div>
                     </div>
                 </div>
@@ -314,5 +314,4 @@
         </form>
     </div>
 </div>
-
-<script src="<?= Helpers::baseUrl('assets/js/opportunities.js') ?>"></script>
+<script src="<?= Helpers::baseUrl('../assets/js/opportunities.js') ?>"></script>

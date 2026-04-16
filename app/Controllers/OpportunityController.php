@@ -26,6 +26,8 @@ class OpportunityController extends Controller {
         $this->view('student/opportunities', $data);
     }
 
+
+    // students can apply for active applications but they must be an active student in the platform
     public function apply() {
         $this->requireActiveStudent();
 
@@ -41,11 +43,15 @@ class OpportunityController extends Controller {
             return;
         }
 
+        //fetch the Student ID for this session
         $studentId = $_SESSION['student_id'] ?? null;
+
+        //fetch from the models and retreive student data based on their Student ID
         $appModel = $this->model('Application');
         $studentModel = $this->model('Student');
         $student = $studentModel->getById($studentId);
 
+        //if model finds out you are an active student with a placement, denies application
         if ($appModel->hasActiveAttachment($studentId) || ($student['EligibilityStatus'] === 'Cleared')) {
             $this->json(['success' => false, 'message' => 'You already have an active placement or are cleared.']);
             return;
@@ -136,7 +142,13 @@ class OpportunityController extends Controller {
                     $data['host_org_id'] = $_POST['host_org_id'];
                 }
             } else {
-                $data['host_org_id'] = $_SESSION['host_org_id'];
+                // Host org user: pull ID from session
+                $hostOrgId = $_SESSION['host_org_id'] ?? null;
+                if (!$hostOrgId) {
+                    header("Location: " . Helpers::baseUrl('/host/opportunities?error=' . urlencode('Session error: Host Organization ID missing. Please log out and log back in.')));
+                    exit();
+                }
+                $data['host_org_id'] = $hostOrgId;
             }
 
             $oppModel = $this->model('Opportunity');
@@ -146,6 +158,7 @@ class OpportunityController extends Controller {
             $param = $result['success'] ? 'success=Saved successfully' : 'error=' . urlencode($result['message']);
             
             header("Location: " . Helpers::baseUrl($redirect . '?' . $param));
+            exit();
         }
     }
 
@@ -159,5 +172,6 @@ class OpportunityController extends Controller {
         $redirect = ($_SESSION['user_type'] === 'admin') ? '/admin/opportunities' : '/host/opportunities';
         $param = $result['success'] ? 'success=Deleted' : 'error=' . urlencode($result['message']);
         header("Location: " . Helpers::baseUrl($redirect . '?' . $param));
+        exit();
     }
 }

@@ -60,6 +60,23 @@
                     });
                 });
             }
+
+            // Toast auto-dismiss
+            document.querySelectorAll('.alert').forEach(function(toast) {
+                // Click to dismiss immediately
+                toast.addEventListener('click', function() {
+                    dismissToast(toast);
+                });
+                // Auto-dismiss after 4 seconds
+                setTimeout(function() {
+                    dismissToast(toast);
+                }, 4000);
+            });
+
+            function dismissToast(el) {
+                el.style.animation = 'fadeOutToast 0.35s ease forwards';
+                setTimeout(function() { el.remove(); }, 350);
+            }
         });
     </script>
 </body>

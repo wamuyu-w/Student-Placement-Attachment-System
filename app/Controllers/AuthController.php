@@ -157,6 +157,9 @@ class AuthController extends Controller {
             }
             elseif ($role === 'host_org') {
                 $profile = $userModel->getHostProfile($user['UserID']);
+                if (!$profile || empty($profile['HostOrgID'])) {
+                    $this->redirectWithError($role, 'Host organization profile not found. Please contact the administrator.');
+                }
                 $_SESSION['host_org_id'] = $profile['HostOrgID'];
                 $_SESSION['organization_name'] = $profile['OrganizationName'];
                 $redirectUrl = Helpers::baseUrl('/host/dashboard');

@@ -251,4 +251,142 @@ class Report {
                 ORDER BY students_assessed DESC";
         return $this->conn->query($sql);
     }
+
+    public function getPlacementCompletions() {
+        $data = [];
+
+        // Summary counters
+        $data['total_completed']  = $this->conn->query("SELECT COUNT(*) FROM attachment WHERE AttachmentStatus = 'Completed'")->fetch_row()[0];
+        $data['total_cleared']    = $this->conn->query("SELECT COUNT(*) FROM attachment WHERE ClearanceStatus = 'Cleared'")->fetch_row()[0];
+        $data['total_ongoing']    = $this->conn->query("SELECT COUNT(*) FROM attachment WHERE AttachmentStatus = 'Ongoing'")->fetch_row()[0];
+        $data['reports_approved'] = $this->conn->query("SELECT COUNT(*) FROM finalreport WHERE Status = 'Approved'")->fetch_row()[0];
+
+        // Avg first & final scores for completed students
+        $data['avg_first']  = $this->conn->query("SELECT ROUND(AVG(Marks),1) FROM assessment WHERE AssessmentType='First Assessment' AND Status='Completed'")->fetch_row()[0] ?? 0;
+        $data['avg_final']  = $this->conn->query("SELECT ROUND(AVG(Marks),1) FROM assessment WHERE AssessmentType='Final Assessment' AND Status='Completed'")->fetch_row()[0] ?? 0;
+
+        // Full per-student completion table
+        $sql = "SELECT
+                    s.StudentID, s.FirstName, s.LastName, s.Course, s.Faculty,
+                    u.Username AS AdmNumber,
+                    ho.OrganizationName,
+                    a.AttachmentID, a.StartDate, a.EndDate,
+                    a.AttachmentStatus, a.ClearanceStatus, a.AssessmentCode,
+                    l.Name AS SupervisorName,
+                    (SELECT COUNT(*) FROM logbook lb WHERE lb.AttachmentID = a.AttachmentID AND lb.Status = 'Approved') AS ApprovedWeeks,
+                    (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'First Assessment' AND Status = 'Completed' LIMIT 1) AS FirstScore,
+                    (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'Final Assessment' AND Status = 'Completed' LIMIT 1) AS FinalScore,
+                    (SELECT AVG(Marks) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Completed') AS AvgScore,
+                    fr.Status AS ReportStatus, fr.SubmissionDate AS ReportSubmitted
+                FROM attachment a
+                JOIN student s ON a.StudentID = s.StudentID
+                JOIN users u ON s.UserID = u.UserID
+                JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
+                LEFT JOIN supervision sup ON a.AttachmentID = sup.AttachmentID
+                LEFT JOIN lecturer l ON sup.LecturerID = l.LecturerID
+                LEFT JOIN finalreport fr ON a.AttachmentID = fr.AttachmentID
+                ORDER BY a.ClearanceStatus DESC, s.LastName, s.FirstName";
+        $data['students'] = $this->conn->query($sql);
+
+        return $data;
+    }
+
+    public function getPlacementImpact() {
+        $data = [];
+
+        // Top-level KPIs
+        $data['total_students']       = $this->conn->query("SELECT COUNT(*) FROM student")->fetch_row()[0];
+        $data['placed_students']      = $this->conn->query("SELECT COUNT(DISTINCT StudentID) FROM attachment WHERE AttachmentStatus IN ('Ongoing','Completed')")->fetch_row()[0];
+        $data['completed_placements'] = $this->conn->query("SELECT COUNT(*) FROM attachment WHERE AttachmentStatus='Completed'")->fetch_row()[0];
+        $data['total_host_orgs']      = $this->conn->query("SELECT COUNT(*) FROM hostorganization")->fetch_row()[0];
+        $data['total_logbook_weeks']  = $this->conn->query("SELECT COUNT(*) FROM logbook WHERE Status='Approved'")->fetch_row()[0];
+        $data['total_assessments']    = $this->conn->query("SELECT COUNT(*) FROM assessment WHERE Status='Completed'")->fetch_row()[0];
+        $data['avg_grade']            = $this->conn->query("SELECT ROUND(AVG(Marks),1) FROM assessment WHERE Status='Completed'")->fetch_row()[0] ?? 0;
+        $data['total_applications']   = $this->conn->query("SELECT COUNT(*) FROM jobapplication")->fetch_row()[0];
+        $data['accepted_applications']= $this->conn->query("SELECT COUNT(*) FROM jobapplication WHERE Status='Accepted'")->fetch_row()[0];
+
+        // Placement rate by faculty
+        $data['faculty_impact'] = $this->conn->query(
+            "SELECT s.Faculty,
+                    COUNT(DISTINCT s.StudentID) AS total_students,
+                    COUNT(DISTINCT a.StudentID) AS placed_students,
+                    ROUND(AVG(CASE WHEN asmt.Marks IS NOT NULL THEN asmt.Marks END),1) AS avg_score
+             FROM student s
+             LEFT JOIN attachment a ON s.StudentID = a.StudentID
+             LEFT JOIN assessment asmt ON a.AttachmentID = asmt.AttachmentID AND asmt.Status='Completed'
+             GROUP BY s.Faculty
+             ORDER BY placed_students DESC"
+        );
+
+        // Top performing host organizations
+        $data['top_hosts'] = $this->conn->query(
+            "SELECT ho.OrganizationName, ho.PhysicalAddress,
+                    COUNT(a.AttachmentID) AS student_count,
+                    SUM(CASE WHEN a.ClearanceStatus='Cleared' THEN 1 ELSE 0 END) AS cleared_count,
+                    ROUND(AVG(asmt.Marks),1) AS avg_score
+             FROM hostorganization ho
+             LEFT JOIN attachment a ON ho.HostOrgID = a.HostOrgID
+             LEFT JOIN assessment asmt ON a.AttachmentID = asmt.AttachmentID AND asmt.Status='Completed'
+             GROUP BY ho.HostOrgID
+             HAVING student_count > 0
+             ORDER BY avg_score DESC, student_count DESC
+             LIMIT 15"
+        );
+
+        // Grade distribution buckets
+        $data['grade_dist'] = $this->conn->query(
+            "SELECT
+                CASE
+                    WHEN Marks >= 80 THEN 'Distinction (80-100)'
+                    WHEN Marks >= 70 THEN 'Credit (70-79)'
+                    WHEN Marks >= 60 THEN 'Pass (60-69)'
+                    ELSE 'Below Pass (<60)'
+                END AS GradeBand,
+                COUNT(*) AS student_count
+             FROM (
+                SELECT AttachmentID, ROUND(AVG(Marks),1) AS Marks
+                FROM assessment WHERE Status='Completed'
+                GROUP BY AttachmentID
+             ) AS avg_scores
+             GROUP BY GradeBand
+             ORDER BY FIELD(GradeBand,'Distinction (80-100)','Credit (70-79)','Pass (60-69)','Below Pass (<60)')"
+        );
+
+        // Job application conversion
+        $data['job_app_stats'] = [];
+        $res = $this->conn->query("SELECT Status, COUNT(*) AS cnt FROM jobapplication GROUP BY Status");
+        while($r = $res->fetch_assoc()) $data['job_app_stats'][$r['Status']] = $r['cnt'];
+
+        // Opportunity listings breakdown
+        $data['opportunities'] = $this->conn->query(
+            "SELECT ao.Description, ho.OrganizationName, ao.Status,
+                    (SELECT COUNT(*) FROM jobapplication ja WHERE ja.OpportunityID = ao.OpportunityID) AS total_apps,
+                    (SELECT COUNT(*) FROM jobapplication ja WHERE ja.OpportunityID = ao.OpportunityID AND ja.Status='Accepted') AS accepted
+             FROM attachmentopportunity ao
+             JOIN hostorganization ho ON ao.HostOrgID = ho.HostOrgID
+             ORDER BY total_apps DESC"
+        );
+
+        // Logbook engagement rate per student (approved weeks out of 12)
+        $data['logbook_engagement'] = $this->conn->query(
+            "SELECT
+                CASE
+                    WHEN wks = 12 THEN '12 weeks (Full)'
+                    WHEN wks >= 9  THEN '9-11 weeks'
+                    WHEN wks >= 6  THEN '6-8 weeks'
+                    ELSE '< 6 weeks'
+                END AS EngagementBand,
+                COUNT(*) AS student_count
+             FROM (
+                SELECT a.AttachmentID, COUNT(lb.LogbookID) AS wks
+                FROM attachment a
+                LEFT JOIN logbook lb ON a.AttachmentID = lb.AttachmentID AND lb.Status='Approved'
+                WHERE a.AttachmentStatus IN ('Ongoing','Completed')
+                GROUP BY a.AttachmentID
+             ) AS t
+             GROUP BY EngagementBand"
+        );
+
+        return $data;
+    }
 }

@@ -102,10 +102,18 @@
                                 <span class="status-badge status-<?= strtolower($entry['Status']) ?>" style="font-size: 0.8rem; padding: 4px 10px;"><?= $entry['Status'] ?></span>
                             </div>
                             <div style="font-size: 0.95rem; color: #4b5563; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #f3f4f6; margin-top: 10px;">
-                                <?php if (!empty($entry['Summary'])): ?>
-                                    <p style="margin: 0;"><strong>Summary:</strong> <?= htmlspecialchars($entry['Summary']) ?></p>
+                                <?php if (!empty($entry['Description'])): ?>
+                                    <p style="margin: 0 0 10px 0;"><strong>Student Entries:</strong><br><?= nl2br(htmlspecialchars($entry['Description'])) ?></p>
                                 <?php else: ?>
-                                    <p style="margin: 0; font-style: italic; color: #9ca3af;">Entries exist, but no summary provided.</p>
+                                    <p style="margin: 0 0 10px 0; font-style: italic; color: #9ca3af;">No logbook entries provided by the student.</p>
+                                <?php endif; ?>
+
+                                <?php if (!empty($entry['HostSupervisorComments'])): ?>
+                                    <p style="margin: 0 0 10px 0; color: #047857;"><strong>Host Supervisor Remarks:</strong><br><?= nl2br(htmlspecialchars($entry['HostSupervisorComments'])) ?></p>
+                                <?php endif; ?>
+
+                                <?php if (!empty($entry['AcademicSupervisorComments'])): ?>
+                                    <p style="margin: 0; color: #1d4ed8;"><strong>Academic Supervisor Remarks:</strong><br><?= nl2br(htmlspecialchars($entry['AcademicSupervisorComments'])) ?></p>
                                 <?php endif; ?>
                             </div>
                         </div>

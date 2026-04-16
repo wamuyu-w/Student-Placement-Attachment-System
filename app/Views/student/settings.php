@@ -13,6 +13,14 @@
         <form action="<?= Helpers::baseUrl('/settings/update-profile') ?>" method="POST">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Faculty</label>
+                <input type="text" value="<?= htmlspecialchars($profile['Faculty'] ?? 'Not Set') ?>" class="form-control" readonly style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; background-color: #f3f4f6;">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Department</label>
+                <input type="text" value="<?= htmlspecialchars($profile['Department'] ?? 'Not Set') ?>" class="form-control" readonly style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; background-color: #f3f4f6;">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email Address</label>
                 <input type="email" name="email" value="<?= htmlspecialchars($profile['Email']) ?>" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
             </div>
