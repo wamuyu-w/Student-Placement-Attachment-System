@@ -102,18 +102,40 @@
                                 <span class="status-badge status-<?= strtolower($entry['Status']) ?>" style="font-size: 0.8rem; padding: 4px 10px;"><?= $entry['Status'] ?></span>
                             </div>
                             <div style="font-size: 0.95rem; color: #4b5563; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #f3f4f6; margin-top: 10px;">
-                                <?php if (!empty($entry['Description'])): ?>
-                                    <p style="margin: 0 0 10px 0;"><strong>Student Entries:</strong><br><?= nl2br(htmlspecialchars($entry['Description'])) ?></p>
-                                <?php else: ?>
-                                    <p style="margin: 0 0 10px 0; font-style: italic; color: #9ca3af;">No logbook entries provided by the student.</p>
-                                <?php endif; ?>
+                                <div style="margin-bottom: 12px;"><strong>Student Entries:</strong></div>
+                                <?php 
+                                    $desc = $entry['Description'] ?? '';
+                                    if (empty($desc)) {
+                                        echo '<p style="margin: 0; font-style: italic; color: #9ca3af;">No logbook entries provided by the student.</p>';
+                                    } else {
+                                        $decoded = json_decode($desc, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $daysMapping = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri'];
+                                            echo "<div style='display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;'>";
+                                            foreach($daysMapping as $key => $label) {
+                                                $task = $decoded[$key]['task'] ?? '';
+                                                $studentComment = $decoded[$key]['comment'] ?? '';
+                                                if (!empty(trim($task)) || !empty(trim($studentComment))) {
+                                                    echo "<div style='background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0;'>";
+                                                    echo "<strong style='color: #1e293b; display: block; margin-bottom: 4px;'>" . $label . "</strong>";
+                                                    if (!empty(trim($task))) echo "<div style='margin-bottom:4px;'><span style='color:#64748b; font-size: 0.85em;'>Task:</span> " . nl2br(htmlspecialchars($task)) . "</div>";
+                                                    if (!empty(trim($studentComment))) echo "<div><span style='color:#64748b; font-size: 0.85em;'>Comment:</span> " . nl2br(htmlspecialchars($studentComment)) . "</div>";
+                                                    echo "</div>";
+                                                }
+                                            }
+                                            echo "</div>";
+                                        } else {
+                                            echo '<p style="margin: 0 0 15px 0;">' . nl2br(htmlspecialchars($desc)) . '</p>';
+                                        }
+                                    }
+                                ?>
 
                                 <?php if (!empty($entry['HostSupervisorComments'])): ?>
-                                    <p style="margin: 0 0 10px 0; color: #047857;"><strong>Host Supervisor Remarks:</strong><br><?= nl2br(htmlspecialchars($entry['HostSupervisorComments'])) ?></p>
+                                    <p style="margin: 0 0 10px 0; color: #047857; padding-top: 10px; border-top: 1px solid #e5e7eb;"><strong>Host Supervisor Remarks:</strong><br><?= nl2br(htmlspecialchars($entry['HostSupervisorComments'])) ?></p>
                                 <?php endif; ?>
 
                                 <?php if (!empty($entry['AcademicSupervisorComments'])): ?>
-                                    <p style="margin: 0; color: #1d4ed8;"><strong>Academic Supervisor Remarks:</strong><br><?= nl2br(htmlspecialchars($entry['AcademicSupervisorComments'])) ?></p>
+                                    <p style="margin: 0; color: #1d4ed8; padding-top: 10px; border-top: 1px solid #e5e7eb;"><strong>Academic Supervisor Remarks:</strong><br><?= nl2br(htmlspecialchars($entry['AcademicSupervisorComments'])) ?></p>
                                 <?php endif; ?>
                             </div>
                         </div>

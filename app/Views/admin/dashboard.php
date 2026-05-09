@@ -34,7 +34,7 @@
     <div class="activity-section">
         <div class="section-header">
             <h2>Recent Activity</h2>
-            <a href="#" class="view-all-link">View All</a>
+            <a href="<?= Helpers::baseUrl('/admin/reports') ?>" class="view-all-link">View All</a>
         </div>
         <div class="activity-list" id="activityList">
             <?php if (empty($activities)): ?>
@@ -45,7 +45,7 @@
             <?php else: ?>
                 <?php foreach ($activities as $activity): ?>
                     <div class="activity-item">
-                        <img src="<?= htmlspecialchars($activity['avatar']); ?>" alt="Activity" class="activity-avatar">
+                        <?= $activity['avatar']; ?>
                         <div class="activity-content">
                             <div class="activity-title"><?= $activity['title']; ?></div>
                             <div class="activity-description"><?= $activity['description']; ?></div>

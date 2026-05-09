@@ -30,10 +30,9 @@
                                     </span>
                                 </td>
                                 <td style="padding: 12px;">
-                                    <!-- Note: Progress view not yet migrated for Host, using placeholder -->
-                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem; opacity: 0.5; cursor: not-allowed;" title="Coming Soon">
-                                        Progress
-                                    </button>
+                                    <a href="<?= Helpers::baseUrl('/host/students/progress?id=' . $row['StudentID']) ?>" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none;">
+                                        <i class="fas fa-chart-line"></i> Progress
+                                    </a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>

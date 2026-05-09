@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/opportunities.css') ?>">
 
 <style>
+    /* Styling for the Opportunities Pop UP */
     .active-placement-notice {
         background: white;
         border-radius: 16px;
@@ -72,6 +73,7 @@
 </style>
 
 <div class="opportunities-section">
+<!-- If student has active placement, redirect them to the supervision and logbook pages  -->
     <?php if (isset($hasActivePlacement) && $hasActivePlacement): ?>
         <div class="active-placement-notice">
             <div class="notice-icon">
@@ -100,6 +102,7 @@
         </div>
     </div>
 
+    <!--  List of Opportunities Pop Up-->
     <?php if ($opportunities && $opportunities->num_rows > 0): ?>
         <div class="opportunities-grid">
             <?php while($opp = $opportunities->fetch_assoc()): ?>
@@ -199,7 +202,7 @@
     </div>
 </div>
 
-<!-- Application Modal -->
+<!-- Application Modal - where the student applies for the job opportunity posted -->
 <div id="applicationModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
@@ -214,6 +217,7 @@
             <div class="app-role-title" id="modalRole"></div>
         </div>
 
+        <!-- Beginning of Job Application Form -->
         <form id="applicationForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" id="opportunityId" name="opportunity_id" value="">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
@@ -259,7 +263,7 @@
                 </div>
             </div>
 
-            <!-- Motivation Section -->
+            <!-- Motivation Section - this may include adding a small Cover Letter and other texts for approval and follow up if there are more than two interview needed-->
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-pen-fancy"></i>
@@ -275,27 +279,15 @@
             <!-- Supporting Documents Section -->
             <div class="form-section">
                 <div class="section-title">
-                    <i class="fas fa-paperclip"></i>
+                    <i class="fas fa-link"></i>
                     <h3>Supporting Documents</h3>
                 </div>
-                <div class="form-group full-width">
-                    <label for="resume" class="form-label">Upload Resume/CV</label>
-                    <div class="file-upload">
-                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
-                        <div class="upload-area">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <div>
-                                <p style="margin-bottom: 4px; font-weight: 500;">Click to upload or drag & drop</p>
-                                <span class="upload-hint">PDF or DOCX (Max 5MB)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="form-group full-width" style="margin-top: 16px;">
-                    <label for="resume_link" class="form-label">Or provide a Link (Optional)</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-link"></i>
-                        <input type="url" id="resume_link" name="resume_link" class="form-control" placeholder="https://drive.google.com/..." style="padding-left: 36px;">
+                    <label for="resume_link" class="form-label">Resume Link (Required)</label>
+                    <div class="input-with-icon" style="position: relative;">
+                        <i class="fas fa-link" style="position: absolute; left: 12px; top: 12px; color: #6b7280;"></i>
+                        <input type="url" id="resume_link" name="resume_link" class="form-control" placeholder="https://drive.google.com/..." required style="padding-left: 36px;">
+                        <span style="font-size: 0.85em; color: #6b7280; display: block; margin-top: 4px;">Provide a link to your resume (Google Drive, Dropbox, LinkedIn, etc.)</span>
                     </div>
                 </div>
             </div>
@@ -306,11 +298,12 @@
                 <button type="submit" class="btn btn-primary" id="submitBtn">Submit Application</button>
             </div>
 
-            <!-- Alert Messages -->
+               <!-- Alert Messages -->
             <div id="formAlert" class="alert" style="display: none;">
                 <i class="fas fa-info-circle"></i>
                 <span id="alertMessage"></span>
             </div>
+
         </form>
     </div>
 </div>

@@ -17,7 +17,7 @@
                     <tr>
                         <td style="font-weight: 600;"><?= htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']) ?></td>
                         <td><span class="status-badge status-neutral" style="font-size: 11px;"><?= htmlspecialchars($row['AssessmentType']) ?></span></td>
-                        <td style="font-weight: 700; color: #8B1538;"><?= $row['Marks'] ?>%</td>
+                        <td style="font-weight: 700; color: #000;"><?= $row['Marks'] ?>%</td>
                         <td style="font-size: 13px;"><?= htmlspecialchars($row['OrganizationName']) ?></td>
                         <td style="font-size: 11px; color: #6b7280;"><?= date('M d, Y', strtotime($row['AssessmentDate'])) ?></td>
                     </tr>

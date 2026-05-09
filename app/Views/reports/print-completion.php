@@ -1,6 +1,17 @@
 <?php 
 use App\Core\Helpers; 
-if (!isset($student) || empty($student) || !isset($progress) || empty($progress)) {
+
+$progress = null;
+if (isset($sessions) && is_array($sessions)) {
+    foreach ($sessions as $session) {
+        if ($session['AttachmentStatus'] === 'Completed') {
+            $progress = $session;
+            break;
+        }
+    }
+}
+
+if (!isset($student) || empty($student) || empty($progress)) {
     echo "<div style='text-align:center; padding:20px; font-family:sans-serif;'>Certificate data unavailable. Ensure the student has a completed attachment.</div>";
     exit;
 }
@@ -14,8 +25,8 @@ if (!isset($student) || empty($student) || !isset($progress) || empty($progress)
         @page { size: A4 landscape; margin: 0; }
         body { 
             font-family: 'Times New Roman', serif; 
-            color: #000; 
-            background: #fff; 
+            ; 
+            ; 
             margin: 0;
             padding: 40px;
             display: flex;
@@ -25,7 +36,7 @@ if (!isset($student) || empty($student) || !isset($progress) || empty($progress)
             box-sizing: border-box;
         }
         .certificate-border {
-            border: 15px double #8B1538;
+            border: 15px double #000;
             padding: 40px;
             width: 100%;
             height: 100%;
@@ -42,22 +53,22 @@ if (!isset($student) || empty($student) || !isset($progress) || empty($progress)
             right: 5px;
             bottom: 5px;
             left: 5px;
-            border: 2px solid #8B1538;
+            border: 2px solid #000;
         }
         .logo { margin-bottom: 20px; z-index: 10; }
         .logo img { height: 120px; width: auto; }
-        h1 { font-size: 32pt; text-transform: uppercase; color: #8B1538; margin: 10px 0; z-index: 10; }
-        h2 { font-size: 22pt; margin-bottom: 30px; font-weight: normal; color: #333; z-index: 10; }
+        h1 { font-size: 32pt; text-transform: uppercase; ; margin: 10px 0; z-index: 10; }
+        h2 { font-size: 22pt; margin-bottom: 30px; font-weight: normal; ; z-index: 10; }
         .content { font-size: 18pt; line-height: 1.8; margin-bottom: 40px; z-index: 10; text-align: center; }
-        .student-name { font-weight: bold; font-size: 28pt; color: #000; margin: 15px 0; display: block; }
+        .student-name { font-weight: bold; font-size: 28pt; ; margin: 15px 0; display: block; }
         .signatures { display: flex; justify-content: space-around; width: 100%; margin-top: 40px; z-index: 10; }
         .sig-block { width: 300px; text-align: center; }
-        .sig-line { border-top: 2px solid #8B1538; padding-top: 10px; font-size: 14pt; color: #555; }
-        .print-btn { position: fixed; top: 20px; right: 20px; background: #8B1538; color: #fff; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .sig-line { border-top: 2px solid #000; padding-top: 10px; font-size: 14pt; ; }
+        .print-btn { position: fixed; top: 20px; right: 20px; ; ; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         @media print { 
             .print-btn { display: none; }
             body { padding: 0; }
-            .certificate-border { border-color: #8B1538 !important; }
+            .certificate-border { border- !important; }
         }
     </style>
 </head>

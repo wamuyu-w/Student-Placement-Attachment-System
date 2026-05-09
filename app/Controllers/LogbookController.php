@@ -6,15 +6,26 @@ use App\Core\Helpers;
 class LogbookController extends Controller {
 
     public function studentIndex() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
         $logbookModel = $this->model('Logbook');
         $appModel = $this->model('Application');
         
         $entries = $logbookModel->getEntriesByStudent($_SESSION['student_id']);
         
+        // Include both Ongoing and Completed so students can view their history even after finishing
+        $hasAttachment = $appModel->hasActiveAttachment($_SESSION['student_id']);
+        if (!$hasAttachment) {
+            // Also check for Completed attachment
+            $db = (new \App\Config\Database())->connect();
+            $stmt = $db->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus IN ('Ongoing','Completed') LIMIT 1");
+            $stmt->bind_param("i", $_SESSION['student_id']);
+            $stmt->execute();
+            $hasAttachment = $stmt->get_result()->num_rows > 0;
+        }
+        
         $data = [
             'entries' => $entries,
-            'hasAttachment' => $appModel->hasActiveAttachment($_SESSION['student_id']),
+            'hasAttachment' => $hasAttachment,
             'title' => 'My Logbook',
             'page' => 'logbook',
             'page_css' => ['student-dashboard.css', 'logbook.css']
@@ -115,6 +126,30 @@ class LogbookController extends Controller {
             header("Location: " . Helpers::baseUrl($redirect . '?success=Review submitted successfully'));
         }
     }
+    public function addComment() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $userType = $_SESSION['user_type'] ?? null;
+        if ($userType !== 'host_org') {
+             header("Location: " . Helpers::baseUrl('/'));
+             exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
+            $logbookId = $_POST['logbook_id'] ?? 0;
+            $studentId = $_POST['student_id'] ?? 0;
+            $comment = Helpers::sanitize($_POST['comment'] ?? '');
+
+            if ($logbookId && $comment) {
+                $logbookModel = $this->model('Logbook');
+                $logbookModel->updateHostComment($logbookId, $comment);
+            }
+            
+            header("Location: " . Helpers::baseUrl('/host/students/progress?id=' . $studentId . '&success=Comment+added+successfully'));
+            exit();
+        }
+    }
+
     // the function printLogbook() allows authorized users (students, staff, or host organizations) to view a printable version of a student's logbook entries 
     //by retrieving the relevant data and rendering it in a print-friendly format without the standard layout
     public function printLogbook() {

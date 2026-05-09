@@ -39,12 +39,12 @@
     <div class="activity-section">
         <div class="section-header">
             <h2>Recent Activity</h2>
-            <a href="#" class="view-all-link">View All</a>
+            <a href="<?= Helpers::baseUrl('/student/applications') ?>" class="view-all-link">View All</a>
         </div>
         <div class="activity-list" id="activityList">
             <?php if (empty($activities)): ?>
                 <div class="activity-item">
-                    <img src="https://ui-avatars.com/api/?name=Welcome&background=8B1538&color=fff&size=128" alt="Welcome" class="activity-avatar">
+                    <?= \App\Core\Helpers::getAvatar('Welcome', '#8B1538', '#fff', 'activity-avatar'); ?>
                     <div class="activity-content">
                         <div class="activity-title">Welcome to your dashboard</div>
                         <div class="activity-description">Start by browsing available opportunities</div>
@@ -54,7 +54,7 @@
             <?php else: ?>
                 <?php foreach ($activities as $activity): ?>
                     <div class="activity-item">
-                        <img src="<?php echo htmlspecialchars($activity['avatar']); ?>" alt="Activity" class="activity-avatar">
+                        <?php echo $activity['avatar']; ?>
                         <div class="activity-content">
                             <div class="activity-title"><?php echo $activity['title']; ?></div>
                             <div class="activity-description"><?php echo $activity['description']; ?></div>

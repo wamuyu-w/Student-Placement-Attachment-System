@@ -34,12 +34,12 @@
     <div class="activity-section">
         <div class="section-header">
             <h2>Recent Logbook Submissions</h2>
-            <a href="#" class="view-all-link">View All →</a>
+            <a href="<?= Helpers::baseUrl('/staff/logbook') ?>" class="view-all-link">View All →</a>
         </div>
         <div class="activity-list">
             <?php while ($log = $recentLogs->fetch_assoc()): ?>
             <div class="activity-item">
-                <img src="https://ui-avatars.com/api/?name=<?= urlencode($log['FirstName'] . ' ' . $log['LastName']); ?>&background=8B1538&color=fff&size=128" alt="Avatar" class="activity-avatar">
+                <?= \App\Core\Helpers::getAvatar($log['FirstName'] . ' ' . $log['LastName'], '#8B1538', '#fff', 'activity-avatar'); ?>
                 <div class="activity-content">
                     <div class="activity-title"><?= htmlspecialchars($log['FirstName'] . ' ' . $log['LastName']); ?></div>
                     <div class="activity-description"><?= htmlspecialchars($log['Course']); ?></div>

@@ -77,7 +77,7 @@ class Student {
             $department = $data['department'] ?? 'Unknown';
 
             $stmt2 = $this->conn->prepare("INSERT INTO student (UserID, FirstName, LastName, Faculty, Department, EligibilityStatus) VALUES (?, ?, ?, ?, ?, 'Pending')");
-            $stmt2->bind_param("isssss", $userId, $firstName, $lastName, $faculty, $department);
+            $stmt2->bind_param("issss", $userId, $firstName, $lastName, $faculty, $department);
             $stmt2->execute();
 
             $this->conn->commit();
@@ -98,6 +98,10 @@ class Student {
             $stmt2 = $this->conn->prepare("UPDATE attachment SET AttachmentStatus = 'Completed', EndDate = COALESCE(EndDate, CURDATE()) WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
             $stmt2->bind_param("i", $id);
             $stmt2->execute();
+
+            $stmt3 = $this->conn->prepare("UPDATE users u JOIN student s ON u.UserID = s.UserID SET u.Status = 'Inactive' WHERE s.StudentID = ?");
+            $stmt3->bind_param("i", $id);
+            $stmt3->execute();
 
             $this->conn->commit();
             return ['success' => true];
@@ -162,7 +166,7 @@ class Student {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
             $activities[] = [
-                'avatar' => 'https://ui-avatars.com/api/?name=Application&background=8B1538&color=fff&size=128',
+                'avatar' => \App\Core\Helpers::getAvatar('Application', '#8B1538', '#fff', 'activity-avatar'),
                 'title' => 'Application submitted',
                 'description' => 'Status: ' . htmlspecialchars($row['ApplicationStatus'] ?? 'Pending'),
                 'time' => $row['ApplicationDate']
@@ -177,7 +181,7 @@ class Student {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
             $activities[] = [
-                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($row['OrganizationName']) . '&background=10b981&color=fff&size=128',
+                'avatar' => \App\Core\Helpers::getAvatar($row['OrganizationName'], '#10b981', '#fff', 'activity-avatar'),
                 'title' => 'Placement at ' . htmlspecialchars($row['OrganizationName']),
                 'description' => 'Status: ' . htmlspecialchars($row['AttachmentStatus'] ?? ''),
                 'time' => $row['StartDate']
@@ -192,7 +196,7 @@ class Student {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
             $activities[] = [
-                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($row['LecturerName']) . '&background=f59e0b&color=fff&size=128',
+                'avatar' => \App\Core\Helpers::getAvatar($row['LecturerName'], '#f59e0b', '#fff', 'activity-avatar'),
                 'title' => 'Supervisor assigned',
                 'description' => htmlspecialchars($row['LecturerName'] ?? ''),
                 'time' => $row['StartDate']
@@ -210,7 +214,7 @@ class Student {
 
     public function getSupervisors($studentId) {
         $stmt = $this->conn->prepare("
-            SELECT l.Name, l.Department, l.Faculty, a.StartDate as AssignedDate
+            SELECT l.Name, l.Department, l.Faculty, l.StaffNumber, a.StartDate as AssignedDate
             FROM supervision s
             JOIN lecturer l ON s.LecturerID = l.LecturerID
             JOIN attachment a ON s.AttachmentID = a.AttachmentID

@@ -82,22 +82,18 @@ class BulkSupervisionController extends Controller {
         $successCount = 0;
         $errorCount = 0;
         
-        // Shuffle lecturers for random assignment
-        shuffle($lecturerIds);
-        $lecCount = count($lecturerIds);
-        
-        foreach ($studentAttachmentIds as $index => $attachmentId) {
-            // Pick a lecturer (round-robin for even distribution)
-            // But we must respect the "unique supervisor" rule
+        //for loop that handles assignment of students to lecturers - downside is the Industrial Attachment Coordinator will need to check
+        //in the event a lecturer has an overload of students
+        foreach ($studentAttachmentIds as $attachmentId) {
+            // Shuffle lecturers randomly for each student to distribute the load
+            shuffle($lecturerIds);
             $assigned = false;
-            $attempts = 0;
             
-            while (!$assigned && $attempts < $lecCount) {
-                $lecturerId = $lecturerIds[($index + $attempts) % $lecCount];
-                
+            foreach ($lecturerIds as $lecturerId) {
                 // Check if this lecturer has supervised this student before
                 if (!$this->hasSupervisedBefore($attachmentId, $lecturerId)) {
                     $result = $supervisorModel->assign($attachmentId, $lecturerId);
+                    //if true -> assign the student to the lecturer
                     if ($result['success']) {
                         $successCount++;
                         $assigned = true;
@@ -116,6 +112,8 @@ class BulkSupervisionController extends Controller {
                         $stmtL->execute();
                         $lecInfo = $stmtL->get_result()->fetch_assoc();
                         
+
+                        //statement that sends the emails to their respective addresses
                         if ($studentInfo && $lecInfo && !empty($studentInfo['Email'])) {
                             \App\Core\Mailer::notifySupervisorAssigned(
                                 $studentInfo['Email'],
@@ -124,9 +122,10 @@ class BulkSupervisionController extends Controller {
                                 $lecInfo['Username'] . '@example.com' // Placeholder email
                             );
                         }
+                        
+                        break; // Stop checking lecturers once successfully assigned
                     }
                 }
-                $attempts++;
             }
             
             if (!$assigned) {

@@ -8,6 +8,7 @@ class AdminController extends Controller {
     public function dashboard() {
         $this->requireAuth('admin');
 
+        
         $adminModel = $this->model('Admin');
 
         $data = [
@@ -48,25 +49,24 @@ class AdminController extends Controller {
             $staffNumber = Helpers::sanitize($_POST['staffNumber'] ?? '');
 
             if (empty($staffNumber)) {
-                header("Location: ../supervisors?error=" . urlencode("Staff Number is required"));
+                header("Location: " . Helpers::baseUrl('/admin/supervisors?error=' . urlencode('Staff Number is required')));
                 exit();
             }
 
             $supervisorModel = $this->model('Supervisor');
 
             if ($supervisorModel->staffNumberExists($staffNumber)) {
-                header("Location: ../supervisors?error=" . urlencode("Supervisor with this Staff Number already exists"));
+                header("Location: " . Helpers::baseUrl('/admin/supervisors?error=' . urlencode('Supervisor with this Staff Number already exists')));
                 exit();
             }
 
             $result = $supervisorModel->create($staffNumber);
 
             if ($result['success']) {
-                //login credentials for the new supervisor should be their staff number and their default password
                 $msg = "Supervisor added successfully. Login Credentials -> Username: " . $result['username'] . " | Password: " . $result['password'];
-                header("Location: ../supervisors?success=" . urlencode($msg));
+                header("Location: " . Helpers::baseUrl('/admin/supervisors?success=' . urlencode($msg)));
             } else {
-                header("Location: ../supervisors?error=" . urlencode($result['message']));
+                header("Location: " . Helpers::baseUrl('/admin/supervisors?error=' . urlencode($result['message'])));
             }
             exit();
         }
@@ -110,6 +110,15 @@ class AdminController extends Controller {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile']) && $_FILES['csvFile']['error'] === UPLOAD_ERR_OK) {
             $this->verifyCsrf();
+
+            // Validate file type (MIME + extension)
+            $allowedMimes = ['text/csv', 'application/vnd.ms-excel', 'text/plain', 'application/csv'];
+            $fileMime = mime_content_type($_FILES['csvFile']['tmp_name']);
+            $fileExt  = strtolower(pathinfo($_FILES['csvFile']['name'], PATHINFO_EXTENSION));
+            if (!in_array($fileMime, $allowedMimes) && $fileExt !== 'csv') {
+                header("Location: " . Helpers::baseUrl('/admin/students?error=Only CSV files are allowed.'));
+                exit();
+            }
             $file = $_FILES['csvFile']['tmp_name'];
             $handle = fopen($file, "r");
             $studentModel = $this->model('Student');
@@ -148,7 +157,11 @@ class AdminController extends Controller {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->verifyCsrf();
-            $id = $_POST['student_id'];
+            $id = (int)($_POST['student_id'] ?? 0);
+            if ($id <= 0) {
+                header("Location: " . Helpers::baseUrl('/admin/students?error=Invalid+student+ID'));
+                exit();
+            }
             $studentModel = $this->model('Student');
             $result = $studentModel->clearStudent($id);
             

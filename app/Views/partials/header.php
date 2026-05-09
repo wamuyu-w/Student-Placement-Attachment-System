@@ -29,7 +29,7 @@ if ($userType === 'student') {
         <?php if(isset($headerActions)) echo $headerActions; ?>
         
         <div class="user-profile">
-            <img src="https://ui-avatars.com/api/?name=<?= urlencode($avatarName) ?>&background=8B1538&color=fff&size=128" alt="Profile" class="profile-img">
+            <?= \App\Core\Helpers::getAvatar($avatarName, '#8B1538', '#fff', 'profile-img', 'width: 40px; height: 40px;'); ?>
             <div class="profile-info">
                 <div class="profile-name"><?= htmlspecialchars($displayName) ?></div>
                 <div class="profile-role"><?= htmlspecialchars($displayRole) ?></div>

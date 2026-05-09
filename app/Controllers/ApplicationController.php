@@ -115,9 +115,11 @@ class ApplicationController extends Controller {
         $oppId = $_POST['opportunity_id'] ?? null;
         $studentId = $_POST['student_id'] ?? null;
         $status = $_POST['status'] ?? null;
+        $rejectionReason = $_POST['rejection_reason'] ?? null;
 
         if (!$oppId || !$studentId || !$status) {
             $this->json(['success' => false, 'message' => 'Invalid parameters']);
+            return;
         }
 
         $appModel = $this->model('Application');
@@ -126,9 +128,10 @@ class ApplicationController extends Controller {
         
         if (!$app) {
             $this->json(['success' => false, 'message' => 'Application not found']);
+            return;
         }
 
-        if ($appModel->updateJobStatus($oppId, $studentId, $status)) {
+        if ($appModel->updateJobStatus($oppId, $studentId, $status, $rejectionReason)) {
             $this->json(['success' => true, 'message' => "Application marked as $status"]);
         } else {
             $this->json(['success' => false, 'message' => 'Database error']);
@@ -136,7 +139,7 @@ class ApplicationController extends Controller {
     }
 
     public function studentIndex() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
         $appModel = $this->model('Application');
         $studentId = $_SESSION['student_id'];
 

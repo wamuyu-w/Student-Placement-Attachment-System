@@ -7,19 +7,18 @@
     <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports.css') ?>">
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">Print Report / Save PDF</button>
+    
 
-    <div class="report-container">
-        <div class="report-header">
-            <div class="logo-container">
-                <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
-            </div>
-            <div class="header-text">
-                <h1>The Catholic University of Eastern Africa</h1>
-                <h2>Supervisor Workload Statistics</h2>
-                <p style="margin: 5px 0 0 0; color: #666; font-size: 10pt;">Date Generated: <?= date('d M Y') ?></p>
-            </div>
+    <button class="no-print" onclick="window.print()">Print / Save PDF</button>
+<div class="report-container">
+        <!-- Header -->
+<div class="header">
+            <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
+            <h1>The Catholic University of Eastern Africa</h1>
+            <div class="header-motto">"Consecrate them in the Truth"</div>
+            <div class="header-title">Supervisor Workload Statistics</div>
         </div>
+        <hr>
 
         <table class="data-table">
             <thead>
@@ -56,6 +55,7 @@
                 <div><strong>Official Stamp</strong></div>
             </div>
         </div>
-    </div>
+    
+</div>
 </body>
 </html>

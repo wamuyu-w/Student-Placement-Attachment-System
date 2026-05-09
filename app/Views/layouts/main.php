@@ -7,16 +7,16 @@
     <meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?? '' ?>">
     <title><?= $title ?? 'CUEA Attachment System' ?></title>
     <!-- Global Styles -->
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>?v=<?= time() ?>">
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/global.css') ?>?v=<?= time() ?>">
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/table-sort-filter.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/theme.css') ?>?v=1.1.0">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/global.css') ?>?v=1.1.0">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/table-sort-filter.css') ?>?v=1.1.0">
     <?php 
     if (isset($page_css)): 
         $css_files = is_array($page_css) ? $page_css : [$page_css];
         foreach ($css_files as $css_file):
     ?>
     <!-- this will dynamically include page-specific CSS files -->
-    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/' . $css_file) ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/' . $css_file) ?>?v=1.1.0">
     <?php 
         endforeach;
     endif; 
@@ -29,7 +29,7 @@
         <?php require_once __DIR__ . '/../partials/header.php'; ?>
         <?= $content; ?>
     </div>
-    <script src="<?= Helpers::baseUrl('../assets/js/table-sort-filter.js') ?>?v=<?= time() ?>"></script>
+    <script src="<?= Helpers::baseUrl('../assets/js/table-sort-filter.js') ?>?v=1.1.0"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.js-menu-toggle');

@@ -7,21 +7,20 @@
     <link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports.css') ?>">
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">Print Report / Save PDF</button>
+    
 
-    <div class="report-container">
-        <div class="report-header">
-            <div class="logo-container">
-                <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
-            </div>
-            <div class="header-text">
-                <h1>The Catholic University of Eastern Africa</h1>
-                <h2>System Effectiveness & Impact Report</h2>
-                <p style="margin: 5px 0 0 0; color: #666; font-size: 10pt;">Date Generated: <?= date('d M Y') ?></p>
-            </div>
+    <button class="no-print" onclick="window.print()">Print / Save PDF</button>
+<div class="report-container">
+        <!-- Header -->
+<div class="header">
+            <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
+            <h1>The Catholic University of Eastern Africa</h1>
+            <div class="header-motto">"Consecrate them in the Truth"</div>
+            <div class="header-title">System Effectiveness & Impact Report</div>
         </div>
+        <hr>
 
-        <h3 style="border-bottom: 1px solid #8B1538; padding-bottom: 5px;">Placements Overview</h3>
+        <h3 style="border-bottom: 1px solid #000; padding-bottom: 5px;">Placements Overview</h3>
         <table class="data-table">
             <thead>
                 <tr>
@@ -49,7 +48,7 @@
             </tbody>
         </table>
 
-        <h3 style="border-bottom: 1px solid #8B1538; padding-bottom: 5px; margin-top: 30px;">Lecturer Assessment Performance</h3>
+        <h3 style="border-bottom: 1px solid #000; padding-bottom: 5px; margin-top: 30px;">Lecturer Assessment Performance</h3>
         <table class="data-table">
             <thead>
                 <tr>
@@ -83,6 +82,7 @@
                 <div><strong>Official Stamp</strong></div>
             </div>
         </div>
-    </div>
+    
+</div>
 </body>
 </html>

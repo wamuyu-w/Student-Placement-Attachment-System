@@ -128,6 +128,10 @@
                         <input type="email" name="contact_email" class="form-control" placeholder="E.g. john.doe@company.com">
                         <small style="color: var(--text-secondary); font-size: 0.8rem;">Login credentials will be sent to this email if it's a new organization.</small>
                     </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Contact Person Phone</label>
+                        <input type="text" name="contact_phone" class="form-control" placeholder="E.g. +254700000000">
+                    </div>
 
                     <!-- Attachment Date Range -->
                     <div style="border-radius:10px;padding:16px;margin-bottom:12px;">

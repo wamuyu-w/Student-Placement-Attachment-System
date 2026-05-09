@@ -77,35 +77,64 @@
     }
 
     function updateStatus(opportunityId, studentId, status) {
-        Swal.fire({
-            title: 'Confirm Action',
-            text: `Are you sure you want to mark this application as ${status}?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: status === 'Approved' ? '#10B981' : '#EF4444',
-            confirmButtonText: `Yes, ${status}`
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append('opportunity_id', opportunityId);
-                formData.append('student_id', studentId);
-                formData.append('status', status);
-                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
-
-                fetch('<?= Helpers::baseUrl('/host/applications/update-status') ?>', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('Success', data.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Error', data.message, 'error');
+        if (status === 'Rejected') {
+            Swal.fire({
+                title: 'Reject Application',
+                text: 'Please provide a reason for rejecting this application:',
+                input: 'textarea',
+                inputPlaceholder: 'Type your reason here...',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Yes, Reject',
+                preConfirm: (reason) => {
+                    if (!reason) {
+                        Swal.showValidationMessage('A reason is required to reject the application.');
                     }
-                })
-                .catch(error => Swal.fire('Error', 'An unexpected error occurred', 'error'));
+                    return reason;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitStatusUpdate(opportunityId, studentId, status, result.value);
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Confirm Action',
+                text: `Are you sure you want to mark this application as ${status}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                confirmButtonText: `Yes, ${status}`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitStatusUpdate(opportunityId, studentId, status, '');
+                }
+            });
+        }
+    }
+
+    function submitStatusUpdate(opportunityId, studentId, status, rejectionReason) {
+        const formData = new FormData();
+        formData.append('opportunity_id', opportunityId);
+        formData.append('student_id', studentId);
+        formData.append('status', status);
+        if (rejectionReason) {
+            formData.append('rejection_reason', rejectionReason);
+        }
+        formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
+
+        fetch('<?= Helpers::baseUrl('/host/applications/update-status') ?>', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Success', data.message, 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Error', data.message, 'error');
             }
-        });
+        })
+        .catch(error => Swal.fire('Error', 'An unexpected error occurred', 'error'));
     }
 </script>

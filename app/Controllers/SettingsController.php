@@ -101,7 +101,6 @@ class SettingsController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->verifyCsrf();
 
-            $current = $_POST['current_password'];
             $new = $_POST['new_password'];
             $confirm = $_POST['confirm_password'];
             
@@ -120,14 +119,10 @@ class SettingsController extends Controller {
             }
 
             $userModel = $this->model('User');
-            if ($userModel->verifyPassword($_SESSION['user_id'], $current)) {
-                if ($userModel->updatePassword($_SESSION['user_id'], $new)) {
-                    header("Location: " . Helpers::baseUrl($redirect . '?success=Password changed'));
-                } else {
-                    header("Location: " . Helpers::baseUrl($redirect . '?error=Database error'));
-                }
+            if ($userModel->updatePassword($_SESSION['user_id'], $new)) {
+                header("Location: " . Helpers::baseUrl($redirect . '?success=Password changed'));
             } else {
-                header("Location: " . Helpers::baseUrl($redirect . '?error=Incorrect current password'));
+                header("Location: " . Helpers::baseUrl($redirect . '?error=Database error'));
             }
         }
     }

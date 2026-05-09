@@ -1,9 +1,11 @@
 <?php
 //This model will encapsulate the database queries for the admin dashboard statistics and activities.
 namespace App\Models;
-use App\Config\Database;
+use App\Config\Database; //db conn required
 
+//intialize class
 class Admin {
+    //set variables that will be used
     private $db;
     private $conn;
 
@@ -33,7 +35,7 @@ class Admin {
         if ($result) {
             while ($row = $result->fetch_assoc()) {
                 $activities[] = [
-                    'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($row['FirstName'] . ' ' . $row['LastName']) . '&background=8B1538&color=fff&size=128',
+                    'avatar' => \App\Core\Helpers::getAvatar($row['FirstName'] . ' ' . $row['LastName'], '#8B1538', '#fff', 'activity-avatar'),
                     'title' => 'New Application from ' . htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']),
                     'description' => 'Status: ' . htmlspecialchars($row['ApplicationStatus']),
                     'time' => $row['ApplicationDate']
@@ -52,7 +54,7 @@ class Admin {
         if ($result) {
             while ($row = $result->fetch_assoc()) {
                 $activities[] = [
-                    'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($row['OrganizationName']) . '&background=10b981&color=fff&size=128',
+                    'avatar' => \App\Core\Helpers::getAvatar($row['OrganizationName'], '#10b981', '#fff', 'activity-avatar'),
                     'title' => htmlspecialchars($row['OrganizationName']) . ' posted a new opportunity',
                     'description' => htmlspecialchars(substr($row['Description'], 0, 50) . '...'),
                     'time' => $row['ApplicationStartDate']

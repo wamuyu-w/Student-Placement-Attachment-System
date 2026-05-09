@@ -59,9 +59,8 @@ class Report {
                 JOIN student s ON a.StudentID = s.StudentID
                 JOIN users u ON s.UserID = u.UserID
                 JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
-                LEFT JOIN supervision sup ON a.AttachmentID = sup.AttachmentID
-                LEFT JOIN lecturer l ON sup.LecturerID = l.LecturerID
                 LEFT JOIN assessment ass ON a.AttachmentID = ass.AttachmentID
+                LEFT JOIN lecturer l ON ass.LecturerID = l.LecturerID
                 WHERE a.AttachmentStatus = 'Ongoing'
                 ORDER BY ass.AssessmentDate ASC";
         return $this->conn->query($sql);
@@ -186,13 +185,19 @@ class Report {
         
         $attachmentId = $res->fetch_assoc()['AttachmentID'];
 
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['success' => false, 'message' => 'Upload error code: ' . $file['error']];
+        }
+
         // Validate MIME type — reject anything that isn't a real PDF
         $allowedMimeTypes = ['application/pdf'];
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if (!$finfo) return ['success' => false, 'message' => 'Internal error: Could not verify file type.'];
+        
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);
         if (!in_array($mimeType, $allowedMimeTypes)) {
-            return ['success' => false, 'message' => 'Only PDF files are allowed.'];
+            return ['success' => false, 'message' => 'Only PDF files are allowed. Detected: ' . $mimeType];
         }
 
         // File upload logic
@@ -206,12 +211,16 @@ class Report {
         if (move_uploaded_file($file["tmp_name"], $targetFile)) {
             // Insert into DB
             $stmt = $this->conn->prepare("INSERT INTO finalreport (AttachmentID, ReportFile, SubmissionDate, Status) VALUES (?, ?, NOW(), 'Pending') ON DUPLICATE KEY UPDATE ReportFile = ?, SubmissionDate = NOW(), Status = 'Pending'");
+            if (!$stmt) {
+                return ['success' => false, 'message' => 'Database prepare failed: ' . $this->conn->error];
+            }
             $stmt->bind_param("iss", $attachmentId, $fileName, $fileName);
             if ($stmt->execute()) {
                 return ['success' => true];
             }
+            return ['success' => false, 'message' => 'Database error: ' . $stmt->error];
         }
-        return ['success' => false, 'message' => 'Upload failed.'];
+        return ['success' => false, 'message' => 'Upload failed to save file to server directory.'];
     }
 
     public function getAssessmentSummary() {
@@ -272,7 +281,7 @@ class Report {
                     ho.OrganizationName,
                     a.AttachmentID, a.StartDate, a.EndDate,
                     a.AttachmentStatus, a.ClearanceStatus, a.AssessmentCode,
-                    l.Name AS SupervisorName,
+                    (SELECT GROUP_CONCAT(l_sub.Name SEPARATOR ', ') FROM supervision sup_sub JOIN lecturer l_sub ON sup_sub.LecturerID = l_sub.LecturerID WHERE sup_sub.AttachmentID = a.AttachmentID) AS SupervisorName,
                     (SELECT COUNT(*) FROM logbook lb WHERE lb.AttachmentID = a.AttachmentID AND lb.Status = 'Approved') AS ApprovedWeeks,
                     (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'First Assessment' AND Status = 'Completed' LIMIT 1) AS FirstScore,
                     (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'Final Assessment' AND Status = 'Completed' LIMIT 1) AS FinalScore,
@@ -282,8 +291,6 @@ class Report {
                 JOIN student s ON a.StudentID = s.StudentID
                 JOIN users u ON s.UserID = u.UserID
                 JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID
-                LEFT JOIN supervision sup ON a.AttachmentID = sup.AttachmentID
-                LEFT JOIN lecturer l ON sup.LecturerID = l.LecturerID
                 LEFT JOIN finalreport fr ON a.AttachmentID = fr.AttachmentID
                 ORDER BY a.ClearanceStatus DESC, s.LastName, s.FirstName";
         $data['students'] = $this->conn->query($sql);
@@ -323,10 +330,9 @@ class Report {
             "SELECT ho.OrganizationName, ho.PhysicalAddress,
                     COUNT(a.AttachmentID) AS student_count,
                     SUM(CASE WHEN a.ClearanceStatus='Cleared' THEN 1 ELSE 0 END) AS cleared_count,
-                    ROUND(AVG(asmt.Marks),1) AS avg_score
+                    (SELECT ROUND(AVG(Marks),1) FROM assessment WHERE AttachmentID IN (SELECT AttachmentID FROM attachment WHERE HostOrgID = ho.HostOrgID) AND Status='Completed') AS avg_score
              FROM hostorganization ho
              LEFT JOIN attachment a ON ho.HostOrgID = a.HostOrgID
-             LEFT JOIN assessment asmt ON a.AttachmentID = asmt.AttachmentID AND asmt.Status='Completed'
              GROUP BY ho.HostOrgID
              HAVING student_count > 0
              ORDER BY avg_score DESC, student_count DESC

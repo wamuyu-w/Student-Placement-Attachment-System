@@ -1,8 +1,11 @@
 <?php use App\Core\Helpers; ?>
+<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports-dashboard.css') ?>">
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0;">System Effectiveness Dashboard</h1>
-    <a href="<?= Helpers::baseUrl('/reports/print/effectiveness') ?>" target="_blank" class="btn btn-outline">
+<div class="report-header">
+    <div class="report-title">
+        <h1>System Effectiveness Dashboard</h1>
+    </div>
+    <a href="<?= Helpers::baseUrl('/reports/print/effectiveness') ?>" target="_blank" class="btn report-tag-dark">
         <i class="fas fa-download"></i> Download Report (PDF)
     </a>
 </div>
@@ -12,21 +15,21 @@
         <div class="card-content">
             <h3>Placement Rate</h3>
             <p class="card-number"><?= $stats['totalStudents'] > 0 ? round(($stats['placedStudents'] / $stats['totalStudents']) * 100, 1) : 0 ?>%</p>
-            <small style="color: #6b7280;"><?= $stats['placedStudents'] ?> of <?= $stats['totalStudents'] ?> Students</small>
+            <small class="text-muted"><?= $stats['placedStudents'] ?> of <?= $stats['totalStudents'] ?> Students</small>
         </div>
     </div>
     <div class="summary-card">
         <div class="card-content">
             <h3>Total Opportunities</h3>
             <p class="card-number"><?= $stats['totalOpportunities'] ?></p>
-            <small style="color: #6b7280;">Active & Past Listings</small>
+            <small class="text-muted">Active & Past Listings</small>
         </div>
     </div>
     <div class="summary-card">
         <div class="card-content">
             <h3>Completed Attachments</h3>
             <p class="card-number"><?= $stats['completedAttachments'] ?></p>
-            <small style="color: #6b7280;">Verified Completions</small>
+            <small class="text-muted">Verified Completions</small>
         </div>
     </div>
 </div>
@@ -52,7 +55,7 @@
                             <tr>
                                 <td style="font-weight: 600;"><?= htmlspecialchars($row['Name']) ?></td>
                                 <td style="text-align: center;">
-                                    <span class="status-badge" style="background: #f0e6ea; color: #8B1538;"><?= $row['students_assessed'] ?> Students</span>
+                                    <span class="report-tag report-tag-dark"><?= $row['students_assessed'] ?> Students</span>
                                 </td>
                                 <td style="text-align: center; font-weight: bold;">
                                     <?= number_format($row['avg_marks_given'], 1) ?>%
@@ -77,16 +80,16 @@
                 <?php while($row = $stats['placementsByMonth']->fetch_assoc()): ?>
                     <div style="margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
-                            <span style="font-weight: 600;"><?= date('F Y', strtotime($row['Month'] . '-01')) ?></span>
-                            <span style="color: #8B1538; font-weight: bold;"><?= $row['count'] ?> Placements</span>
+                            <span class="text-bold"><?= date('F Y', strtotime($row['Month'] . '-01')) ?></span>
+                            <span class="text-black text-bold"><?= $row['count'] ?> Placements</span>
                         </div>
-                        <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 4px;">
-                            <div style="background: #8B1538; height: 100%; width: <?= min(($row['count'] / 20) * 100, 100) ?>%;"></div>
+                        <div class="progress-container">
+                            <div class="progress-fill" style="width: <?= min(($row['count'] / 20) * 100, 100) ?>%;"></div>
                         </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p style="text-align: center; color: #6b7280;">No placement history available.</p>
+                <p style="text-align: center;" class="text-muted">No placement history available.</p>
             <?php endif; ?>
         </div>
     </div>

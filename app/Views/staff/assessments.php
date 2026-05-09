@@ -76,7 +76,10 @@
             
             <div style="display: flex; gap: 10px;">
                 <button type="button" onclick="document.getElementById('codeModal').style.display='none'" style="flex: 1; padding: 10px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;">Cancel</button>
-                <button type="submit" style="flex: 1; padding: 10px; border: none; background: #8B1538; color: white; border-radius: 4px; cursor: pointer;">Verify</button>
+                <button type="submit" id="verifyBtn" style="flex: 1; padding: 10px; border: none; background: #8B1538; color: white; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span id="btnText">Verify</span>
+                    <i id="btnSpinner" class="fas fa-spinner fa-spin" style="display: none;"></i>
+                </button>
             </div>
         </form>
     </div>
@@ -91,6 +94,16 @@ function openCodeModal(id, name) {
 
 document.getElementById('codeForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    const btn = document.getElementById('verifyBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    
+    // UI Loading State
+    btn.disabled = true;
+    btnText.textContent = 'Verifying...';
+    btnSpinner.style.display = 'inline-block';
+    btn.style.opacity = '0.8';
+
     const formData = new FormData(this);
     formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
     
@@ -101,10 +114,25 @@ document.getElementById('codeForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            btnText.textContent = 'Opening Form...';
             window.location.href = data.redirect;
         } else {
             alert(data.message);
+            // Reset UI State
+            btn.disabled = false;
+            btnText.textContent = 'Verify';
+            btnSpinner.style.display = 'none';
+            btn.style.opacity = '1';
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again.');
+        // Reset UI State
+        btn.disabled = false;
+        btnText.textContent = 'Verify';
+        btnSpinner.style.display = 'none';
+        btn.style.opacity = '1';
     });
 });
 </script>

@@ -106,6 +106,21 @@ class ReportController extends Controller {
         $this->view('reports/host-performance', $data);
     }
 
+    // Admin-specific version: shows all host data without relying on host_org_id session
+    public function adminHostPerformance() {
+        $this->requireAuth('admin');
+        $hostId = $_GET['host_id'] ?? 0;
+        $reportModel = $this->model('Report');
+        $data = [
+            'performance' => $reportModel->getHostPerformanceReport($hostId),
+            'title' => 'Host Performance Report',
+            'page' => 'reports',
+            'page_css' => 'admin-dashboard.css',
+            'hostId' => $hostId
+        ];
+        $this->view('reports/host-performance', $data);
+    }
+
     public function studentIndex() {
         $this->requireAuth('student');
         try {
@@ -245,8 +260,18 @@ class ReportController extends Controller {
     }
 
     public function printHostPerformance() {
-        $this->requireAuth('admin');
-        $hostId = $_GET['host_id'] ?? 0;
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['admin', 'host_org'])) {
+            header("Location: " . Helpers::baseUrl('/'));
+            exit();
+        }
+        
+        if ($_SESSION['user_type'] === 'admin') {
+            $hostId = $_GET['host_id'] ?? 0;
+        } else {
+            $hostId = $_SESSION['host_org_id'];
+        }
+        
         $reportModel = $this->model('Report');
         $data = ['performance' => $reportModel->getHostPerformanceReport($hostId)];
         $this->view('reports/print-host-performance', $data, false);

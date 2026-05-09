@@ -112,11 +112,11 @@ $userType = $_SESSION['user_type'] ?? 'guest';
             <i class="fas fa-file-alt"></i>
             <span>My Applications</span>
         </a>
-        <?php endif; ?>
         <a href="<?= Helpers::baseUrl('/student/logbook') ?>" class="nav-item <?= ($page === 'logbook') ? 'active' : '' ?>">
             <i class="fas fa-book"></i>
             <span>Logbook</span>
         </a>
+        <?php endif; ?>
         <a href="<?= Helpers::baseUrl('/student/reports') ?>" class="nav-item <?= ($page === 'reports') ? 'active' : '' ?>">
             <i class="fas fa-file-pdf"></i>
             <span>Reports</span>

@@ -61,9 +61,14 @@
                                     <div class="form-group" style="margin-bottom: 8px;">
                                         <textarea name="comment" class="form-control" rows="1" placeholder="Add optional feedback..."></textarea>
                                     </div>
-                                    <button type="submit" name="status" value="Approved" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em; background-color: #10b981; width: 100%;">
-                                        <i class="fas fa-check"></i> Approve Entry
-                                    </button>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button type="submit" name="status" value="Approved" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em; background-color: #10b981; border: none; border-radius: 4px; color: white; flex: 1;" title="Approve Entry">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                        <button type="submit" name="status" value="Rejected" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85em; background-color: #ef4444; border: none; border-radius: 4px; color: white; flex: 1;" title="Request Revision">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </div>
                                 </form>
                             </td>
                         </tr>

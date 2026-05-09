@@ -112,6 +112,7 @@ class AuthController extends Controller {
 
             if (!$isValidRole) {
                 $this->redirectWithError($role, "Invalid role for this user.");
+                return; // explicit guard — redirectWithError exits, but be explicit
             }
 
             // Set Session
@@ -236,9 +237,132 @@ class AuthController extends Controller {
                 $data['password']
             );
             
-            header("Location: " . Helpers::baseUrl('/login/host?success=Registration successful. Please login.'));
+            header("Location: " . Helpers::baseUrl('/login/host?success=' . urlencode('Registration successful. Please login.')));
         } else {
             header("Location: " . Helpers::baseUrl('/register/host?error=' . urlencode($result['message'])));
+        }
+        exit();
+    }
+
+    public function forgotPassword() {
+        $this->view('auth/forgot-password', ['title' => 'Forgot Password'], 'auth');
+    }
+
+    public function processForgotPassword() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: " . Helpers::baseUrl('/auth/forgot-password'));
+            exit();
+        }
+
+        $this->verifyCsrf();
+        $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
+
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header("Location: " . Helpers::baseUrl('/auth/forgot-password?error=' . urlencode('Valid email is required.')));
+            exit();
+        }
+
+        // --- Rate Limiting ---
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $key = 'forgot_pw_' . md5($ip);
+        if (!isset($_SESSION[$key])) {
+            $_SESSION[$key] = ['count' => 0, 'time' => time()];
+        }
+        // Reset window every 15 minutes
+        if (time() - $_SESSION[$key]['time'] > 900) {
+            $_SESSION[$key] = ['count' => 0, 'time' => time()];
+        }
+        if ($_SESSION[$key]['count'] >= 3) {
+            header("Location: " . Helpers::baseUrl('/auth/forgot-password?error=' . urlencode('Too many requests. Please try again later.')));
+            exit();
+        }
+
+        $_SESSION[$key]['count']++;
+
+        $userModel = $this->model('User');
+        $userObj = $userModel->findUserByEmail($email);
+
+        if ($userObj) {
+            $token = bin2hex(random_bytes(32));
+            $expiry = date('Y-m-d H:i:s', time() + 3600); // 1 hour expiry
+            $userModel->savePasswordResetToken($userObj['UserID'], $token, $expiry);
+            
+            $resetLink = Helpers::baseUrl("/auth/reset-password?token=" . $token);
+            
+            // Send email
+            \App\Core\Mailer::sendPasswordResetLink($email, $userObj['Name'], $resetLink);
+        }
+
+        // Always show success message for security to not leak existing emails
+        header("Location: " . Helpers::baseUrl('/auth/forgot-password?success=' . urlencode('If your email exists in our system, you will receive a password reset link shortly.')));
+        exit();
+    }
+
+    public function resetPassword() {
+        $token = $_GET['token'] ?? '';
+        if (empty($token)) {
+            header("Location: " . Helpers::baseUrl('/?error=' . urlencode('Invalid reset token.')));
+            exit();
+        }
+
+        $userModel = $this->model('User');
+        $user = $userModel->findUserByResetToken($token);
+
+        if (!$user || strtotime($user['ResetTokenExpiry']) < time()) {
+            header("Location: " . Helpers::baseUrl('/?error=' . urlencode('Invalid or expired reset token.')));
+            exit();
+        }
+
+        $this->view('auth/reset-password', ['title' => 'Reset Password', 'token' => $token], 'auth');
+    }
+
+    public function processResetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: " . Helpers::baseUrl('/'));
+            exit();
+        }
+
+        $this->verifyCsrf();
+
+        $token = $_POST['token'] ?? '';
+        $newPass = $_POST['new_password'] ?? '';
+        $confirmPass = $_POST['confirm_password'] ?? '';
+
+        if (empty($token) || empty($newPass) || empty($confirmPass)) {
+            header("Location: " . Helpers::baseUrl('/auth/reset-password?token=' . urlencode($token) . '&error=' . urlencode('All fields are required.')));
+            exit();
+        }
+
+        if ($newPass !== $confirmPass) {
+            header("Location: " . Helpers::baseUrl('/auth/reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match.')));
+            exit();
+        }
+
+        if (strlen($newPass) < 6) {
+            header("Location: " . Helpers::baseUrl('/auth/reset-password?token=' . urlencode($token) . '&error=' . urlencode('Password must be at least 6 characters long.')));
+            exit();
+        }
+
+        $userModel = $this->model('User');
+        $user = $userModel->findUserByResetToken($token);
+
+        if (!$user || strtotime($user['ResetTokenExpiry']) < time()) {
+            header("Location: " . Helpers::baseUrl('/?error=' . urlencode('Invalid or expired reset token.')));
+            exit();
+        }
+
+        if ($userModel->updatePassword($user['UserID'], $newPass)) {
+            $userModel->clearPasswordResetToken($user['UserID']);
+            
+            // Redirect based on role
+            $dbRole = strtolower($user['Role']);
+            $redirectRole = 'student';
+            if ($dbRole === 'lecturer' || $dbRole === 'admin' || $dbRole === 'supervisor') $redirectRole = 'staff';
+            if ($dbRole === 'host organization') $redirectRole = 'host';
+
+            header("Location: " . Helpers::baseUrl('/login/' . $redirectRole . '?success=' . urlencode('Password reset successful. Please log in.')));
+        } else {
+            header("Location: " . Helpers::baseUrl('/auth/reset-password?token=' . urlencode($token) . '&error=' . urlencode('An error occurred. Please try again.')));
         }
         exit();
     }
@@ -253,7 +377,8 @@ class AuthController extends Controller {
         }
         
         if ($this->isAjax()) {
-            $this->json(['success' => false, 'message' => $message]);
+            $this->json(['success' => false, 'message' => $message]); // exits internally
+            return; // explicit guard for future safety
         }
 
         header("Location: " . Helpers::baseUrl($route . "?error=" . urlencode($message)));

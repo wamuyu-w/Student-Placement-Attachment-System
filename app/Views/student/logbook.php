@@ -126,7 +126,12 @@
                                     &nbsp;|&nbsp; Submitted: <?= date('M d, Y', strtotime($row['EntryDate'])) ?>
                                 </div>
                             </div>
-                            <span class="status-badge status-<?= strtolower($row['Status']) ?>" style="padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; background-color: <?= $row['Status'] == 'Approved' ? '#dcfce7' : '#fef9c3' ?>; color: <?= $row['Status'] == 'Approved' ? '#166534' : '#854d0e' ?>; border: 1px solid <?= $row['Status'] == 'Approved' ? '#bbf7d0' : '#fef08a' ?>;">
+                            <?php 
+                                $bg = $row['Status'] == 'Approved' ? '#dcfce7' : ($row['Status'] == 'Rejected' ? '#fee2e2' : '#fef9c3');
+                                $color = $row['Status'] == 'Approved' ? '#166534' : ($row['Status'] == 'Rejected' ? '#991b1b' : '#854d0e');
+                                $border = $row['Status'] == 'Approved' ? '#bbf7d0' : ($row['Status'] == 'Rejected' ? '#fecaca' : '#fef08a');
+                            ?>
+                            <span class="status-badge status-<?= strtolower($row['Status']) ?>" style="padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; background-color: <?= $bg ?>; color: <?= $color ?>; border: 1px solid <?= $border ?>;">
                                 <?= htmlspecialchars($row['Status']) ?>
                             </span>
                         </div>

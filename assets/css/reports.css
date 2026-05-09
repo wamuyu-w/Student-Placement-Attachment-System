@@ -1,202 +1,150 @@
-/* Common Styles for Printable Reports - Modernized Premium Aesthetic */
 @page {
-    size: A4 portrait;
-    margin: 18mm 14mm;
+    size: A4;
+    margin: 1in;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-    font-family: 'Arial', sans-serif;
-    color: #1a1a2e;
-    background: #fff;
-    font-size: 9.5pt;
+    font-family: 'Times New Roman', serif;
+    color: #000;
     line-height: 1.5;
+    font-size: 12pt;
+    margin: 0;
+    padding: 0;
 }
 
 .report-container {
-    padding: 10px;
     width: 100%;
 }
 
-/* Header */
-.report-header, .header { 
-    display: flex; 
-    align-items: center; 
-    border-bottom: 3px solid #8B1538; 
-    padding-bottom: 10px; 
-    margin-bottom: 16px; 
-}
-.report-header img, .logo-container img, .header img { 
-    height: 52px; 
-    width: auto;
-    margin-right: 14px; 
-}
-.header-text {
-    flex: 1;
-}
-.header-text h1 { 
-    font-size: 15pt; 
-    color: #8B1538; 
-    font-weight: 800; 
-    line-height: 1.2; 
-    margin: 0;
-}
-.header-text h2 { 
-    font-size: 12pt; 
-    color: #333; 
-    margin: 4px 0 2px 0;
-}
-.header-text p { 
-    font-size: 8pt; 
-    color: #4b5563; 
-    margin: 0;
-}
-
-/* KPI Row */
-.kpi-row { 
-    display: flex; 
-    gap: 8px; 
-    margin-bottom: 16px; 
-    flex-wrap: wrap; 
-}
-.kpi-box { 
-    flex: 1; 
-    min-width: 90px; 
-    border: 1.5px solid #e5e7eb; 
-    border-radius: 6px; 
-    padding: 8px 10px; 
-    text-align: center; 
-}
-.kpi-box .num { 
-    font-size: 16pt; 
-    font-weight: 800; 
-    color: #8B1538; 
-}
-.kpi-box .lbl { 
-    font-size: 7.5pt; 
-    color: #6b7280; 
-    margin-top: 2px; 
-}
-
-/* Section Headings */
-.section-heading, h3 { 
-    font-size: 11pt; 
-    font-weight: 800; 
-    color: #1f2937; 
-    margin: 16px 0 8px; 
-    border-left: 4px solid #8B1538; 
-    padding-left: 8px; 
-    border-bottom: none !important;
-}
-
-/* Grid/Columns */
-.two-col { display: flex; gap: 16px; margin-bottom: 16px; }
-.col { flex: 1; }
-
-/* Bar charts / Tracks */
-.bar-row { margin-bottom: 10px; }
-.bar-label { display: flex; justify-content: space-between; font-size: 8pt; margin-bottom: 3px; }
-.bar-label .name  { font-weight: 700; color: #374151; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar-label .value { color: #8B1538; font-weight: 700; }
-.bar-track { width: 100%; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
-.bar-fill  { height: 100%; border-radius: 4px; }
-
-/* Tables */
-.data-table, table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    font-size: 8pt; 
+.header {
+    text-align: center;
     margin-bottom: 20px;
 }
-.data-table thead tr, table thead tr { 
-    background: #8B1538; 
-    color: #fff; 
+
+.header img {
+    height: 80px;
+    display: block;
+    margin: 0 auto 10px;
 }
-.data-table thead th, table thead th { 
-    padding: 6px 6px; 
-    text-align: left; 
-    font-size: 7.5pt; 
-    white-space: nowrap; 
+
+.header h1 {
+    font-size: 16pt;
     font-weight: bold;
-}
-.data-table tbody tr:nth-child(even), table tbody tr:nth-child(even) { background: #f9f9f9; }
-.data-table tbody tr:hover, table tbody tr:hover { background: #fdf2f5; }
-.data-table tbody td, table tbody td { 
-    padding: 5px 6px; 
-    border-bottom: 1px solid #f1f5f9; 
-    vertical-align: middle; 
+    text-transform: uppercase;
+    margin: 0;
 }
 
-/* Helpers */
-.center { text-align: center; }
-
-/* Badges */
-.badge { padding: 2px 7px; border-radius: 20px; font-size: 7pt; font-weight: 700; white-space: nowrap; display: inline-block; }
-.badge-cleared, .badge-green   { background: #d1fae5; color: #065f46; }
-.badge-notcleared, .badge-amber{ background: #fef3c7; color: #92400e; }
-.badge-approved, .badge-blue  { background: #dbeafe; color: #1e40af; }
-.badge-submitted { background: #ede9fe; color: #5b21b6; }
-.badge-none, .badge-gray      { background: #f3f4f6; color: #6b7280; }
-
-/* Score Cues */
-.score-hi  { color: #059669; font-weight: 700; }
-.score-mid { color: #2563eb; font-weight: 700; }
-.score-low { color: #d97706; font-weight: 700; }
-
-/* Signatures */
-.footer-signatures {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-.sig-block {
-    width: 35%;
-    text-align: center;
-}
-.sig-line {
-    border-bottom: 1px solid #1f2937;
-    margin-bottom: 5px;
-    height: 30px;
+.header-motto {
+    font-style: italic;
+    font-size: 11pt;
+    margin-bottom: 10px;
 }
 
-/* Footer note */
-.footer { 
-    margin-top: 16px; 
-    font-size: 7.5pt; 
-    color: #9ca3af; 
-    text-align: center; 
-    border-top: 1px solid #e5e7eb; 
-    padding-top: 8px; 
+.header-title {
+    font-weight: bold;
+    font-size: 14pt;
+    margin: 10px 0;
 }
 
-/* Print Buttons */
-.print-btn, .no-print {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-    background: #8B1538;
-    color: #fff;
+hr {
     border: none;
-    padding: 10px 22px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    transition: all 0.3s ease;
+    border-top: 1px solid #000;
+    margin: 10px 0 20px;
 }
-.print-btn:hover, .no-print:hover {
-    background: #6b0f2a;
-    transform: translateY(-2px);
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.info-table, .info-table th, .info-table td {
+    border: none;
+    padding: 5px 0;
+}
+
+.info-label {
+    font-weight: bold;
+    width: 30%;
+}
+
+.info-value {
+    border-bottom: 1px dotted #000;
+}
+
+.kpi-row {
+    display: table;
+    width: 100%;
+    border: 1px solid #000;
+    margin-bottom: 20px;
+}
+
+.kpi-box {
+    display: table-cell;
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #000;
+}
+
+.kpi-box:last-child {
+    border-right: none;
+}
+
+.kpi-box .num {
+    font-weight: bold;
+    font-size: 14pt;
+    display: block;
+}
+
+.kpi-box .lbl {
+    font-size: 10pt;
+    text-transform: uppercase;
+}
+
+.remarks-box {
+    border: 1px solid #000;
+    padding: 10px;
+    min-height: 100px;
+}
+
+.footer-signatures {
+    margin-top: 50px;
+    width: 100%;
+}
+
+.sig-block {
+    display: inline-block;
+    width: 45%;
+    vertical-align: top;
+}
+
+.sig-block:last-child {
+    float: right;
+}
+
+.sig-line {
+    border-top: 1px solid #000;
+    margin-top: 40px;
+    margin-bottom: 5px;
 }
 
 @media print {
-    .print-btn, .no-print {
-        display: none !important;
-    }
-    body, .report-container {
-        padding: 0;
-        margin: 0;
-    }
+    .no-print { display: none !important; }
+}
+
+.no-print {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
 }

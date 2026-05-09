@@ -32,6 +32,10 @@
                     <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
                 </div>
                 
+                <div style="text-align: right; margin-bottom: 15px;">
+                    <a href="<?= Helpers::baseUrl('/auth/forgot-password') ?>" style="color: #3b82f6; font-size: 0.9em; text-decoration: none; font-weight: 500;">Forgot Password?</a>
+                </div>
+
                 <button type="submit" class="sign-in-button">Sign In</button>
             </form>
         </div>

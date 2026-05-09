@@ -28,12 +28,12 @@
     <div class="activity-section">
         <div class="section-header">
             <h2>Recent Placements</h2>
-            <a href="#" class="view-all-link">View All →</a>
+            <a href="<?= Helpers::baseUrl('/host/students') ?>" class="view-all-link">View All →</a>
         </div>
         <div class="activity-list">
             <?php while ($app = $recentApps->fetch_assoc()): ?>
             <div class="activity-item">
-                <img src="https://ui-avatars.com/api/?name=<?= urlencode($app['FirstName'] . ' ' . $app['LastName']); ?>&background=8B1538&color=fff&size=128" alt="Avatar" class="activity-avatar">
+                <?= \App\Core\Helpers::getAvatar($app['FirstName'] . ' ' . $app['LastName'], '#8B1538', '#fff', 'activity-avatar'); ?>
                 <div class="activity-content">
                     <div class="activity-title"><?= htmlspecialchars($app['FirstName'] . ' ' . $app['LastName']); ?></div>
                     <div class="activity-description"><?= htmlspecialchars($app['Course']); ?> - <?= htmlspecialchars($app['position_applied']); ?></div>

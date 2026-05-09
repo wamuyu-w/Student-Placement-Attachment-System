@@ -72,32 +72,15 @@ class Opportunity {
                 throw new \Exception('You have already applied to this opportunity.');
             }
 
-            // Handle file upload
             $resumePathToStore = null;
-            if (isset($data['resume_file']) && $data['resume_file']['error'] === UPLOAD_ERR_OK) {
-                $file = $data['resume_file'];
-                
-                if ($file['size'] > 5242880) { // 5MB
-                    throw new \Exception('File size exceeds 5MB limit.');
-                }
-                $allowedExtensions = ['pdf', 'doc', 'docx'];
-                $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                if (!in_array($fileExtension, $allowedExtensions)) {
-                    throw new \Exception('Only PDF, DOC, and DOCX files are allowed.');
-                }
+            $resumeLinkToStore = null;
 
-                $uploadsDir = __DIR__ . '/../../public/uploads/resumes/';
-                if (!is_dir($uploadsDir)) {
-                    mkdir($uploadsDir, 0755, true);
-                }
+            if (!empty($data['resume_link'])) {
+                $resumeLinkToStore = trim($data['resume_link']);
+            }
 
-                $resumeFileName = 'resume_' . $data['student_id'] . '_' . $data['opportunity_id'] . '_' . time() . '.' . $fileExtension;
-                $filePath = $uploadsDir . $resumeFileName;
-
-                if (!move_uploaded_file($file['tmp_name'], $filePath)) {
-                    throw new \Exception('Failed to move uploaded resume.');
-                }
-                $resumePathToStore = $resumeFileName;
+            if (!$resumeLinkToStore || !filter_var($resumeLinkToStore, FILTER_VALIDATE_URL)) {
+                throw new \Exception("A valid resume link must be provided.");
             }
 
             // Insert into jobapplication

@@ -5,7 +5,7 @@ use App\Core\Helpers;
 class OpportunityController extends Controller {
 
     public function index() {
-        $this->requireAuth('student');
+        $this->requireActiveStudent();
 
         $opportunityModel = $this->model('Opportunity');
         $appModel = $this->model('Application');
@@ -62,14 +62,8 @@ class OpportunityController extends Controller {
         $resumeLink = filter_input(INPUT_POST, 'resume_link', FILTER_SANITIZE_URL);
         $studentId = $_SESSION['student_id'] ?? null;
 
-        if (!$opportunityId || !$studentId || !$motivation) {
-            $this->json(['success' => false, 'message' => 'Missing required fields.']);
-            return;
-        }
-        
-        $hasFile = isset($_FILES['resume']) && $_FILES['resume']['error'] !== UPLOAD_ERR_NO_FILE;
-        if (!$hasFile && empty($resumeLink)) {
-            $this->json(['success' => false, 'message' => 'Please upload a resume or provide a link.']);
+        if (!$opportunityId || !$studentId || !$motivation || empty($resumeLink)) {
+            $this->json(['success' => false, 'message' => 'Missing required fields. Please ensure you provide a motivation and a resume link.']);
             return;
         }
 
@@ -77,8 +71,7 @@ class OpportunityController extends Controller {
             'opportunity_id' => $opportunityId,
             'student_id' => $studentId,
             'motivation' => $motivation,
-            'resume_link' => $resumeLink,
-            'resume_file' => $_FILES['resume'] ?? null
+            'resume_link' => $resumeLink
         ];
 
         $opportunityModel = $this->model('Opportunity');

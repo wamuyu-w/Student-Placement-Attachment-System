@@ -185,4 +185,10 @@ class Logbook {
         call_user_func_array([$stmt, 'bind_param'], $params);
         return $stmt->execute();
     }
+
+    public function updateHostComment($logbookId, $comment) {
+        $stmt = $this->conn->prepare("UPDATE logbook SET HostSupervisorComments = ? WHERE LogbookID = ?");
+        $stmt->bind_param("si", $comment, $logbookId);
+        return $stmt->execute();
+    }
 }

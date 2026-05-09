@@ -1,9 +1,10 @@
 <?php use App\Core\Helpers; ?>
+<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports-dashboard.css') ?>">
 
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1f2937;">Student Assessment Summary</h2>
-        <a href="<?= Helpers::baseUrl('/reports/print/assessment-summary') ?>" target="_blank" class="btn btn-outline">
+    <div class="report-card-header">
+        <h2 class="report-card-title">Student Assessment Summary</h2>
+        <a href="<?= Helpers::baseUrl('/reports/print/assessment-summary') ?>" target="_blank" class="btn report-tag-dark">
             <i class="fas fa-download"></i> Download Report (PDF)
         </a>
     </div>
@@ -31,11 +32,11 @@
                             <td><?= htmlspecialchars($row['AdmNumber']) ?></td>
                             <td style="text-align: center;"><?= $row['FirstScore'] !== null ? $row['FirstScore'] . '%' : '-' ?></td>
                             <td style="text-align: center;"><?= $row['SecondScore'] !== null ? $row['SecondScore'] . '%' : '-' ?></td>
-                            <td style="text-align: center; font-weight: bold; color: #8B1538;">
+                            <td style="text-align: center; font-weight: bold;" class="text-black">
                                 <?= $row['AverageScore'] !== null ? number_format($row['AverageScore'], 1) . '%' : '-' ?>
                             </td>
                             <td>
-                                <span class="status-badge status-<?= strtolower($row['AttachmentStatus']) ?>">
+                                <span class="report-tag report-tag-neutral">
                                     <?= htmlspecialchars($row['AttachmentStatus']) ?>
                                 </span>
                             </td>
@@ -43,7 +44,7 @@
                     <?php endwhile; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No assessment records found.</td>
+                        <td colspan="6" style="text-align: center; padding: 20px; color: #9ca3af;">No assessment records found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

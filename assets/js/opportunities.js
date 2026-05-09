@@ -1,16 +1,22 @@
 function handleViewDetails(btn) {
+    //getting all the necessary attributes and constants for the functions
     const orgName = btn.getAttribute('data-org');
     const description = btn.getAttribute('data-desc');
     const criteria = btn.getAttribute('data-crit');
     const deadline = btn.getAttribute('data-deadline');
+    
+    //call OpenDetails Modal
     const opportunityId = btn.getAttribute('data-id');
     openDetailsModal(orgName, description, criteria, deadline, opportunityId);
 }
 
 function handleApplyForm(btn) {
+    //handles the application form
     const opportunityId = btn.getAttribute('data-id');
     const orgName = btn.getAttribute('data-org');
     const description = btn.getAttribute('data-desc');
+
+    //function called here
     openApplicationForm(opportunityId, orgName, description);
 }
 
@@ -56,8 +62,8 @@ function closeApplicationForm() {
 function showAlert(message, type = 'success') {
     const alertDiv = document.getElementById('formAlert');
     const alertMessage = document.getElementById('alertMessage');
-    
-    alertDiv.className = 'alert ' + type;
+
+    alertDiv.className = 'alert' + type;
     alertMessage.textContent = message;
     alertDiv.style.display = 'flex';
 }
@@ -79,7 +85,7 @@ if (applicationForm) {
         const submitBtn = document.getElementById('submitBtn');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting';
     
     const formData = new FormData(this);
     const basePath = window.location.pathname.substring(0, window.location.pathname.indexOf('/public/'));
@@ -100,6 +106,7 @@ if (applicationForm) {
                 location.reload();
             }, 500);
         } else {
+            // this is where the issue lies
             showAlert(data.message, 'error');
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
@@ -126,49 +133,6 @@ window.onclick = function(event) {
     }
 };
 
-// Drag and drop for file upload
-const fileUpload = document.getElementById('resume');
-const uploadArea = fileUpload ? fileUpload.parentElement.querySelector('.upload-area') : null;
-
-if (uploadArea) {
-    uploadArea.addEventListener('click', () => fileUpload.click());
-
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.style.backgroundColor = '#f0f0f0';
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.style.backgroundColor = '';
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (e.dataTransfer.files.length) {
-            fileUpload.files = e.dataTransfer.files;
-            updateFileName(e.dataTransfer.files[0].name);
-        }
-        uploadArea.style.backgroundColor = '';
-    });
-}
-
-if (fileUpload) {
-    fileUpload.addEventListener('change', (e) => {
-        if (fileUpload.files.length) {
-            updateFileName(fileUpload.files[0].name);
-        }
-    });
-}
-
-function updateFileName(name) {
-    if (!uploadArea) return;
-    const hint = uploadArea.querySelector('.upload-hint');
-    if (hint) {
-        hint.textContent = 'Selected: ' + name;
-        hint.style.color = '#10b981';
-        hint.style.fontWeight = '600';
-    }
-}
 
 // Search functionality
 const searchInput = document.getElementById('searchInput');

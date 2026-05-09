@@ -66,7 +66,7 @@ class Supervisor {
         $sql = "
             SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName,
                    (SELECT COUNT(*) FROM supervision WHERE AttachmentID = a.AttachmentID) as SupCount,
-                   (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID) as AssessCount
+                   (SELECT COUNT(*) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Completed') as AssessCount
             FROM attachment a
             JOIN student s ON a.StudentID = s.StudentID
             JOIN hostorganization h ON a.HostOrgID = h.HostOrgID
@@ -76,7 +76,9 @@ class Supervisor {
         return $this->conn->query($sql);
     }
     public function getAssignableLecturers() {
-        $sql = "SELECT LecturerID, Name FROM lecturer WHERE Role = 'Supervisor' OR Role = 'Admin'";
+        // this ensures that the admin can only assign supervisors that are actual lecturers
+        // he or she cannot assign themselves - if they are an admin
+        $sql = "SELECT LecturerID, Name FROM lecturer WHERE Role = 'Supervisor'";
         return $this->conn->query($sql);
     }
 
@@ -97,12 +99,15 @@ class Supervisor {
         }
         $checkStmt->close();
 
-        $assessStmt = $this->conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ?");
+        $assessStmt = $this->conn->prepare(
+            "SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ? AND Status = 'Completed'"
+        );
         $assessStmt->bind_param("i", $attachmentId);
         $assessStmt->execute();
         $assessCount = $assessStmt->get_result()->fetch_assoc()['count'];
         $assessStmt->close();
 
+        // Model-level guard: also check if second supervisor conditions are met
         $canAssign = false;
         $errorMsg = "";
 

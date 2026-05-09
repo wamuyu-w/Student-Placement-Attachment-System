@@ -31,10 +31,6 @@
         <form action="<?= Helpers::baseUrl('/settings/update-password') ?>" method="POST">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <div class="form-group" style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Current Password</label>
-                <input type="password" name="current_password" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
-            </div>
-            <div class="form-group" style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">New Password</label>
                 <input type="password" name="new_password" class="form-control" required minlength="6" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
             </div>

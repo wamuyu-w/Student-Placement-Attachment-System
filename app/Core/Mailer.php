@@ -43,10 +43,20 @@ class Mailer {
     /**
      * Core send method.
      */
+    // Set to false to enable real email sending
+    private static bool $testingMode = false;
+
+    //sending the actual email function
     public static function send(string $to, string $subject, string $htmlBody): bool {
         if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
             error_log("Mailer: Invalid recipient email — $to");
             return false;
+        }
+
+        // Testing mode: skip actual sending, just log
+        if (self::$testingMode) {
+            error_log("Mailer [TEST MODE]: Would send to=$to | subject=$subject");
+            return true;
         }
 
         $env = self::getEnvVars();
@@ -152,6 +162,40 @@ class Mailer {
                 <li><strong>Password:</strong> " . htmlspecialchars($password) . "</li>
             </ul>
             <p style='color:#b45309;'><strong>Important:</strong> You will be required to change your password on first login.</p>
+            <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
+        ";
+        return self::send($email, $subject, $body);
+    }
+
+    /**
+     * Send reset password default.
+     */
+    public static function sendDefaultPassword(string $email, string $name, string $defaultPassword): bool {
+        $subject = "Password Reset - CUEA Attachment System";
+        $body = "
+            <p>Dear <strong>" . htmlspecialchars($name) . "</strong>,</p>
+            <p>Your password has been reset. Please use the following default password to log in:</p>
+            <p style='font-size: 1.2em; font-weight: bold; color: #8B1538; padding: 10px; background: #fee2e2; display: inline-block; border-radius: 4px;'>" . htmlspecialchars($defaultPassword) . "</p>
+            <p>You will be required to change this password upon your first login.</p>
+            <p>If you did not request this change, please contact the administrator immediately.</p>
+            <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
+        ";
+        return self::send($email, $subject, $body);
+    }
+
+    /**
+     * Send password reset link.
+     */
+    public static function sendPasswordResetLink(string $email, string $name, string $resetLink): bool {
+        $subject = "Password Reset Link - CUEA Attachment System";
+        $body = "
+            <p>Dear <strong>" . htmlspecialchars($name) . "</strong>,</p>
+            <p>We received a request to reset your password. Click the link below to choose a new password:</p>
+            <p><a href='" . htmlspecialchars($resetLink) . "' style='display: inline-block; padding: 10px 20px; background-color: #8B1538; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold;'>Reset Password</a></p>
+            <p>If the button does not work, copy and paste this link into your browser:</p>
+            <p><a href='" . htmlspecialchars($resetLink) . "'>" . htmlspecialchars($resetLink) . "</a></p>
+            <p>This link will expire in 1 hour.</p>
+            <p>If you did not request this, please ignore this email or contact the administrator.</p>
             <p>Best regards,<br>CUEA - Industrial Attachment Department</p>
         ";
         return self::send($email, $subject, $body);

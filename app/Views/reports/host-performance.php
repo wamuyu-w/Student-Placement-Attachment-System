@@ -1,18 +1,25 @@
 <?php use App\Core\Helpers; ?>
+<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/reports-dashboard.css') ?>">
 
-<div class="activity-section">
-    <div class="section-header">
-        <h2>Organization Performance Summary</h2>
+<div class="card">
+    <div class="report-card-header">
+        <h2 class="report-card-title">Organization Performance Summary</h2>
+        <a href="<?= Helpers::baseUrl('/reports/print/host-performance' . (isset($hostId) ? '?host_id=' . urlencode($hostId) : '')) ?>" target="_blank" class="btn report-tag-dark">
+            <i class="fas fa-download"></i> Download Report (PDF)
+        </a>
     </div>
     
-    <div class="table-container" style="box-shadow: none; border: none; padding: 0;">
-        <table>
+    <div class="table-container">
+        <div class="table-actions" style="margin-bottom: 15px;">
+            <input type="text" id="tableSearch" placeholder="Search comments or students..." style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+        </div>
+        <table id="summaryTable">
             <thead>
                 <tr>
                     <th>Student Name</th>
                     <th>Evaluation Date</th>
                     <th>Host Comment Preview</th>
-                    <th>Overall verdict</th>
+                    <th>Overall Verdict</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,12 +27,12 @@
                     <?php while($row = $performance->fetch_assoc()): ?>
                         <tr>
                             <td style="font-weight: 600;"><?= htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']) ?></td>
-                            <td style="font-size: 12px;"><?= date('M d, Y', strtotime($row['LogDate'])) ?></td>
-                            <td style="font-size: 13px; font-style: italic; color: #4b5563;">
-                                "<?= htmlspecialchars(substr($row['HostComment'], 0, 80)) ?>..."
+                            <td><?= date('M d, Y', strtotime($row['StartDate'])) ?></td>
+                            <td style="font-style: italic;">
+                                "<?= htmlspecialchars(substr((string)$row['HostSupervisorComments'], 0, 80)) ?><?= strlen((string)$row['HostSupervisorComments']) > 80 ? '...' : '' ?>"
                             </td>
                             <td>
-                                <span class="status-badge status-approved" style="font-size: 11px;">Satisfactory</span>
+                                <span class="report-tag report-tag-neutral">Satisfactory</span>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -36,3 +43,14 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.getElementById('tableSearch').addEventListener('keyup', function() {
+        let input = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#summaryTable tbody tr');
+        rows.forEach(row => {
+            let text = row.textContent.toLowerCase();
+            row.style.display = text.includes(input) ? '' : 'none';
+        });
+    });
+</script>

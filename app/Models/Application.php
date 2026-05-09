@@ -76,9 +76,9 @@ class Application {
             // Create attachment record with student-defined dates and ClearedAt = NOW()
             $ins = $this->conn->prepare(
                 "INSERT INTO attachment (StudentID, HostOrgID, StartDate, EndDate, ClearanceStatus, AttachmentStatus, ClearedAt)
-                 VALUES (?, ?, ?, ?, 'Cleared', 'Ongoing', NOW())"
+                 VALUES (?, ?, ?, ?, ?, 'Ongoing', NOW())"
             );
-            $ins->bind_param("iiss", $studentId, $hostOrgId, $startDate, $endDate);
+            $ins->bind_param("iisss", $studentId, $hostOrgId, $startDate, $endDate, $financialClearance);
             $ins->execute();
 
             $this->conn->commit();
@@ -110,10 +110,25 @@ class Application {
     }
 
     // --- Shared Methods ---
-    public function updateJobStatus($opportunityId, $studentId, $status) {
-        $stmt = $this->conn->prepare("UPDATE jobapplication SET Status = ? WHERE OpportunityID = ? AND StudentID = ?");
-        $stmt->bind_param("sii", $status, $opportunityId, $studentId);
+    public function updateJobStatus($opportunityId, $studentId, $status, $rejectionReason = null) {
+        $this->ensureJobApplicationCols();
+        if ($status === 'Rejected' && $rejectionReason) {
+            $stmt = $this->conn->prepare("UPDATE jobapplication SET Status = ?, RejectionReason = ? WHERE OpportunityID = ? AND StudentID = ?");
+            $stmt->bind_param("ssii", $status, $rejectionReason, $opportunityId, $studentId);
+        } else {
+            $stmt = $this->conn->prepare("UPDATE jobapplication SET Status = ? WHERE OpportunityID = ? AND StudentID = ?");
+            $stmt->bind_param("sii", $status, $opportunityId, $studentId);
+        }
         return $stmt->execute();
+    }
+    
+    private function ensureJobApplicationCols() {
+        $colCheck = $this->conn->query("SHOW COLUMNS FROM jobapplication LIKE 'RejectionReason'");
+        if ($colCheck && $colCheck->num_rows == 0) {
+            try {
+                $this->conn->query("ALTER TABLE jobapplication ADD COLUMN RejectionReason TEXT NULL");
+            } catch (\Throwable $e) {}
+        }
     }
 
     public function getStudentApplications($studentId) {
@@ -159,6 +174,7 @@ class Application {
                     // Create New Host Org
                     $contactPerson = $data['contact_person'] ?? '';
                     $contactEmail = $data['contact_email'] ?? '';
+                    $contactPhone = $data['contact_phone'] ?? '';
 
                     // Generate Username
                     $userStmt = $this->conn->query("SELECT Username FROM users WHERE Role = 'Host Organization' ORDER BY UserID DESC LIMIT 1");
@@ -176,8 +192,8 @@ class Application {
                     $insertUser->execute();
                     $newUserId = $this->conn->insert_id;
 
-                    $insertHost = $this->conn->prepare("INSERT INTO hostorganization (UserID, OrganizationName, ContactPerson, Email) VALUES (?, ?, ?, ?)");
-                    $insertHost->bind_param("isss", $newUserId, $intendedHost, $contactPerson, $contactEmail);
+                    $insertHost = $this->conn->prepare("INSERT INTO hostorganization (UserID, OrganizationName, ContactPerson, Email, PhoneNumber) VALUES (?, ?, ?, ?, ?)");
+                    $insertHost->bind_param("issss", $newUserId, $intendedHost, $contactPerson, $contactEmail, $contactPhone);
                     $insertHost->execute();
                     $hostOrgId = $this->conn->insert_id;
 
@@ -205,7 +221,12 @@ class Application {
             $this->conn->commit();
 
             if (isset($newHostDetails) && !empty($newHostDetails['email'])) {
-                \App\Core\Mailer::sendHostCredentials($newHostDetails['email'], $newHostDetails['orgName'], $newHostDetails['username'], $newHostDetails['password']);
+                try {
+                    \App\Core\Mailer::sendHostCredentials($newHostDetails['email'], $newHostDetails['orgName'], $newHostDetails['username'], $newHostDetails['password']);
+                } catch (\Throwable $mailerEx) {
+                    // Fallback: log credentials so admin can retrieve them manually
+                    error_log("[HOST CREDENTIALS] Email failed for '{$newHostDetails['orgName']}'. Username: {$newHostDetails['username']} | Password: {$newHostDetails['password']} | Error: " . $mailerEx->getMessage());
+                }
             }
 
             return ['success' => true];
@@ -217,18 +238,14 @@ class Application {
     }
 
     public function registerPlacement($studentId, $data) {
-        // Check for existing
-        $checkStmt = $this->conn->prepare("SELECT AttachmentID, AttachmentStatus FROM attachment WHERE StudentID = ?");
+        // Only block if there is an ACTIVE ongoing attachment
+        $checkStmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
         $checkStmt->bind_param("i", $studentId);
         $checkStmt->execute();
         $result = $checkStmt->get_result();
 
         if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            if ($row['AttachmentStatus'] == 'Ongoing') {
-                return ['success' => false, 'message' => 'already_active'];
-            }
-            return ['success' => false, 'message' => 'already_has_record'];
+            return ['success' => false, 'message' => 'already_active'];
         }
 
         $stmt = $this->conn->prepare("INSERT INTO attachment (StudentID, HostOrgID, StartDate, EndDate, ClearanceStatus, AttachmentStatus) VALUES (?, ?, ?, ?, 'Pending', 'Ongoing')");

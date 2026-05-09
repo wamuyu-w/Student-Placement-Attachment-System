@@ -19,7 +19,7 @@ if (!isset($student) || empty($student)) {
     </style>
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    
 
     <?php if (!isset($entries) || empty($entries)): ?>
         <div style="text-align:center; padding:50px;">No logbook entries found for this student.</div>
@@ -38,15 +38,14 @@ if (!isset($student) || empty($student)) {
             }
         ?>
         <div class="report-container <?= !$isLast ? 'page-break' : '' ?>">
-            <div class="report-header">
-                <div class="logo-container">
-                    <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
-                </div>
-                <div class="header-text">
-                    <h1>The Catholic University of Eastern Africa</h1>
-                    <h2>Weekly Attachment Logbook Entry</h2>
-                </div>
-            </div>
+            <!-- Header -->
+<div class="header">
+            <img src="<?= Helpers::baseUrl('../assets/cuea-logo.png') ?>" alt="CUEA Logo">
+            <h1>The Catholic University of Eastern Africa</h1>
+            <div class="header-motto">"Consecrate them in the Truth"</div>
+            <div class="header-title">Weekly Attachment Logbook Entry</div>
+        </div>
+        <hr>
 
             <table class="info-table">
                 <tr>
@@ -62,9 +61,9 @@ if (!isset($student) || empty($student)) {
             <table class="data-table" style="margin-top: 15px; border: 1px solid #000;">
                 <thead>
                     <tr>
-                        <th style="width: 12%; background-color: #f0f0f0; border: 1px solid #000; text-align: center; font-size: 11pt; padding: 12px 8px;">DAY</th>
-                        <th style="width: 44%; background-color: #f0f0f0; border: 1px solid #000; font-size: 11pt; padding: 12px 8px;">DESCRIPTION OF WORK PERFORMANCE</th>
-                        <th style="width: 44%; background-color: #f0f0f0; border: 1px solid #000; font-size: 11pt; padding: 12px 8px;">STUDENT'S REMARKS/CHALLENGES</th>
+                        <th style="width: 12%; border: 1px solid #000; text-align: center; font-size: 11pt; padding: 12px 8px;">DAY</th>
+                        <th style="width: 44%; border: 1px solid #000; font-size: 11pt; padding: 12px 8px;">DESCRIPTION OF WORK PERFORMANCE</th>
+                        <th style="width: 44%; border: 1px solid #000; font-size: 11pt; padding: 12px 8px;">STUDENT'S REMARKS/CHALLENGES</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,8 +75,8 @@ if (!isset($student) || empty($student)) {
                     ?>
                     <tr>
                         <td style="font-weight: bold; border: 1px solid #000; text-align: center; vertical-align: top; padding: 10px 8px; font-size: 10pt;"><?= strtoupper($label) ?></td>
-                        <td style="border: 1px solid #000; vertical-align: top; padding: 10px 8px; font-size: 10pt; line-height: 1.4;"><?= !empty($task) ? nl2br(htmlspecialchars($task)) : '<span style="color: #999; font-style: italic;">No entry</span>' ?></td>
-                        <td style="border: 1px solid #000; vertical-align: top; padding: 10px 8px; font-size: 10pt; line-height: 1.4;"><?= !empty($comment) ? nl2br(htmlspecialchars($comment)) : '<span style="color: #999; font-style: italic;">No entry</span>' ?></td>
+                        <td style="border: 1px solid #000; vertical-align: top; padding: 10px 8px; font-size: 10pt; line-height: 1.4;"><?= !empty($task) ? nl2br(htmlspecialchars($task)) : '<span style="color: #666; font-style: italic;">No entry</span>' ?></td>
+                        <td style="border: 1px solid #000; vertical-align: top; padding: 10px 8px; font-size: 10pt; line-height: 1.4;"><?= !empty($comment) ? nl2br(htmlspecialchars($comment)) : '<span style="color: #666; font-style: italic;">No entry</span>' ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>

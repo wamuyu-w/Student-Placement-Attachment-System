@@ -67,9 +67,9 @@
                 <?php if ($supervisors && $supervisors->num_rows > 0): ?>
                     <?php while($row = $supervisors->fetch_assoc()): ?>
                         <tr>
-                            <td><?= htmlspecialchars($row['Name']) ?></td>
-                            <td><?= htmlspecialchars($row['Department']) ?></td>
-                            <td><?= htmlspecialchars($row['Faculty']) ?></td>
+                            <td><?= htmlspecialchars($row['Name'] ?? 'Pending Setup') ?></td>
+                            <td><?= htmlspecialchars($row['Department'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($row['Faculty'] ?? '—') ?></td>
                             <td>
                                 <span class="status-badge status-<?= strtolower($row['Status']) === 'active' ? 'approved' : 'rejected' ?>">
                                     <?= htmlspecialchars($row['Status']) ?>
