@@ -2,9 +2,20 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-// StudentController handles all student-related actions such as dashboard and supervisor view
+/**
+ * Class StudentController
+ * 
+ * Handles student-specific endpoints, such as rendering the main student dashboard
+ * and viewing their assigned academic supervisors and assessment status.
+ */
 class StudentController extends Controller {
     
+    /**
+     * Renders the primary student dashboard.
+     * Fetches top-level placement statistics and recent timeline activities.
+     * 
+     * @return void
+     */
     public function dashboard() {
         $this->requireAuth('student');
         
@@ -22,6 +33,13 @@ class StudentController extends Controller {
         $this->view('student/dashboard', $data);
     }
 
+    /**
+     * Renders the student's supervisor view.
+     * Displays details about their assigned academic supervisor(s) and any completed
+     * or pending assessments.
+     * 
+     * @return void
+     */
     public function viewSupervisor() {
         $this->requireAuth('student');
         $studentModel = $this->model('Student');

@@ -20,6 +20,13 @@
         </div>
     </div>
 
+    <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success" style="margin-bottom: 20px;"><?= htmlspecialchars($_GET['success']) ?></div>
+    <?php endif; ?>
+    <?php if (isset($_GET['error'])): ?>
+        <div class="alert alert-danger" style="margin-bottom: 20px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px;"><?= htmlspecialchars($_GET['error']) ?></div>
+    <?php endif; ?>
+
     <?php if ($progress): ?>
         <!-- Attachment Details -->
         <div class="card mb-4" style="border-left: 4px solid #3b82f6;">
@@ -53,6 +60,25 @@
                 </div>
             </div>
         </div>
+
+        <?php if ($progress['AttachmentStatus'] === 'Ongoing'): ?>
+        <div class="card mb-4" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.05rem; color: #1e293b;">Manual Clearance</h3>
+                    <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Mark attachment as complete and clear the student immediately.</p>
+                </div>
+                <form action="<?= Helpers::baseUrl('/admin/attachment/complete') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to manually complete and clear this attachment?');">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                    <input type="hidden" name="attachment_id" value="<?= $progress['AttachmentID'] ?>">
+                    <input type="hidden" name="student_id" value="<?= $student['StudentID'] ?>">
+                    <button type="submit" class="btn btn-primary" style="background-color: #10b981; border: none; padding: 8px 16px;">
+                        <i class="fas fa-check-circle"></i> Force Complete & Clear
+                    </button>
+                </form>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Assessments -->
         <div class="card mb-4">

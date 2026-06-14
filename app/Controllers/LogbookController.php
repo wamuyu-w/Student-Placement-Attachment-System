@@ -3,8 +3,21 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
 
+/**
+ * Class LogbookController
+ * 
+ * Manages the creation, viewing, reviewing, and printing of weekly student logbooks.
+ * Facilitates interaction between students, academic supervisors, and host organizations.
+ */
 class LogbookController extends Controller {
 
+    /**
+     * Renders the student's logbook dashboard.
+     * Fetches all their previous entries and checks if they have an active or completed attachment
+     * to determine if they are allowed to submit new entries.
+     * 
+     * @return void
+     */
     public function studentIndex() {
         $this->requireActiveStudent();
         $logbookModel = $this->model('Logbook');
@@ -33,6 +46,12 @@ class LogbookController extends Controller {
         $this->view('student/logbook', $data);
     }
 
+    /**
+     * Processes a student's submission of a new weekly logbook entry.
+     * Parses the daily tasks (Monday-Friday) into a JSON structure and saves it to the database.
+     * 
+     * @return void
+     */
     public function createEntry() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -67,6 +86,12 @@ class LogbookController extends Controller {
         }
     }
 
+    /**
+     * Renders the staff (lecturer) view for reviewing pending logbooks.
+     * Fetches logbooks submitted by students assigned to the logged-in lecturer.
+     * 
+     * @return void
+     */
     public function staffIndex() {
         $this->requireAuth('staff');
         try {
@@ -85,6 +110,12 @@ class LogbookController extends Controller {
         }
     }
 
+    /**
+     * Renders the host organization's view for reviewing pending logbooks.
+     * Fetches logbooks submitted by students attached to this organization.
+     * 
+     * @return void
+     */
     public function hostIndex() {
         $this->requireAuth('host_org');
         try {
@@ -103,6 +134,12 @@ class LogbookController extends Controller {
         }
     }
 
+    /**
+     * Processes logbook reviews (approvals or rejections) with comments.
+     * Shared method utilized by both academic staff and host organizations.
+     * 
+     * @return void
+     */
     public function reviewEntry() {
         // Shared for staff and host
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -126,6 +163,12 @@ class LogbookController extends Controller {
             header("Location: " . Helpers::baseUrl($redirect . '?success=Review submitted successfully'));
         }
     }
+    /**
+     * Processes ad-hoc comments added by a Host Organization to a specific logbook entry
+     * directly from the student's progress view.
+     * 
+     * @return void
+     */
     public function addComment() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         $userType = $_SESSION['user_type'] ?? null;
@@ -150,8 +193,12 @@ class LogbookController extends Controller {
         }
     }
 
-    // the function printLogbook() allows authorized users (students, staff, or host organizations) to view a printable version of a student's logbook entries 
-    //by retrieving the relevant data and rendering it in a print-friendly format without the standard layout
+    /**
+     * Generates a printable, layout-free view of a student's entire logbook history.
+     * Restricts host organizations from printing to maintain student data privacy based on requirements.
+     * 
+     * @return void
+     */
     public function printLogbook() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['user_id'])) { header("Location: " . Helpers::baseUrl('/')); exit(); }

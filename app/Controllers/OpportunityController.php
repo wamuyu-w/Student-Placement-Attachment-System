@@ -2,8 +2,21 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
+/**
+ * Class OpportunityController
+ * 
+ * Manages all attachment opportunities (job postings).
+ * Allows admins and host organizations to create/manage postings, 
+ * and allows eligible students to apply for them.
+ */
 class OpportunityController extends Controller {
 
+    /**
+     * Renders the student's view of all active attachment opportunities.
+     * Determines if the student is eligible to apply based on their current placement status.
+     * 
+     * @return void
+     */
     public function index() {
         $this->requireActiveStudent();
 
@@ -27,7 +40,13 @@ class OpportunityController extends Controller {
     }
 
 
-    // students can apply for active applications but they must be an active student in the platform
+    /**
+     * Processes a student's application to a specific opportunity.
+     * Handles file uploads for resumes (up to 2MB PDF) or external links.
+     * Validates eligibility via AJAX before recording the application.
+     * 
+     * @return void JSON response
+     */
     public function apply() {
         $this->requireActiveStudent();
 
@@ -116,10 +135,21 @@ class OpportunityController extends Controller {
         $this->json($result);
     }
 
+    /**
+     * Determines if the current HTTP request is an AJAX/Fetch request.
+     * 
+     * @return bool
+     */
     private function isAjax() {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 
+    /**
+     * Renders the administrator's opportunity management dashboard.
+     * Shows all opportunities across all host organizations.
+     * 
+     * @return void
+     */
     public function adminManage() {
         $this->requireAuth('admin');
         $oppModel = $this->model('Opportunity');
@@ -133,6 +163,12 @@ class OpportunityController extends Controller {
         $this->view('admin/opportunities', $data);
     }
 
+    /**
+     * Renders the host organization's opportunity management dashboard.
+     * Restricts the view to only show opportunities created by the logged-in host.
+     * 
+     * @return void
+     */
     public function hostManage() {
         $this->requireAuth('host_org');
         $oppModel = $this->model('Opportunity');
@@ -145,6 +181,13 @@ class OpportunityController extends Controller {
         $this->view('host/opportunities', $data);
     }
 
+    /**
+     * Processes the creation or updating (saving) of an opportunity.
+     * Allows admins to create opportunities on behalf of new or existing hosts.
+     * Ensures host organizations can only edit their own opportunities.
+     * 
+     * @return void
+     */
     public function save() {
         // Auth check (Admin or Host)
         if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['admin', 'host_org'])) {
@@ -201,6 +244,12 @@ class OpportunityController extends Controller {
         }
     }
 
+    /**
+     * Deletes a specific opportunity posting.
+     * Enforces ownership authorization before deletion.
+     * 
+     * @return void
+     */
     public function delete() {
         // Auth check (Admin or Host)
         if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['admin', 'host_org'])) {

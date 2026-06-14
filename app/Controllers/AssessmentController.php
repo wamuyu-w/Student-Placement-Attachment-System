@@ -3,9 +3,20 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
 
+/**
+ * Class AssessmentController
+ * 
+ * Manages the entire assessment workflow, allowing lecturers to verify codes,
+ * conduct assessments, schedule future assessments, and view results.
+ */
 class AssessmentController extends Controller {
 
-    // Displays assessments dashboard for staff (lecturers) with supervised students
+    /**
+     * Renders the main assessments dashboard for staff (lecturers).
+     * Retrieves a list of all students currently supervised by the logged-in lecturer.
+     * 
+     * @return void
+     */
     public function index() {
         $this->requireAuth('staff');
         $staffModel = $this->model('Staff');
@@ -19,7 +30,13 @@ class AssessmentController extends Controller {
         $this->view('staff/assessments', $data);
     }
 
-    // Verifies assessment code entered by staff before allowing assessment conduct
+    /**
+     * Verifies the 6-digit assessment code provided by the Host Organization.
+     * Ensures the lecturer is actually assigned to the student before allowing the assessment to begin.
+     * Sets an authorization session flag if successful.
+     * 
+     * @return void JSON response
+     */
     public function verifyCode() {
         $this->requireAuth('staff');
 
@@ -62,7 +79,12 @@ class AssessmentController extends Controller {
         }
     }
 
-    // Loads assessment conduct page after code verification, ensuring proper assignment
+    /**
+     * Loads the assessment grading form.
+     * Enforces security by checking the session authorization flag set during verifyCode().
+     * 
+     * @return void
+     */
     public function conduct() {
         $this->requireAuth('staff');
         $attachmentId = $_GET['attachment_id'] ?? null;
@@ -97,7 +119,13 @@ class AssessmentController extends Controller {
         $this->view('staff/conduct-assessment', $data);
     }
 
-    // Handles submission of assessment results, updating or creating records
+    /**
+     * Processes the submission of the grading form.
+     * Calculates marks, checks if the assessment was pre-scheduled (to update it) 
+     * or ad-hoc (to create a new one), and saves the results to the database.
+     * 
+     * @return void
+     */
     public function submit() {
         $this->requireAuth('staff');
         
@@ -141,9 +169,13 @@ class AssessmentController extends Controller {
             }
         }
     }
-    // the function schedule() allows a staff member to schedule an assessment for a student's attachment by processing the form submission, 
-    //validating the input, and inserting a new record into the assessment table with the provided details, including the attachment ID, lecturer ID, assessment type, date, and any remarks
-    // Allows staff to schedule an assessment for a student's attachment
+    /**
+     * Allows a staff member to schedule an upcoming assessment for a student.
+     * Validates input, prevents duplicate scheduling, auto-determines if it's a first or final assessment,
+     * and queues email notifications to both the student and the host organization.
+     * 
+     * @return void JSON response
+     */
     public function schedule() {
         $this->requireAuth('staff');
 
@@ -229,7 +261,13 @@ class AssessmentController extends Controller {
     }
 
 
-    // Retrieves and displays a specific assessment for authorized users
+    /**
+     * Retrieves and displays a specific assessment's detailed grading report.
+     * Implements strict RBAC ensuring students only see their own, hosts only see their attached students,
+     * and staff only see their supervised students.
+     * 
+     * @return void
+     */
     public function viewAssessment() {
         // Allow student or staff/admin to view
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -276,9 +314,12 @@ class AssessmentController extends Controller {
         $data = ['assessment' => $assessment];
         $this->view('reports/print-assessment', $data, false);
     }
-    // the function printSummary() allows authorized users (students, staff, or host organizations) to view a printable summary of a student's assessments 
-    // by retrieving the relevant data and rendering it in a print-friendly format without the standard layout
-    // Generates a printable summary of a student's assessments for authorized users
+    /**
+     * Generates a printable, layout-free summary of a student's complete assessment history.
+     * Enforces the same strict RBAC as the viewAssessment method.
+     * 
+     * @return void
+     */
     public function printSummary() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['user_id'])) { header("Location: " . Helpers::baseUrl('/')); exit(); }

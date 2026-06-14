@@ -35,8 +35,8 @@
     <div class="summary-card">
         <div class="card-content">
             <h3>Avg Final Score</h3>
-            <p class="card-number"><?= $report['avg_final'] ?>%</p>
-            <small class="text-muted">Final Assessment</small>
+            <p class="card-number"><?= number_format(($report['avg_first'] + $report['avg_final']) / 2, 1) ?>%</p>
+            <small class="text-muted">Combined Assessments</small>
         </div>
     </div>
 </div>
@@ -100,7 +100,7 @@
                         </span>
                     </td>
                     <td style="text-align:center; font-weight:600;">
-                        <?= $row['FinalScore'] !== null ? $row['FinalScore'] . '%' : '<span class="text-muted">—</span>' ?>
+                        <?= $row['AvgScore'] !== null ? number_format($row['AvgScore'], 2) . '%' : '<span class="text-muted">—</span>' ?>
                     </td>
                     <td style="text-align:center;">
                         <a href="<?= Helpers::baseUrl('/reports/print/completion?id=' . $row['StudentID']) ?>" target="_blank"

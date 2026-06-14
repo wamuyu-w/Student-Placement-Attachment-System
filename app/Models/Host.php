@@ -1,20 +1,32 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// and handle student attachments, while ensuring secure database interactions through prepared statements and transaction management for critical operations like registration.
-// It serves as the primary interface for host organizations to interact
-// Host model handles host organization data and related operations
+/**
+ * Class Host
+ * 
+ * Manages operations and data related to Host Organizations.
+ * Includes methods for retrieving statistics, managing attached students,
+ * updating profiles, and generating secure verification codes for assessments.
+ */
 class Host {
     private $db;
     private $conn;
 
-    // Initialize database connection
-public function __construct() {
+    /**
+     * Initializes the database connection.
+     */
+    public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
-    // Retrieve dashboard statistics for a host organization
-public function getDashboardStats($hostOrgId) {
+    /**
+     * Retrieves aggregated statistics for a specific host organization's dashboard.
+     * Counts active opportunities, attached students, and pending logbooks.
+     * 
+     * @param int $hostOrgId The host organization ID
+     * @return array Associative array of statistics
+     */
+    public function getDashboardStats($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
                 (SELECT COUNT(*) FROM attachmentopportunity WHERE HostOrgID = ? AND Status = 'Active' AND ApplicationEndDate >= CURDATE()) as active_placements,
@@ -27,8 +39,13 @@ public function getDashboardStats($hostOrgId) {
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
-    // Get recent placement records for a host organization
-public function getRecentPlacements($hostOrgId) {
+    /**
+     * Fetches the most recent student placements at this host organization.
+     * 
+     * @param int $hostOrgId The host organization ID
+     * @return \mysqli_result|false Result set
+     */
+    public function getRecentPlacements($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
                 s.FirstName, s.LastName, s.Course,
@@ -46,22 +63,39 @@ public function getRecentPlacements($hostOrgId) {
         $stmt->execute();
         return $stmt->get_result();
     }
-    // Update host organization profile information
-public function updateProfile($hostId, $data) {
+    /**
+     * Updates the basic profile information of a host organization.
+     * 
+     * @param int $hostId
+     * @param array $data Associative array of profile fields
+     * @return bool True on successful update
+     */
+    public function updateProfile($hostId, $data) {
         $stmt = $this->conn->prepare("UPDATE hostorganization SET OrganizationName = ?, ContactPerson = ?, Email = ?, PhoneNumber = ? WHERE HostOrgID = ?");
         $stmt->bind_param("ssssi", $data['org_name'], $data['contact_person'], $data['email'], $data['phone'], $hostId);
         return $stmt->execute();
     }
 
-    // Complete host profile after registration
-public function completeProfile($hostId, $data) {
+    /**
+     * Finalizes the host profile data during the first-login initialization process.
+     * 
+     * @param int $hostId
+     * @param array $data Profile fields
+     * @return bool True on success
+     */
+    public function completeProfile($hostId, $data) {
         $stmt = $this->conn->prepare("UPDATE hostorganization SET OrganizationName=?, ContactPerson=?, Email=?, PhoneNumber=? WHERE HostOrgID=?");
         $stmt->bind_param("ssssi", $data['org_name'], $data['contact_person'], $data['email'], $data['phone'], $hostId);
         return $stmt->execute();
     }
 
-    // Retrieve list of students attached to a host organization
-public function getAttachedStudents($hostOrgId) {
+    /**
+     * Retrieves a list of all students currently attached to this host organization.
+     * 
+     * @param int $hostOrgId
+     * @return \mysqli_result|false Result set
+     */
+    public function getAttachedStudents($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.YearOfStudy, a.AttachmentID, a.StartDate, a.EndDate, a.AttachmentStatus, a.AssessmentCode
             FROM attachment a
@@ -73,8 +107,15 @@ public function getAttachedStudents($hostOrgId) {
         $stmt->execute();
         return $stmt->get_result();
     }
-    // Generate a unique assessment code for an attachment
-public function generateAssessmentCode($attachmentId, $hostOrgId) {
+    /**
+     * Generates a secure, 6-character alphanumeric verification code for a specific attachment.
+     * This code must be shared with the academic supervisor to authorize an assessment.
+     * 
+     * @param int $attachmentId
+     * @param int $hostOrgId Prevents unauthorized generation by validating ownership
+     * @return bool True on successful generation and update
+     */
+    public function generateAssessmentCode($attachmentId, $hostOrgId) {
         // Verify ownership
         $verifyStmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE AttachmentID = ? AND HostOrgID = ?");
         $verifyStmt->bind_param("ii", $attachmentId, $hostOrgId);
@@ -87,8 +128,14 @@ public function generateAssessmentCode($attachmentId, $hostOrgId) {
         return $updateStmt->execute();
     }
 
-    // Create host organization and user account from registration data
-public function createFromRegistration($data) {
+    /**
+     * Creates a new host organization profile and its associated user account.
+     * Used by admins to manually register new host entities.
+     * 
+     * @param array $data Form data including credentials and organization details
+     * @return array Success status and optional error message
+     */
+    public function createFromRegistration($data) {
         $this->conn->begin_transaction();
         try {
             // 1. Create User Account

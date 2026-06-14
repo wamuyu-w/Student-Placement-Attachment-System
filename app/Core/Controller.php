@@ -52,7 +52,23 @@ class Controller {
             session_start();
         }
 
+        // 10-Minute Inactivity Timeout Check
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 600)) {
+            session_unset();
+            session_destroy();
+            session_start(); // Restart an empty session for the redirect
+        }
+        $_SESSION['last_activity'] = time();
+
         if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== $role) {
+            $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+            $isFetch = isset($_SERVER['HTTP_ACCEPT']) && strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/json') !== false;
+            
+            if ($isAjax || $isFetch) {
+                http_response_code(401);
+                $this->json(['success' => false, 'message' => 'Session expired or unauthorized. Please log in again.']);
+            }
+
             $loginRoutes = [
                 'student'  => '/login/student',
                 'staff'    => '/login/staff',

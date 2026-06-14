@@ -173,7 +173,15 @@ document.getElementById('codeForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
     formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
-    fetch('<?= Helpers::baseUrl('/assessment/verify-code') ?>', { method: 'POST', body: formData })
+    fetch('<?= Helpers::baseUrl('/assessment/verify-code') ?>', { 
+        method: 'POST', 
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: formData 
+    })
         .then(r => r.json())
         .then(data => data.success ? window.location.href = data.redirect : alert(data.message));
 });
@@ -182,7 +190,15 @@ document.getElementById('scheduleForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
     formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
-    fetch('<?= Helpers::baseUrl('/staff/assessments/schedule') ?>', { method: 'POST', body: formData })
+    fetch('<?= Helpers::baseUrl('/staff/assessments/schedule') ?>', { 
+        method: 'POST', 
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: formData 
+    })
         .then(r => r.json())
         .then(data => {
             alert(data.message);

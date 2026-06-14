@@ -109,6 +109,11 @@ document.getElementById('codeForm').addEventListener('submit', function(e) {
     
     fetch('<?= Helpers::baseUrl('/assessment/verify-code') ?>', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
         body: formData
     })
     .then(response => response.json())

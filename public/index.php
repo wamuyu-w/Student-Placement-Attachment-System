@@ -1,8 +1,9 @@
 <?php
 // public/index.php
 
-// Session configuration
+ini_set('session.gc_maxlifetime', 600);
 session_set_cookie_params([
+    'lifetime' => 600, // 10 minutes
     'httponly' => true,
     'samesite' => 'Lax',
 ]);

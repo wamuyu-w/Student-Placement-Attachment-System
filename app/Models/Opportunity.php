@@ -1,7 +1,12 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// Model for managing attachment opportunities, including CRUD operations and application handling.
+/**
+ * Class Opportunity
+ * 
+ * Model for managing attachment job opportunities posted by host organizations,
+ * including CRUD operations and handling student applications to these specific roles.
+ */
 class Opportunity {
     private $db;
     private $conn;
@@ -11,7 +16,12 @@ class Opportunity {
         $this->conn = $this->db->connect();
     }
 
-    //get all opportunities
+    /**
+     * Retrieves all opportunities across all host organizations.
+     * Used primarily by administrators.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAll() {
         $sql = "SELECT ao.*, COALESCE(ho.OrganizationName, 'Unknown') as OrganizationName 
                 FROM attachmentopportunity ao
@@ -20,9 +30,21 @@ class Opportunity {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Retrieves a simplified list of all host organizations.
+     * Used for populating dropdowns during opportunity creation.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getHostOrganizations() {
         return $this->conn->query("SELECT HostOrgID, OrganizationName FROM hostorganization ORDER BY OrganizationName");
     }
+    /**
+     * Retrieves all currently active and open opportunities.
+     * Validates that the current date falls within the application window.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAllActive() {
         $sql = "SELECT ao.*, ho.OrganizationName 
                 FROM attachmentopportunity ao
@@ -34,6 +56,12 @@ class Opportunity {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Retrieves all opportunities posted by a specific host organization.
+     * 
+     * @param int $hostId
+     * @return \mysqli_result|false Result set
+     */
     public function getByHost($hostId) {
         $stmt = $this->conn->prepare("SELECT *, DATE_ADD(ApplicationEndDate, INTERVAL 0 DAY) as daysUntilExpire FROM attachmentopportunity WHERE HostOrgID = ? ORDER BY ApplicationEndDate DESC");
         $stmt->bind_param("i", $hostId);
@@ -41,6 +69,12 @@ class Opportunity {
         return $stmt->get_result();
     }
 
+    /**
+     * Finds a specific opportunity by its ID.
+     * 
+     * @param int $id
+     * @return array|null Associative array of opportunity data or null
+     */
     public function findById($id) {
         $stmt = $this->conn->prepare("SELECT * FROM attachmentopportunity WHERE OpportunityID = ?");
         $stmt->bind_param("i", $id);
@@ -48,6 +82,13 @@ class Opportunity {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Checks if a specific student has already applied to a specific opportunity.
+     * 
+     * @param int $studentId
+     * @param int $opportunityId
+     * @return bool True if they have applied
+     */
     public function hasApplied($studentId, $opportunityId) {
         $stmt = $this->conn->prepare("SELECT OpportunityID FROM jobapplication WHERE StudentID = ? AND OpportunityID = ?");
         $stmt->bind_param("ii", $studentId, $opportunityId);
@@ -56,6 +97,13 @@ class Opportunity {
         return $result->num_rows > 0;
     }
 
+    /**
+     * Processes a student's application to a specific job opportunity.
+     * Validates deadline, active status, and prevents duplicate applications.
+     * 
+     * @param array $data Application details including resume and motivation
+     * @return array Success status and optional error message
+     */
     public function createApplication($data) {
         $this->conn->begin_transaction();
 
@@ -119,6 +167,14 @@ class Opportunity {
         }
     }
 
+    /**
+     * Saves or updates an opportunity.
+     * Also supports "on-the-fly" creation of a new Host Organization by an administrator,
+     * including generating a temporary account and sending a welcome email.
+     * 
+     * @param array $data Form data for the opportunity and potentially new host
+     * @return array Success status and optional error message
+     */
     public function save($data) {
         $this->conn->begin_transaction();
         try {
@@ -212,6 +268,12 @@ class Opportunity {
         }
     }
 
+    /**
+     * Deletes an opportunity if it has no dependent applications.
+     * 
+     * @param int $id
+     * @return array Success status or failure reason
+     */
     public function delete($id) {
         // Check dependencies
         $stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM jobapplication WHERE OpportunityID = ?");

@@ -12,6 +12,7 @@
         <div class="login-form-section">
             <h2 class="login-heading">Host Organization Login</h2>
             
+            <!-- PHP-based error message -->
             <?php if (isset($_GET['error'])): ?>
                 <div class="error-message-general">
                     <?= htmlspecialchars($_GET['error']) ?>

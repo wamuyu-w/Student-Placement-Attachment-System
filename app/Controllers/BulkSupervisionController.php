@@ -4,8 +4,20 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
 
+/**
+ * Class BulkSupervisionController
+ * 
+ * Handles the bulk assignment of academic supervisors (lecturers) to students
+ * by the industrial attachment coordinator (admin).
+ */
 class BulkSupervisionController extends Controller {
     
+    /**
+     * Renders the bulk supervision assignment dashboard.
+     * Fetches students needing supervision and all eligible lecturers.
+     * 
+     * @return void
+     */
     public function index() {
         $this->requireAuth('admin');
         
@@ -61,6 +73,13 @@ class BulkSupervisionController extends Controller {
         return $students;
     }
     
+    /**
+     * Processes the bulk assignment of selected lecturers to selected students.
+     * Loops through selections, assigns randomly, checks for previous supervisor history
+     * to prevent duplication, and queues email notifications.
+     * 
+     * @return void
+     */
     public function processAssignment() {
         $this->requireAuth('admin');
         // Allow long-running bulk operations
@@ -90,8 +109,8 @@ class BulkSupervisionController extends Controller {
         $errorCount = 0;
         // Prepare reusable statements for fetching student & lecturer details (outside the loop)
         $db = (new \App\Config\Database())->connect();
-        $studentStmt = $db->prepare("SELECT s.Email, s.FirstName, s.LastName FROM student s JOIN attachment a ON s.StudentID = a.StudentID WHERE a.AttachmentID = ?");
-        $lecturerStmt = $db->prepare("SELECT u.Username, l.Name FROM lecturer l JOIN users u ON l.UserID = u.UserID WHERE l.LecturerID = ?");
+        $studentStmt = $db->prepare("SELECT s.Email, s.FirstName, s.LastName, u.Username as RegNo, h.OrganizationName FROM student s JOIN attachment a ON s.StudentID = a.StudentID JOIN users u ON s.UserID = u.UserID JOIN hostorganization h ON a.HostOrgID = h.HostOrgID WHERE a.AttachmentID = ?");
+        $lecturerStmt = $db->prepare("SELECT u.Username, l.Name, l.Email FROM lecturer l JOIN users u ON l.UserID = u.UserID WHERE l.LecturerID = ?");
         $emailQueue = [];
         foreach ($studentAttachmentIds as $attachmentId) {
             shuffle($lecturerIds);
@@ -109,13 +128,26 @@ class BulkSupervisionController extends Controller {
                         $lecturerStmt->bind_param("i", $lecturerId);
                         $lecturerStmt->execute();
                         $lecInfo = $lecturerStmt->get_result()->fetch_assoc();
-                        if ($studentInfo && $lecInfo && !empty($studentInfo['Email'])) {
-                            $emailQueue[] = [
-                                'to' => $studentInfo['Email'],
-                                'name' => trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
-                                'lecturer' => $lecInfo['Name'],
-                                'lecturerEmail' => $lecInfo['Username'] . '@example.com'
-                            ];
+                        if ($studentInfo && $lecInfo) {
+                            if (!empty($studentInfo['Email'])) {
+                                $emailQueue[] = [
+                                    'type' => 'student',
+                                    'to' => $studentInfo['Email'],
+                                    'name' => trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
+                                    'lecturer' => $lecInfo['Name'],
+                                    'lecturerEmail' => $lecInfo['Email'] ?? ($lecInfo['Username'] . '@example.com')
+                                ];
+                            }
+                            if (!empty($lecInfo['Email'])) {
+                                $emailQueue[] = [
+                                    'type' => 'lecturer',
+                                    'to' => $lecInfo['Email'],
+                                    'lecturerName' => $lecInfo['Name'],
+                                    'studentName' => trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
+                                    'studentRegNo' => $studentInfo['RegNo'],
+                                    'hostOrg' => $studentInfo['OrganizationName']
+                                ];
+                            }
                         }
                         break;
                     }
@@ -127,12 +159,22 @@ class BulkSupervisionController extends Controller {
         }
         // Send all queued emails after assignments are done (reduces DB latency & execution time)
         foreach ($emailQueue as $mail) {
-            \App\Core\Mailer::notifySupervisorAssigned(
-                $mail['to'],
-                $mail['name'],
-                $mail['lecturer'],
-                $mail['lecturerEmail']
-            );
+            if ($mail['type'] === 'student') {
+                \App\Core\Mailer::notifySupervisorAssigned(
+                    $mail['to'],
+                    $mail['name'],
+                    $mail['lecturer'],
+                    $mail['lecturerEmail']
+                );
+            } elseif ($mail['type'] === 'lecturer') {
+                \App\Core\Mailer::notifyLecturerAssignedStudent(
+                    $mail['to'],
+                    $mail['lecturerName'],
+                    $mail['studentName'],
+                    $mail['studentRegNo'],
+                    $mail['hostOrg']
+                );
+            }
         }
         
         $msg = "Successfully assigned $successCount students.";
@@ -144,6 +186,14 @@ class BulkSupervisionController extends Controller {
         exit();
     }
     
+    /**
+     * Checks if a specific lecturer has previously supervised the given student
+     * to prevent redundant supervisor assignments.
+     * 
+     * @param int $attachmentId The attachment ID
+     * @param int $lecturerId The lecturer ID
+     * @return bool True if supervised before, false otherwise
+     */
     private function hasSupervisedBefore($attachmentId, $lecturerId) {
         $db = (new \App\Config\Database())->connect();
         $stmt = $db->prepare("

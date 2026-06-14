@@ -26,7 +26,9 @@
                     <th>Student Name</th>
                     <th>Admission No.</th>
                     <th style="text-align: center;">1st Assessment</th>
+                    <th style="text-align: left;">1st Assessor</th>
                     <th style="text-align: center;">2nd Assessment</th>
+                    <th style="text-align: left;">2nd Assessor</th>
                     <th style="text-align: center;">Average Score</th>
                     <th>Status</th>
                 </tr>
@@ -38,7 +40,9 @@
                             <td><?= htmlspecialchars($row['LastName'] . ', ' . $row['FirstName']) ?></td>
                             <td><?= htmlspecialchars($row['AdmNumber']) ?></td>
                             <td style="text-align: center;"><?= $row['FirstScore'] !== null ? $row['FirstScore'] . '%' : '-' ?></td>
+                            <td style="font-size: 0.9em;"><?= htmlspecialchars($row['FirstAssessor'] ?? '-') ?></td>
                             <td style="text-align: center;"><?= $row['SecondScore'] !== null ? $row['SecondScore'] . '%' : '-' ?></td>
+                            <td style="font-size: 0.9em;"><?= htmlspecialchars($row['SecondAssessor'] ?? '-') ?></td>
                             <td style="text-align: center; font-weight: bold;">
                                 <?= $row['AverageScore'] !== null ? number_format($row['AverageScore'], 1) . '%' : '-' ?>
                             </td>
@@ -46,7 +50,7 @@
                         </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="6" style="text-align: center;">No assessment records found.</td></tr>
+                    <tr><td colspan="8" style="text-align: center;">No assessment records found.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

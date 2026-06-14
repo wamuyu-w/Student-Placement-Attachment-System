@@ -4,9 +4,21 @@ use App\Core\Controller;
 use App\Core\Helpers;
 use App\Core\Mailer;
 
+/**
+ * Class ApplicationController
+ * 
+ * Handles all aspects of student attachment and job opportunity applications.
+ * Facilitates the workflows for students applying to roles/sessions, 
+ * host organizations reviewing applications, and administrators managing placements.
+ */
 class ApplicationController extends Controller {
 
-    // Admin dashboard view for managing applications
+    /**
+     * Renders the administrative dashboard for managing applications.
+     * Displays both job-specific and generic program applications.
+     * 
+     * @return void
+     */
     public function adminIndex() {
         $this->requireAuth('admin');
         $appModel = $this->model('Application');
@@ -21,7 +33,13 @@ class ApplicationController extends Controller {
         $this->view('admin/applications', $data);
     }
 
-    // Handles admin updates to program application status, including approvals and rejections
+    /**
+     * Processes administrative updates to program application statuses (Approval or Rejection).
+     * If approved, dynamically creates an active attachment record and emails 
+     * both the student and the host organization.
+     * 
+     * @return void
+     */
     public function updateProgramStatus() {
         // the admin will be required in this session
         $this->requireAuth('admin');
@@ -98,7 +116,11 @@ class ApplicationController extends Controller {
 
 
 
-    // Host organization view of its received applications
+    /**
+     * Renders the host organization's view of incoming job applications.
+     * 
+     * @return void
+     */
     public function hostIndex() {
         $this->requireAuth('host_org');
         $appModel = $this->model('Application');
@@ -112,7 +134,12 @@ class ApplicationController extends Controller {
         $this->view('host/applications', $data);
     }
 
-    // Host updates job application status (approve/reject) via AJAX
+    /**
+     * Processes a Host Organization's decision (Approve/Reject) on a specific job application.
+     * Operates via asynchronous AJAX requests.
+     * 
+     * @return void JSON response
+     */
     public function updateJobStatusHost() {
         $this->requireAuth('host_org');
         
@@ -142,7 +169,12 @@ class ApplicationController extends Controller {
         }
     }
 
-    // Student view of their applications and status overview
+    /**
+     * Renders the student's dashboard for tracking their applications.
+     * Includes application history, pending/approved status flags, and placement registration forms.
+     * 
+     * @return void
+     */
     public function studentIndex() {
         $this->requireActiveStudent();
         $appModel = $this->model('Application');
@@ -181,7 +213,12 @@ class ApplicationController extends Controller {
         $this->view('student/applications', $data);
     }
 
-    // Student initiates a placement session application with validation
+    /**
+     * Processes a student's submission of a self-sourced placement session application.
+     * Validates financial clearance declarations and attachment duration limits (45 to 90 days).
+     * 
+     * @return void
+     */
     public function applySession() {
         $this->requireActiveStudent();
         
@@ -230,7 +267,11 @@ class ApplicationController extends Controller {
         }
     }
 
-    // Student registers a placement after approval
+    /**
+     * Processes the final registration of an approved placement by a student.
+     * 
+     * @return void
+     */
     public function registerPlacement() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

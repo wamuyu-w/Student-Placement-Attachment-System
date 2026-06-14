@@ -1,17 +1,30 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-
+/**
+ * Class Report
+ * 
+ * Aggregates data for various system reports across all user roles (Admin, Staff, Host, Student).
+ * Also manages the submission and status tracking of students' final attachment reports.
+ */
 class Report {
     private $db;
     private $conn;
 
+    /**
+     * Initializes the database connection and ensures the final report schema exists.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
         $this->ensureTablesExist();
     }
 
+    /**
+     * Internal migration method. Ensures the 'finalreport' table is present in the database.
+     * 
+     * @return void
+     */
     private function ensureTablesExist() {
         $check = $this->conn->query("SHOW TABLES LIKE 'finalreport'");
         if ($check->num_rows == 0) {
@@ -27,7 +40,13 @@ class Report {
         }
     }
 
-    // Admin Reports
+    // --- Admin Reports ---
+
+    /**
+     * Retrieves the count of ongoing/completed placements grouped by Faculty.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getPlacementStats() {
         // Placements by Faculty
         $sql = "SELECT s.Faculty, COUNT(*) as count 
@@ -38,6 +57,11 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Retrieves the top 10 host organizations based on the number of students attached.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getHostStats() {
         $sql = "SELECT ho.OrganizationName, COUNT(a.AttachmentID) as student_count
                 FROM hostorganization ho
@@ -48,6 +72,12 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Retrieves a chronological schedule of pending assessments for active attachments.
+     * Includes details of the student, allocated lecturer, and host organization.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAssessmentSchedule() {
         $sql = "SELECT 
                     s.FirstName, s.LastName, u.Username as AdmNumber,
@@ -66,6 +96,11 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Calculates the supervisory load (number of assigned students) per lecturer.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getSupervisorStats() {
         $sql = "SELECT l.Name, l.Department, COUNT(sup.AttachmentID) as student_count
                 FROM lecturer l
@@ -75,6 +110,12 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Fetches high-level system metrics including total final reports, cleared students,
+     * and a breakdown of job applications by status.
+     * 
+     * @return array Associative array of statistics
+     */
     public function getSystemStats() {
         $stats = [];
         // Final Reports
@@ -89,7 +130,15 @@ class Report {
         return $stats;
     }
 
-    // Staff Reports
+    // --- Staff Reports ---
+
+    /**
+     * Retrieves placement statistics for students currently supervised by a specific lecturer.
+     * Includes aggregate data like logbook counts and average assessment scores.
+     * 
+     * @param int $lecturerId
+     * @return \mysqli_result|false Result set
+     */
     public function getSupervisedStats($lecturerId) {
         // Students supervised by this lecturer
         $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, a.AttachmentStatus, a.AttachmentID,
@@ -105,6 +154,12 @@ class Report {
         return $stmt->get_result();
     }
 
+    /**
+     * Fetches all assessment grades previously awarded by a specific lecturer.
+     * 
+     * @param int $lecturerId
+     * @return \mysqli_result|false Result set
+     */
     public function getLecturerGrades($lecturerId) {
         $sql = "SELECT s.FirstName, s.LastName, u.Username as AdmNumber,
                        ass.AssessmentType, ass.Marks, ass.AssessmentDate,
@@ -122,7 +177,14 @@ class Report {
         return $stmt->get_result();
     }
 
-    // Host Reports
+    // --- Host Reports ---
+
+    /**
+     * Retrieves statistics on students attached to a specific host organization.
+     * 
+     * @param int $hostId
+     * @return \mysqli_result|false Result set
+     */
     public function getHostStudentStats($hostId) {
         $sql = "SELECT s.StudentID, s.FirstName, s.LastName, s.Course, a.StartDate, a.EndDate, a.AttachmentID,
                        (SELECT COUNT(*) FROM logbook WHERE AttachmentID = a.AttachmentID) as log_count
@@ -135,21 +197,47 @@ class Report {
         return $stmt->get_result();
     }
 
-    public function getHostPerformanceReport($hostId) {
+    /**
+     * Compiles a performance report based on host supervisor logbook comments.
+     * Can optionally filter by a specific student.
+     * 
+     * @param int $hostId
+     * @param int|null $studentId
+     * @return \mysqli_result|false Result set
+     */
+    public function getHostPerformanceReport($hostId, $studentId = null) {
         // Condensed logbook: Weekly Host comments only
         $sql = "SELECT s.FirstName, s.LastName, l.WeekNumber, l.HostSupervisorComments, l.StartDate
                 FROM logbook l
                 JOIN attachment a ON l.AttachmentID = a.AttachmentID
                 JOIN student s ON a.StudentID = s.StudentID
-                WHERE a.HostOrgID = ? AND l.HostSupervisorComments IS NOT NULL AND l.HostSupervisorComments != ''
-                ORDER BY s.StudentID, l.WeekNumber";
+                WHERE a.HostOrgID = ? AND l.HostSupervisorComments IS NOT NULL AND l.HostSupervisorComments != ''";
+                
+        if ($studentId) {
+            $sql .= " AND s.StudentID = ?";
+        }
+        
+        $sql .= " ORDER BY s.StudentID, l.WeekNumber";
+        
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $hostId);
+        if ($studentId) {
+            $stmt->bind_param("ii", $hostId, $studentId);
+        } else {
+            $stmt->bind_param("i", $hostId);
+        }
         $stmt->execute();
         return $stmt->get_result();
     }
 
-    // Student Reports
+    // --- Student Reports ---
+
+    /**
+     * Fetches a complete history of all attachment sessions for a student.
+     * Includes logbook counts, assessment counts, and final report statuses.
+     * 
+     * @param int $studentId
+     * @return array Array of associative arrays representing session data
+     */
     public function getStudentProgress($studentId) {
         // FIX: Return ALL attachment sessions to handle dual-attachment history correctly
         $sql = "SELECT a.AttachmentID, a.AttachmentStatus, a.StartDate, a.EndDate, a.AssessmentCode,
@@ -175,6 +263,14 @@ class Report {
         return $sessions;
     }
 
+    /**
+     * Handles the file upload process for a student's final attachment report.
+     * Validates MIME type (PDF only), moves the file securely, and records the submission in the DB.
+     * 
+     * @param int $studentId
+     * @param array $file $_FILES array corresponding to the uploaded file
+     * @return array Success status and optional error message
+     */
     public function uploadFinalReport($studentId, $file) {
         // First get attachment ID (active one)
         $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus IN ('Ongoing', 'Active')");
@@ -223,12 +319,54 @@ class Report {
         return ['success' => false, 'message' => 'Upload failed to save file to server directory.'];
     }
 
+    /**
+     * Updates the status of a final report.
+     * If marked as 'Approved', automatically cascades updates to mark the attachment 
+     * as 'Completed' and the student's eligibility status as 'Cleared'.
+     * 
+     * @param int $attachmentId
+     * @param string $status
+     * @return bool True on success
+     */
+    public function updateFinalReportStatus($attachmentId, $status) {
+        $this->conn->begin_transaction();
+        try {
+            $stmt = $this->conn->prepare("UPDATE finalreport SET Status = ? WHERE AttachmentID = ?");
+            $stmt->bind_param("si", $status, $attachmentId);
+            $stmt->execute();
+            
+            if ($status === 'Approved') {
+                $stmt2 = $this->conn->prepare("UPDATE attachment SET AttachmentStatus = 'Completed', ClearanceStatus = 'Cleared' WHERE AttachmentID = ?");
+                $stmt2->bind_param("i", $attachmentId);
+                $stmt2->execute();
+                
+                $stmt3 = $this->conn->prepare("UPDATE student s JOIN attachment a ON s.StudentID = a.StudentID SET s.EligibilityStatus = 'Cleared' WHERE a.AttachmentID = ?");
+                $stmt3->bind_param("i", $attachmentId);
+                $stmt3->execute();
+            }
+            
+            $this->conn->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->conn->rollback();
+            return false;
+        }
+    }
+
+    /**
+     * Generates a comprehensive summary of assessments across all completed/ongoing attachments.
+     * Includes scores and assessor names for both first and final assessments.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAssessmentSummary() {
         $sql = "SELECT 
                     s.FirstName, s.LastName, u.Username as AdmNumber,
                     a.AttachmentStatus,
                     (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'First Assessment' AND Status = 'Completed' LIMIT 1) as FirstScore,
+                    (SELECT l.Name FROM assessment ass JOIN lecturer l ON ass.LecturerID = l.LecturerID WHERE ass.AttachmentID = a.AttachmentID AND ass.AssessmentType = 'First Assessment' AND ass.Status = 'Completed' LIMIT 1) as FirstAssessor,
                     (SELECT Marks FROM assessment WHERE AttachmentID = a.AttachmentID AND AssessmentType = 'Final Assessment' AND Status = 'Completed' LIMIT 1) as SecondScore,
+                    (SELECT l.Name FROM assessment ass JOIN lecturer l ON ass.LecturerID = l.LecturerID WHERE ass.AttachmentID = a.AttachmentID AND ass.AssessmentType = 'Final Assessment' AND ass.Status = 'Completed' LIMIT 1) as SecondAssessor,
                     (SELECT AVG(Marks) FROM assessment WHERE AttachmentID = a.AttachmentID AND Status = 'Completed') as AverageScore
                 FROM attachment a
                 JOIN student s ON a.StudentID = s.StudentID
@@ -238,6 +376,12 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Calculates overall system effectiveness metrics, such as total placement ratios
+     * and monthly placement volume trends.
+     * 
+     * @return array Associative array of statistics
+     */
     public function getSystemEffectiveness() {
         $stats = [];
         $stats['totalStudents'] = $this->conn->query("SELECT COUNT(*) FROM student")->fetch_row()[0];
@@ -251,6 +395,12 @@ class Report {
         return $stats;
     }
 
+    /**
+     * Evaluates lecturer assessment behavior by counting total students assessed 
+     * and the average mark given by each lecturer.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getLecturerAssessedStats() {
         $sql = "SELECT l.Name, COUNT(DISTINCT a.AttachmentID) as students_assessed, AVG(a.Marks) as avg_marks_given
                 FROM lecturer l
@@ -261,6 +411,13 @@ class Report {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Compiles a massive administrative report summarizing the entire lifecycle 
+     * of all placements. Calculates high-level averages and returns a detailed 
+     * row per student with completion metrics.
+     * 
+     * @return array Associative array containing summary keys and a 'students' result set
+     */
     public function getPlacementCompletions() {
         $data = [];
 
@@ -298,6 +455,13 @@ class Report {
         return $data;
     }
 
+    /**
+     * Generates an extensive impact report analyzing system-wide performance.
+     * Includes KPIs, faculty impact ratios, top performing host orgs, grade distribution buckets, 
+     * and logbook engagement levels.
+     * 
+     * @return array Complex associative array of various metric datasets
+     */
     public function getPlacementImpact() {
         $data = [];
 

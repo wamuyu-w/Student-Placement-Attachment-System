@@ -240,6 +240,46 @@ class Mailer {
         return self::send($email, $subject, $body);
     }
 
+    /**
+     * Notify a lecturer about an assigned student.
+     */
+    public static function notifyLecturerAssignedStudent(string $lecturerEmail, string $lecturerName, string $studentName, string $studentRegNo, string $hostOrg): bool {
+        $subject = "New Student Supervision Assignment";
+        $body = "
+            <p>Dear <strong>" . htmlspecialchars($lecturerName) . "</strong>,</p>
+            <p>You have been assigned to supervise a new student for their industrial attachment.</p>
+            <p><strong>Student Details:</strong></p>
+            <ul>
+                <li><strong>Name:</strong> " . htmlspecialchars($studentName) . "</li>
+                <li><strong>Registration No:</strong> " . htmlspecialchars($studentRegNo) . "</li>
+                <li><strong>Host Organization:</strong> " . htmlspecialchars($hostOrg) . "</li>
+            </ul>
+            <p>Please log into the portal to review their logbook and assessment schedule.</p>
+            <p>Best regards,<br>CUEA Industrial Attachment Department</p>
+        ";
+        return self::send($lecturerEmail, $subject, $body);
+    }
+
+    /**
+     * Notify a user (student/host/lecturer) about an assessment within 24 hours.
+     */
+    public static function notifyAssessmentReminder(string $email, string $recipientName, string $studentName, string $assessmentDate, string $assessmentType, string $role): bool {
+        $subject = "Reminder: Upcoming Assessment in Less Than 24 Hours";
+        $body = "
+            <p>Dear <strong>" . htmlspecialchars($recipientName) . "</strong>,</p>
+            <p>This is a reminder that an attachment assessment is scheduled in less than 24 hours.</p>
+            <ul>
+                <li><strong>Student:</strong> " . htmlspecialchars($studentName) . "</li>
+                <li><strong>Assessment Type:</strong> " . htmlspecialchars($assessmentType) . "</li>
+                <li><strong>Scheduled Date:</strong> " . htmlspecialchars($assessmentDate) . "</li>
+                <li><strong>Your Role:</strong> " . htmlspecialchars(ucfirst($role)) . "</li>
+            </ul>
+            <p>Please ensure all necessary preparations are made prior to this date.</p>
+            <p>Best regards,<br>CUEA Industrial Attachment Department</p>
+        ";
+        return self::send($email, $subject, $body);
+    }
+
     // ─── Private Helpers ─────────────────────────────────────────────────────
 
     private static function wrapHtml(string $title, string $body): string {

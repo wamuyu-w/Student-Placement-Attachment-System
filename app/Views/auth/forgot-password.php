@@ -58,5 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(function() { toast.style.opacity = '1'; });
         setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 400); }, 3000);
     }
+
+    var form = document.querySelector('.login-form');
+    var btn = form.querySelector('.sign-in-button');
+    if (form && btn) {
+        form.addEventListener('submit', function() {
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+        });
+    }
 });
 </script>

@@ -2,9 +2,20 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-// StaffController handles all staff-related actions such as dashboard, student management, and supervision.
+/**
+ * Class StaffController
+ * 
+ * Handles staff-specific endpoints including rendering the academic supervisor's dashboard, 
+ * viewing their assigned students, and managing their supervision tasks.
+ */
 class StaffController extends Controller {
     
+    /**
+     * Renders the academic supervisor's main dashboard.
+     * Fetches top-level statistics and recently submitted logbooks by their students.
+     * 
+     * @return void
+     */
     public function dashboard() {
         $this->requireAuth('staff');
         
@@ -22,6 +33,11 @@ class StaffController extends Controller {
         $this->view('staff/dashboard', $data);
     }
 
+    /**
+     * Renders the staff view of all students assigned to them for supervision.
+     * 
+     * @return void
+     */
     public function viewStudents() {
         $this->requireAuth('staff');
         $staffModel = $this->model('Staff');
@@ -34,6 +50,12 @@ class StaffController extends Controller {
         $this->view('staff/students', $data);
     }
 
+    /**
+     * Renders the staff supervision management view.
+     * Allows the lecturer to oversee and manage their assigned cohort of students.
+     * 
+     * @return void
+     */
     public function supervision() {
         $this->requireAuth('staff');
         $staffModel = $this->model('Staff');

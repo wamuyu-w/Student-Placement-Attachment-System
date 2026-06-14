@@ -43,6 +43,48 @@
         <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success" style="margin-bottom: 20px;"><?= htmlspecialchars($_GET['success']) ?></div>
         <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger" style="margin-bottom: 20px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px;"><?= htmlspecialchars($_GET['error']) ?></div>
+        <?php endif; ?>
+
+        <!-- Final Report Verification -->
+        <?php if (!empty($progress['ReportPath'])): ?>
+            <div class="card mb-4" style="border-left: 4px solid #8b5cf6; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; font-size: 1.1rem; color: #1f2937;">Final Report Verification</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 15px;">
+                    <div style="flex-grow: 1;">
+                        <span style="display: block; font-size: 0.85rem; color: #6b7280;">Status</span>
+                        <span class="status-badge status-<?= strtolower($progress['ReportStatus'] ?? 'pending') ?>">
+                            <?= htmlspecialchars($progress['ReportStatus'] ?? 'Pending') ?>
+                        </span>
+                        <div style="margin-top: 8px;">
+                            <a href="<?= Helpers::baseUrl('/uploads/reports/' . htmlspecialchars($progress['ReportPath'])) ?>" target="_blank" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">
+                                <i class="fas fa-file-pdf"></i> Download & View Report
+                            </a>
+                        </div>
+                    </div>
+                    <?php if (($progress['ReportStatus'] ?? 'Pending') !== 'Approved'): ?>
+                        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center;">
+                            <form action="<?= Helpers::baseUrl('/host/report/verify') ?>" method="POST" style="margin: 0;">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                                <input type="hidden" name="attachment_id" value="<?= $progress['AttachmentID'] ?>">
+                                <input type="hidden" name="student_id" value="<?= $student['StudentID'] ?>">
+                                
+                                <button type="submit" name="action" value="Approve" class="btn btn-primary" style="background-color: #10b981; border: none; padding: 8px 16px;">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                
+                                <?php if (($progress['ReportStatus'] ?? 'Pending') !== 'Rejected'): ?>
+                                    <button type="submit" name="action" value="Reject" class="btn btn-primary" style="background-color: #ef4444; border: none; padding: 8px 16px; margin-left: 10px;">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- Logbook Summary -->
         <div class="card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">

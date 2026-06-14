@@ -1,17 +1,30 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// class user is a base class for all user types (students, supervisors, admins) to handle common user-related database operations, such as authentication, fetching user details, 
-//and any other user related functions in the future
+/**
+ * Class User
+ * 
+ * Base model handling authentication, password management, and unified profile
+ * retrieval across all system user roles (Students, Lecturers, Admins, Hosts).
+ */
 class User {
     private $db;
     private $conn;
 
+    /**
+     * Initializes the database connection.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    /**
+     * Locates a user record based on their username.
+     * 
+     * @param string $username
+     * @return array|null Associative array of user data or null
+     */
     public function findUserByUsername($username) {
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE Username = ?");
         $stmt->bind_param("s", $username);
@@ -19,6 +32,15 @@ class User {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Verifies a user's password. Automatically migrates legacy plain-text passwords
+     * to secure Bcrypt hashes upon successful login.
+     * 
+     * @param int $userId
+     * @param string $inputPassword The password provided during login
+     * @param string $storedPassword The password currently stored in the DB (hashed or plain)
+     * @return bool True if password is correct
+     */
     public function verifyAndMigratePassword($userId, $inputPassword, $storedPassword) {
         // Check if password is already hashed (Bcrypt starts with $2y$ or $2a$ or $2b$ and is 60 chars)
         if (preg_match('/^\$2[ayb]\$.{56}$/', $storedPassword)) {
@@ -37,6 +59,12 @@ class User {
         }
     }
 
+    /**
+     * Retrieves the specific profile data for a student user.
+     * 
+     * @param int $userId The underlying users.UserID
+     * @return array|null
+     */
     public function getStudentProfile($userId) {
         $stmt = $this->conn->prepare("SELECT * FROM student WHERE UserID = ?");
         $stmt->bind_param("i", $userId);
@@ -44,6 +72,12 @@ class User {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Retrieves the specific profile data for a staff member (Lecturer/Admin).
+     * 
+     * @param int $userId
+     * @return array|null
+     */
     public function getStaffProfile($userId) {
         // Staff/Lecturer/Admin - The student_id/Staff_Number is used for login/extracting details
         $stmt = $this->conn->prepare("SELECT * FROM lecturer WHERE UserID = ?");
@@ -52,6 +86,12 @@ class User {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Retrieves the specific profile data for a host organization.
+     * 
+     * @param int $userId
+     * @return array|null
+     */
     public function getHostProfile($userId) {
         // Host Organization - identified as H001/H002/H003
         $stmt = $this->conn->prepare("SELECT * FROM hostorganization WHERE UserID = ?");
@@ -60,6 +100,13 @@ class User {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Searches across all profile tables (Student, Lecturer, HostOrg) to find 
+     * a user by their email address. Used primarily for password resets.
+     * 
+     * @param string $email
+     * @return array|null Array containing UserID and Name, or null if not found
+     */
     public function findUserByEmail($email) {
         // --- Student ---
         try {
@@ -110,6 +157,13 @@ class User {
         return null;
     }
 
+    /**
+     * Updates a user's password securely by hashing it first.
+     * 
+     * @param int $userId
+     * @param string $newPassword Plain text new password
+     * @return bool True on success
+     */
     public function updatePassword($userId, $newPassword) {
         $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $this->conn->prepare("UPDATE users SET Password = ? WHERE UserID = ?");
@@ -117,6 +171,13 @@ class User {
         return $stmt->execute();
     }
 
+    /**
+     * Strict password verification against the database hash.
+     * 
+     * @param int $userId
+     * @param string $password Plain text password to verify
+     * @return bool True if valid
+     */
     public function verifyPassword($userId, $password) {
         $stmt = $this->conn->prepare("SELECT Password FROM users WHERE UserID = ?");
         if (!$stmt) return false;
@@ -127,12 +188,26 @@ class User {
         return $user ? password_verify($password, $user['Password']) : false;
     }
 
+    /**
+     * Stores a generated password reset token and its expiration timestamp.
+     * 
+     * @param int $userId
+     * @param string $token
+     * @param string $expiry DATETIME string format
+     * @return bool
+     */
     public function savePasswordResetToken($userId, $token, $expiry) {
         $stmt = $this->conn->prepare("UPDATE users SET ResetToken = ?, ResetTokenExpiry = ? WHERE UserID = ?");
         $stmt->bind_param("ssi", $token, $expiry, $userId);
         return $stmt->execute();
     }
 
+    /**
+     * Locates a user based on a valid reset token.
+     * 
+     * @param string $token
+     * @return array|null
+     */
     public function findUserByResetToken($token) {
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE ResetToken = ?");
         $stmt->bind_param("s", $token);
@@ -140,6 +215,12 @@ class User {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Clears the password reset token fields to invalidate the token after use.
+     * 
+     * @param int $userId
+     * @return bool
+     */
     public function clearPasswordResetToken($userId) {
         $stmt = $this->conn->prepare("UPDATE users SET ResetToken = NULL, ResetTokenExpiry = NULL WHERE UserID = ?");
         $stmt->bind_param("i", $userId);

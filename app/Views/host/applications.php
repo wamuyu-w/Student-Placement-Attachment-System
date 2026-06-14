@@ -125,6 +125,11 @@
 
         fetch('<?= Helpers::baseUrl('/host/applications/update-status') ?>', {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
             body: formData
         })
         .then(response => response.json())

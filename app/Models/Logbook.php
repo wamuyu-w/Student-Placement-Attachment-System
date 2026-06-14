@@ -1,12 +1,22 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
+/**
+ * Class Logbook
+ * 
+ * Handles the storage, retrieval, and schema management for student logbook entries.
+ * Manages weekly submissions by students and the review workflows for both host 
+ * organizations and academic supervisors.
+ */
 class Logbook {
     private $db;
     private $conn;
 
-    // Initialize database connection and ensure tables exist
-public function __construct() {
+    /**
+     * Initializes the database connection and ensures the logbook schema 
+     * is up-to-date upon instantiation.
+     */
+    public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
         $this->ensureTablesExist();
@@ -14,8 +24,13 @@ public function __construct() {
 
     //there should be a function to ensure that the logbook is opened only to students whose attachment is active
     
-    // Ensure the logbook table exists and has required columns, creating or migrating as needed
-private function ensureTablesExist() {
+    /**
+     * Internal migration method.
+     * Ensures the logbook table exists and applies required schema changes (e.g., adding WeekNumber).
+     * 
+     * @return void
+     */
+    private function ensureTablesExist() {
         $check = $this->conn->query("SHOW TABLES LIKE 'logbook'");
         if ($check->num_rows == 0) {
             $sql = "CREATE TABLE logbook (
@@ -59,9 +74,14 @@ private function ensureTablesExist() {
         }
     }
 
-    // Student / Print: Get entries (returns array for compatibility with print view and foreach loops)
-    // Retrieve logbook entries for a specific student, ensuring the latest attachment is used
-public function getEntriesByStudent($studentId) {
+    /**
+     * Retrieves all logbook entries for a specific student's most recent active attachment.
+     * Returned as an array to support view loops and PDF generation.
+     * 
+     * @param int $studentId
+     * @return array Array of associative arrays representing logbook rows
+     */
+    public function getEntriesByStudent($studentId) {
         // Ensure SubmittedAt column exists for accurate date tracking
         $this->conn->query("ALTER TABLE logbook ADD COLUMN IF NOT EXISTS SubmittedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
@@ -86,9 +106,15 @@ public function getEntriesByStudent($studentId) {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    // Student: Create entry
-    // Create a new logbook entry for a student, enforcing week limits and uniqueness
-public function createEntry($studentId, $data) {
+    /**
+     * Submits a new logbook entry for a student.
+     * Enforces business rules: prevents duplicate weeks and caps total duration at 12 weeks.
+     * 
+     * @param int $studentId
+     * @param array $data Form data including week_number, start_date, end_date, description
+     * @return array Success status and optional error message
+     */
+    public function createEntry($studentId, $data) {
         // Get AttachmentID
         $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
         $stmt->bind_param("i", $studentId);
@@ -125,9 +151,14 @@ public function createEntry($studentId, $data) {
         return ['success' => false, 'message' => $this->conn->error];
     }
 
-    // Staff: Get pending logbooks
-    // Retrieve pending logbook entries for a staff member
-public function getPendingLogbooksForStaff($staffId) {
+    /**
+     * Retrieves pending logbook entries that require review by a specific academic supervisor.
+     * 
+     * @param int $staffId Lecturer ID
+     * @return \mysqli_result|false Result set of pending logbooks
+     * @throws \Exception on database query error
+     */
+    public function getPendingLogbooksForStaff($staffId) {
         $sql = "SELECT l.LogbookID, l.WeekNumber, l.StartDate, l.EndDate, l.Activities as Description, l.Status, s.FirstName, s.LastName, s.StudentID
                 FROM logbook l
                 JOIN attachment a ON l.AttachmentID = a.AttachmentID
@@ -144,9 +175,14 @@ public function getPendingLogbooksForStaff($staffId) {
         return $stmt->get_result();
     }
 
-    // Host: Get pending logbooks
-    // Retrieve pending logbook entries for a host organization
-public function getPendingLogbooksForHost($hostId) {
+    /**
+     * Retrieves pending logbook entries that require review by a specific host organization.
+     * 
+     * @param int $hostId Host Organization ID
+     * @return \mysqli_result|false Result set of pending logbooks
+     * @throws \Exception on database query error
+     */
+    public function getPendingLogbooksForHost($hostId) {
         $sql = "SELECT l.LogbookID, l.WeekNumber, l.StartDate, l.EndDate, l.Activities as Description, l.Status, s.FirstName, s.LastName, s.StudentID
                 FROM logbook l
                 JOIN attachment a ON l.AttachmentID = a.AttachmentID
@@ -162,9 +198,17 @@ public function getPendingLogbooksForHost($hostId) {
         return $stmt->get_result();
     }
 
-    // Shared: Approve entry
-    // Review and update the status of a logbook entry, optionally adding comments based on user type
-public function reviewEntry($logbookId, $status, $comment, $userType) {
+    /**
+     * Reviews and updates the status of a logbook entry (e.g., 'Approved', 'Rejected').
+     * Appends comments dynamically based on whether the reviewer is staff or a host org.
+     * 
+     * @param int $logbookId
+     * @param string $status
+     * @param string $comment Optional feedback
+     * @param string $userType 'staff' or 'host_org'
+     * @return bool True on success
+     */
+    public function reviewEntry($logbookId, $status, $comment, $userType) {
         $sql = "UPDATE logbook SET Status = ?";
         $params = [];
         $params[] = &$status;
@@ -193,8 +237,14 @@ public function reviewEntry($logbookId, $status, $comment, $userType) {
         return $stmt->execute();
     }
 
-    // Update the host supervisor's comment for a specific logbook entry
-public function updateHostComment($logbookId, $comment) {
+    /**
+     * Updates the host supervisor's comment for a specific logbook entry.
+     * 
+     * @param int $logbookId
+     * @param string $comment
+     * @return bool True on success
+     */
+    public function updateHostComment($logbookId, $comment) {
         $stmt = $this->conn->prepare("UPDATE logbook SET HostSupervisorComments = ? WHERE LogbookID = ?");
         $stmt->bind_param("si", $comment, $logbookId);
         return $stmt->execute();

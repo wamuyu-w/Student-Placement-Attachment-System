@@ -1,20 +1,41 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// Student model for handling student-related database operations
+/**
+ * Class Student
+ * 
+ * Model for handling database operations related to Students.
+ * Manages registration, profile updates, clearance processes, and fetching dashboards.
+ */
 class Student {
     private $db;
     private $conn;
 
+    /**
+     * Initializes the database connection for student operations.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    /**
+     * Retrieves all registered students.
+     * Joined with the `users` table to fetch the Admission Number (Username).
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAll() {
         // Join with users to get Admission Number (Username)
         return $this->conn->query("SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.Faculty, s.Department, s.YearOfStudy, s.Email, s.EligibilityStatus, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID ORDER BY s.StudentID DESC");
     }
+
+    /**
+     * Retrieves a specific student's full details by ID.
+     * 
+     * @param int $studentId
+     * @return array|null Associative array of student data or null if not found
+     */
     public function getById($studentId) {
         $stmt = $this->conn->prepare("SELECT s.*, u.Username as AdmissionNumber FROM student s JOIN users u ON s.UserID = u.UserID WHERE s.StudentID = ?");
         $stmt->bind_param("i", $studentId);
@@ -22,6 +43,12 @@ class Student {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Checks if a given email is already associated with an existing student.
+     * 
+     * @param string $email
+     * @return bool True if the email is taken
+     */
     public function emailExists($email) {
         $stmt = $this->conn->prepare("SELECT StudentID FROM student WHERE Email = ?");
         $stmt->bind_param("s", $email);
@@ -30,6 +57,13 @@ class Student {
         return $result->num_rows > 0;
     }
 
+    /**
+     * Incomplete/deprecated method. Handles legacy student registration logic.
+     * 
+     * @param array $userData
+     * @param array $studentData
+     * @return bool
+     */
     public function register($userData, $studentData) {
         $this->conn->begin_transaction();
         try {
@@ -50,6 +84,14 @@ class Student {
         }
     }
 
+    /**
+     * Creates a new student record and associated user account.
+     * Typically used by Administrators for manual or bulk addition.
+     * 
+     * @param array $data Contains admNumber, firstName, lastName, etc.
+     * @return bool True on successful creation, false if skipped (in bulk)
+     * @throws \Exception If duplicate or DB error occurs during single creation
+     */
     public function createFromAdmin($data) {
         $this->conn->begin_transaction();
         try {
@@ -88,6 +130,13 @@ class Student {
         }
     }
 
+    /**
+     * Clears a student after successful completion of their attachment.
+     * Updates student eligibility, attachment status, and deactivates their user account.
+     * 
+     * @param int $id The student ID
+     * @return array Success status and optional error message
+     */
     public function clearStudent($id) {
         $this->conn->begin_transaction();
         try {
@@ -111,18 +160,39 @@ class Student {
         }
     }
 
+    /**
+     * Updates a student's basic contact information.
+     * 
+     * @param int $studentId
+     * @param array $data Form data
+     * @return bool True on success
+     */
     public function updateProfile($studentId, $data) {
         $stmt = $this->conn->prepare("UPDATE student SET PhoneNumber = ?, Email = ? WHERE StudentID = ?");
         $stmt->bind_param("ssi", $data['phone'], $data['email'], $studentId);
         return $stmt->execute();
     }
 
+    /**
+     * Completes a student's profile during their first login.
+     * Transitions their EligibilityStatus to 'Eligible'.
+     * 
+     * @param int $studentId
+     * @param array $data Form data
+     * @return bool True on success
+     */
     public function completeProfile($studentId, $data) {
         $stmt = $this->conn->prepare("UPDATE student SET FirstName=?, LastName=?, Email=?, PhoneNumber=?, Course=?, Faculty=?, YearOfStudy=?, EligibilityStatus='Eligible' WHERE StudentID=?");
         $stmt->bind_param("ssssssii", $data['firstName'], $data['lastName'], $data['email'], $data['phone'], $data['course'], $data['faculty'], $data['yearOfStudy'], $studentId);
         return $stmt->execute();
     }
 
+    /**
+     * Retrieves aggregated statistics for a student's dashboard.
+     * 
+     * @param int $studentId
+     * @return array Associative array (myApplications, activePlacement, availableOpportunities, pendingTasks)
+     */
     public function getDashboardStats($studentId) {
         $stats = [];
 
@@ -156,6 +226,13 @@ class Student {
         return $stats;
     }
 
+    /**
+     * Compiles a chronological timeline of a student's recent activities.
+     * Combines job applications, placement updates, and supervisor assignments.
+     * 
+     * @param int $studentId
+     * @return array Array of formatted activity entries
+     */
     public function getRecentActivities($studentId) {
         $activities = [];
 
@@ -215,6 +292,12 @@ class Student {
         return array_slice($activities, 0, 4);
     }
 
+    /**
+     * Retrieves the academic supervisors assigned to a student's active attachment.
+     * 
+     * @param int $studentId
+     * @return array Array of supervisor details
+     */
     public function getSupervisors($studentId) {
         $stmt = $this->conn->prepare("
             SELECT l.Name, l.Department, l.Faculty, l.StaffNumber, a.StartDate as AssignedDate
@@ -233,6 +316,12 @@ class Student {
         return $supervisors;
     }
 
+    /**
+     * Retrieves all assessments (Scheduled and Completed) linked to a student's active attachment.
+     * 
+     * @param int $studentId
+     * @return array Array of assessment details
+     */
     public function getAssessments($studentId) {
         $stmt = $this->conn->prepare("
             SELECT ass.*, l.Name as LecturerName

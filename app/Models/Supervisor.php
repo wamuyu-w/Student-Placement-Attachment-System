@@ -1,16 +1,29 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// supervisor model to handle supervisor related database operations, such as fetching supervisor details for a student, and any other supervisor related functions in the future
+/**
+ * Class Supervisor
+ * 
+ * Manages database operations specific to academic supervisors (lecturers),
+ * including creation, bulk imports, and student supervision assignments.
+ */
 class Supervisor {
     private $db;
     private $conn;
 
+    /**
+     * Initializes the database connection for supervisor operations.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    /**
+     * Retrieves a list of all lecturers designated as 'Supervisors'.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAllSupervisors() {
         $sql = "SELECT l.Name, l.Department, l.Faculty, u.Status 
                 FROM lecturer l 
@@ -19,6 +32,12 @@ class Supervisor {
         return $this->conn->query($sql);
     }
 
+    /**
+     * Checks if a staff number already exists in the lecturer table.
+     * 
+     * @param string $staffNumber
+     * @return bool True if exists
+     */
     public function staffNumberExists($staffNumber) {
         $stmt = $this->conn->prepare("SELECT LecturerID FROM lecturer WHERE StaffNumber = ?");
         $stmt->bind_param("s", $staffNumber);
@@ -27,6 +46,13 @@ class Supervisor {
         return $result->num_rows > 0;
     }
 
+    /**
+     * Creates a new supervisor record and an associated user account.
+     * Generates a temporary default password for initial login.
+     * 
+     * @param string $staffNumber
+     * @return array Success status and auto-generated credentials on success
+     */
     public function create($staffNumber) {
         $this->conn->begin_transaction();
         try {
@@ -61,7 +87,13 @@ class Supervisor {
         }
     }
 
-    //get the number of students that need to be assigned for supervision
+    /**
+     * Retrieves a list of active students who require supervision assignment.
+     * Enforces the rule that a second supervisor can only be assigned after 
+     * the first assessment is completed.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getStudentsForAssignment() {
         $sql = "
             SELECT a.AttachmentID, s.FirstName, s.LastName, h.OrganizationName,
@@ -75,14 +107,26 @@ class Supervisor {
         ";
         return $this->conn->query($sql);
     }
+    /**
+     * Retrieves all lecturers eligible to be assigned as supervisors.
+     * Ensures admin users cannot assign themselves.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAssignableLecturers() {
-        // this ensures that the admin can only assign supervisors that are actual lecturers
-        // he or she cannot assign themselves - if they are an admin
         $sql = "SELECT LecturerID, Name FROM lecturer WHERE Role = 'Supervisor'";
         return $this->conn->query($sql);
     }
 
-    //function that assigns lecturers and students
+    /**
+     * Assigns a lecturer to supervise a specific attachment.
+     * Enforces business rules: maximum 2 supervisors, prevents duplicate assignments,
+     * and requires the first assessment to be complete before assigning a second supervisor.
+     * 
+     * @param int $attachmentId
+     * @param int $lecturerId
+     * @return array Success status and optional error message
+     */
     public function assign($attachmentId, $lecturerId) {
         if (empty($attachmentId) || empty($lecturerId)) {
             return ['success' => false, 'message' => 'Missing data'];
@@ -138,6 +182,13 @@ class Supervisor {
             return ['success' => false, 'message' => $errorMsg];
         }
     }
+    /**
+     * Processes a bulk CSV upload to create multiple supervisor accounts simultaneously.
+     * 
+     * @param string $file Path to the uploaded CSV file
+     * @param string $faculty The faculty to assign these supervisors to
+     * @return array Contains 'successCount' and 'errorCount'
+     */
     public function createBulk($file, $faculty) {
         $handle = fopen($file, "r");
         if ($handle === FALSE) return ['successCount' => 0, 'errorCount' => 0];

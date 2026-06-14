@@ -4,9 +4,22 @@ use App\Core\Controller;
 use App\Core\Helpers;
 
 //intialize the class
+/**
+ * Class AdminController
+ * 
+ * Handles all administrative operations in the system, including dashboard statistics,
+ * student management, supervisor assignments, and system-wide overrides.
+ * 
+ * Inherits core functionality from the base Controller class.
+ */
 class AdminController extends Controller {
     
-    //function for loading the admin panel dashboard
+    /**
+     * Loads the main administrator dashboard.
+     * Fetches top-level statistics (pending apps, active placements) and recent activities.
+     * 
+     * @return void
+     */
     public function dashboard() {
         // Ensure the user is authenticated as admin
         $this->requireAuth('admin');
@@ -26,7 +39,12 @@ class AdminController extends Controller {
         $this->view('admin/dashboard', $data);
     }
     
-    //enables the admin to see the list of supervisors/lecturers
+    /**
+     * Renders the supervisor management view.
+     * Fetches all registered supervisors and provides lists of assignable students and lecturers.
+     * 
+     * @return void
+     */
     public function viewSupervisors() {
         $this->requireAuth('admin');
 
@@ -47,8 +65,13 @@ class AdminController extends Controller {
         $this->view('admin/supervisors', $data);
     }
 
-    // admin can add a supervisor to the system
-    //details are updated in the db 
+    /**
+     * Processes the creation of a new supervisor/lecturer account.
+     * Validates the staff number and generates login credentials if successful.
+     * Redirects back to the supervisors view with success/error messages.
+     * 
+     * @return void
+     */
     public function createSupervisor() {
         $this->requireAuth('admin');
 
@@ -83,7 +106,12 @@ class AdminController extends Controller {
         }
     }
 
-    //allows the admin to see the list of students
+    /**
+     * Renders the student management dashboard.
+     * Retrieves a complete list of registered students and their current eligibility status.
+     * 
+     * @return void
+     */
     public function viewStudents() {
         $this->requireAuth('admin');
         $studentModel = $this->model('Student');
@@ -97,6 +125,12 @@ class AdminController extends Controller {
         $this->view('admin/students', $data);
     }
 
+    /**
+     * Processes the manual creation of a single student account by the administrator.
+     * Assigns them a default password and registers them to a specific department/faculty.
+     * 
+     * @return void
+     */
     public function createStudent() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -118,6 +152,12 @@ class AdminController extends Controller {
         }
     }
 
+    /**
+     * Processes the bulk uploading of student records via a CSV file.
+     * Iterates through the CSV rows and registers multiple students to a specified faculty/department.
+     * 
+     * @return void
+     */
     public function bulkUploadStudents() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile']) && $_FILES['csvFile']['error'] === UPLOAD_ERR_OK) {
@@ -165,6 +205,12 @@ class AdminController extends Controller {
         }
     }
 
+    /**
+     * Clears a student globally, marking their EligibilityStatus as 'Cleared' and 
+     * automatically ending any ongoing attachments.
+     * 
+     * @return void
+     */
     public function clearStudent() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -181,9 +227,13 @@ class AdminController extends Controller {
             header("Location: " . Helpers::baseUrl('/admin/students?' . $param));
         }
     }
-// the function viewStudentProgress gets the progress of a student,
-// including their attachment status, report status, assessments,
-// and logbook entries, and passes this data to the view for display
+    /**
+     * Renders the detailed progress view for a specific student.
+     * Displays their current attachment details, logbook entries, host supervisor remarks, 
+     * and formal assessment marks.
+     * 
+     * @return void
+     */
     public function viewStudentProgress() {
         $this->requireAuth('admin');
         $studentId = $_GET['id'] ?? null;
@@ -233,7 +283,12 @@ class AdminController extends Controller {
         ];
         $this->view('admin/student-progress', $data);
     }
-// the function assignSupervisor processes the assignment of a supervisor to a student's attachment, ensuring that no more than 2 supervisors are assigned and that the first assessment is completed before allowing a second supervisor to be assigned 
+    /**
+     * Processes the assignment of an academic supervisor (lecturer) to a student's attachment.
+     * Ensures no more than 2 supervisors are assigned per attachment and queues email notifications.
+     * 
+     * @return void
+     */
     public function assignSupervisor() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -273,7 +328,12 @@ class AdminController extends Controller {
             header("Location: " . Helpers::baseUrl('/admin/supervisors?' . $param));
         }
     }
-// the function bulkUploadSupervisors processes the bulk upload of supervisors from a CSV file, creating user accounts and lecturer records for each valid entry while handling duplicates and errors gracefully, and then redirects back to the supervisor management page with a summary of the results
+    /**
+     * Processes the bulk upload of supervisors via CSV.
+     * Parses the file and creates user accounts/lecturer records for each valid entry.
+     * 
+     * @return void
+     */
     public function bulkUploadSupervisors() {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
@@ -298,6 +358,43 @@ class AdminController extends Controller {
             header("Location: " . Helpers::baseUrl('/admin/supervisors?' . $param));
         } else {
             header("Location: " . Helpers::baseUrl('/admin/supervisors?error=Upload failed'));
+        }
+    }
+
+    /**
+     * Manually overrides and marks an ongoing attachment as 'Completed' 
+     * and the student's clearance status as 'Cleared'. Also updates the global student eligibility.
+     * 
+     * @return void
+     */
+    public function completeAttachment() {
+        $this->requireAuth('admin');
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
+            $attachmentId = (int)($_POST['attachment_id'] ?? 0);
+            $studentId = (int)($_POST['student_id'] ?? 0);
+            
+            if ($attachmentId > 0 && $studentId > 0) {
+                $db = (new \App\Config\Database())->connect();
+                $db->begin_transaction();
+                try {
+                    $stmt = $db->prepare("UPDATE attachment SET AttachmentStatus = 'Completed', ClearanceStatus = 'Cleared' WHERE AttachmentID = ?");
+                    $stmt->bind_param("i", $attachmentId);
+                    $stmt->execute();
+                    
+                    $stmt2 = $db->prepare("UPDATE student SET EligibilityStatus = 'Cleared' WHERE StudentID = ?");
+                    $stmt2->bind_param("i", $studentId);
+                    $stmt2->execute();
+                    
+                    $db->commit();
+                    header("Location: " . Helpers::baseUrl("/admin/students/progress?id={$studentId}&success=Attachment+marked+as+Completed+and+Cleared"));
+                    exit();
+                } catch (\Exception $e) {
+                    $db->rollback();
+                }
+            }
+            header("Location: " . Helpers::baseUrl("/admin/students/progress?id={$studentId}&error=Failed+to+update+attachment"));
+            exit();
         }
     }
 }

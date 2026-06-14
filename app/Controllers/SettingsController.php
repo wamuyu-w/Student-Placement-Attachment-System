@@ -2,9 +2,21 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
-// It includes methods for displaying settings pages, updating profile information, changing passwords, and handling the first login process where users must complete their profile and change their default password.
+/**
+ * Class SettingsController
+ * 
+ * Manages user profile settings and preferences across all roles (Admin, Staff, Host, Student).
+ * Includes methods for displaying settings pages, updating profile information, changing passwords, 
+ * and handling the first-login initialization process where users must complete their profile 
+ * and change default passwords.
+ */
 class SettingsController extends Controller {
 
+    /**
+     * Renders the settings profile page for a Student.
+     * 
+     * @return void
+     */
     public function studentIndex() {
         $this->requireAuth('student');
         $userModel = $this->model('User');
@@ -13,6 +25,11 @@ class SettingsController extends Controller {
         $this->view('student/settings', ['profile' => $profile, 'title' => 'Settings', 'page' => 'settings', 'page_css' => 'student-dashboard.css']);
     }
 
+    /**
+     * Renders the settings profile page for a Staff member (Lecturer).
+     * 
+     * @return void
+     */
     public function staffIndex() {
         $this->requireAuth('staff');
         $userModel = $this->model('User');
@@ -21,6 +38,11 @@ class SettingsController extends Controller {
         $this->view('staff/settings', ['profile' => $profile, 'title' => 'Settings', 'page' => 'settings', 'page_css' => 'staff-dashboard.css']);
     }
     
+    /**
+     * Renders the settings profile page for an Administrator.
+     * 
+     * @return void
+     */
     public function adminIndex() {
         $this->requireAuth('admin');
         $userModel = $this->model('User');
@@ -29,6 +51,11 @@ class SettingsController extends Controller {
         $this->view('admin/settings', ['profile' => $profile, 'title' => 'Settings', 'page' => 'settings', 'page_css' => 'admin-dashboard.css']);
     }
 
+    /**
+     * Renders the settings profile page for a Host Organization.
+     * 
+     * @return void
+     */
     public function hostIndex() {
         $this->requireAuth('host_org');
         $userModel = $this->model('User');
@@ -37,6 +64,12 @@ class SettingsController extends Controller {
         $this->view('host/settings', ['profile' => $profile, 'title' => 'Settings', 'page' => 'settings', 'page_css' => 'host-org-dashboard.css']);
     }
 
+    /**
+     * Processes profile update requests dynamically based on the user's role.
+     * Updates session variables upon successful database persistence.
+     * 
+     * @return void
+     */
     public function updateProfile() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         $role = $_SESSION['user_type'] ?? '';
@@ -95,6 +128,12 @@ class SettingsController extends Controller {
         }
     }
 
+    /**
+     * Processes password change requests from the user's settings page.
+     * Enforces password confirmation matching before hashing and updating.
+     * 
+     * @return void
+     */
     public function updatePassword() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         
@@ -126,7 +165,13 @@ class SettingsController extends Controller {
             }
         }
     }
-    //then loads the first-login view with the appropriate data and layout for the user to complete their profile and change their default password
+    /**
+     * Renders the first-login initialization view.
+     * Forces users logging in with a default password (e.g., 'Changeme123!') 
+     * to complete their profile and establish a secure password.
+     * 
+     * @return void
+     */
     public function firstLogin() {
         $role = $_SESSION['user_type'] ?? null;
         if (!$role) {
@@ -147,7 +192,14 @@ class SettingsController extends Controller {
         
         $this->view('auth/first-login', ['profile' => $profile, 'role' => $role], 'auth');
     }
-    // updating the user's password and profile information based on their role, and then redirects them to their respective dashboard upon successful completion
+    /**
+     * Processes the submission of the first-login initialization form.
+     * Validates new passwords, secures immutable fields (like imported Student Names),
+     * updates the database, clears the 'force_password_change' flag, and redirects
+     * the user to their respective dashboard.
+     * 
+     * @return void
+     */
     public function processFirstLogin() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

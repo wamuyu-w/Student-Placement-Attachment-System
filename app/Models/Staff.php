@@ -1,16 +1,31 @@
 <?php
 namespace App\Models;
 use App\Config\Database;
-// Staff model for handling staff-related database operations
+/**
+ * Class Staff
+ * 
+ * Model for handling database operations related to academic staff (Lecturers).
+ * Manages supervisor dashboards, student allocations, and profile updates.
+ */
 class Staff {
     private $db;
     private $conn;
 
+    /**
+     * Initializes the database connection for staff operations.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    /**
+     * Retrieves aggregated statistics for a lecturer's dashboard.
+     * Counts monitored attachments, pending logbook reviews, and total supervised students.
+     * 
+     * @param int $staffId The lecturer's ID
+     * @return array Associative array of statistics
+     */
     public function getDashboardStats($staffId) {
         $stmt = $this->conn->prepare("
             SELECT
@@ -33,6 +48,12 @@ class Staff {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Fetches the most recently submitted logbooks by students assigned to this lecturer.
+     * 
+     * @param int $staffId
+     * @return \mysqli_result|false Result set
+     */
     public function getRecentLogs($staffId) {
         $stmt = $this->conn->prepare("
             SELECT
@@ -50,6 +71,13 @@ class Staff {
         return $stmt->get_result();
     }
 
+    /**
+     * Retrieves a detailed list of all active students supervised by a specific lecturer.
+     * Includes counts of completed assessments and dates of scheduled assessments.
+     * 
+     * @param int $staffId
+     * @return \mysqli_result|false Result set
+     */
     public function getSupervisedStudents($staffId) {
         $stmt = $this->conn->prepare("
             SELECT s.StudentID, s.FirstName, s.LastName, u.Username as RegistrationNumber, s.Course, 
@@ -69,12 +97,26 @@ class Staff {
         return $stmt->get_result();
     }
 
+    /**
+     * Updates the basic profile information of a lecturer.
+     * 
+     * @param int $staffId
+     * @param array $data Form data with name and department
+     * @return bool True on success
+     */
     public function updateProfile($staffId, $data) {
         $stmt = $this->conn->prepare("UPDATE lecturer SET Name = ?, Department = ? WHERE LecturerID = ?");
         $stmt->bind_param("ssi", $data['name'], $data['department'], $staffId);
         return $stmt->execute();
     }
 
+    /**
+     * Completes a lecturer's profile during their first login.
+     * 
+     * @param int $staffId
+     * @param array $data
+     * @return bool True on success
+     */
     public function completeProfile($staffId, $data) {
         $stmt = $this->conn->prepare("UPDATE lecturer SET Name=?, Department=?, Faculty=? WHERE LecturerID=?");
         $stmt->bind_param("sssi", $data['name'], $data['department'], $data['faculty'], $staffId);

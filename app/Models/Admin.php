@@ -1,21 +1,32 @@
 <?php
-//This model will encapsulate the database queries for the admin dashboard statistics and activities.
 namespace App\Models;
-use App\Config\Database; //db conn required
+use App\Config\Database;
 
-//intialize class
+/**
+ * Class Admin
+ * 
+ * Encapsulates the database queries specific to the administrative dashboard,
+ * including high-level statistics and recent system activities.
+ */
 class Admin {
     //set variables that will be used
     private $db;
     private $conn;
 
-    // Initializes database connection for admin operations
+    /**
+     * Initializes the database connection for administrative operations.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
-    // Retrieves dashboard statistics for admin overview
+    /**
+     * Retrieves aggregated system statistics for the admin dashboard overview.
+     * Counts pending applications, active placements, opportunities, and eligible but unassigned students.
+     * 
+     * @return array Associative array of statistics
+     */
     public function getDashboardStats() {
         $stats = [];
         $stats['pendingApps'] = $this->conn->query("SELECT COUNT(*) as count FROM jobapplication WHERE Status = 'Pending'")->fetch_assoc()['count'] ?? 0;
@@ -25,7 +36,12 @@ class Admin {
         return $stats;
     }
 
-    // Fetches recent activities (applications and opportunities) for admin activity feed
+    /**
+     * Fetches and structures a merged timeline of recent activities.
+     * Combines recent job applications from students and new opportunities posted by hosts.
+     * 
+     * @return array Chronologically sorted array of recent activity objects
+     */
     public function getRecentActivities() {
         $activities = [];
         // Get recent applications

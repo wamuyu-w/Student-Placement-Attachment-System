@@ -3,8 +3,20 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
 
+/**
+ * Class ReportController
+ * 
+ * Manages all reporting capabilities across the system. 
+ * Handles the uploading of final reports by students, and the generation of various 
+ * statistical and performance reports for Admins, Staff, and Host Organizations.
+ */
 class ReportController extends Controller {
 
+    /**
+     * Renders the central System Reports dashboard for Administrators.
+     * 
+     * @return void
+     */
     public function adminIndex() {
         $this->requireAuth('admin');
         try {
@@ -48,6 +60,11 @@ class ReportController extends Controller {
         $this->view('reports/supervisor-stats', $data);
     }
 
+    /**
+     * Renders the supervision reports dashboard for Staff (Lecturers).
+     * 
+     * @return void
+     */
     public function staffIndex() {
         $this->requireAuth('staff');
         try {
@@ -77,6 +94,11 @@ class ReportController extends Controller {
         $this->view('reports/lecturer-grades', $data);
     }
 
+    /**
+     * Renders the placement reports dashboard for Host Organizations.
+     * 
+     * @return void
+     */
     public function hostIndex() {
         $this->requireAuth('host_org');
         try {
@@ -96,12 +118,14 @@ class ReportController extends Controller {
 
     public function hostPerformance() {
         $this->requireAuth('host_org');
+        $studentId = $_GET['student_id'] ?? null;
         $reportModel = $this->model('Report');
         $data = [
-            'performance' => $reportModel->getHostPerformanceReport($_SESSION['host_org_id']),
+            'performance' => $reportModel->getHostPerformanceReport($_SESSION['host_org_id'], $studentId),
             'title' => 'Host Performance Report',
             'page' => 'reports',
-            'page_css' => 'host-org-dashboard.css'
+            'page_css' => 'host-org-dashboard.css',
+            'studentId' => $studentId
         ];
         $this->view('reports/host-performance', $data);
     }
@@ -110,17 +134,24 @@ class ReportController extends Controller {
     public function adminHostPerformance() {
         $this->requireAuth('admin');
         $hostId = $_GET['host_id'] ?? 0;
+        $studentId = $_GET['student_id'] ?? null;
         $reportModel = $this->model('Report');
         $data = [
-            'performance' => $reportModel->getHostPerformanceReport($hostId),
+            'performance' => $reportModel->getHostPerformanceReport($hostId, $studentId),
             'title' => 'Host Performance Report',
             'page' => 'reports',
             'page_css' => 'admin-dashboard.css',
-            'hostId' => $hostId
+            'hostId' => $hostId,
+            'studentId' => $studentId
         ];
         $this->view('reports/host-performance', $data);
     }
 
+    /**
+     * Renders the progress reports dashboard for Students.
+     * 
+     * @return void
+     */
     public function studentIndex() {
         $this->requireAuth('student');
         try {
@@ -138,6 +169,12 @@ class ReportController extends Controller {
         }
     }
 
+    /**
+     * Processes the upload of a final report document by a student.
+     * Associates the uploaded file with their current active attachment.
+     * 
+     * @return void
+     */
     public function upload() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['final_report'])) {
@@ -272,8 +309,10 @@ class ReportController extends Controller {
             $hostId = $_SESSION['host_org_id'];
         }
         
+        $studentId = $_GET['student_id'] ?? null;
+        
         $reportModel = $this->model('Report');
-        $data = ['performance' => $reportModel->getHostPerformanceReport($hostId)];
+        $data = ['performance' => $reportModel->getHostPerformanceReport($hostId, $studentId)];
         $this->view('reports/print-host-performance', $data, false);
     }
 

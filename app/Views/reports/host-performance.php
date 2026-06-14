@@ -4,7 +4,13 @@
 <div class="card">
     <div class="report-card-header">
         <h2 class="report-card-title">Organization Performance Summary</h2>
-        <a href="<?= Helpers::baseUrl('/reports/print/host-performance' . (isset($hostId) ? '?host_id=' . urlencode($hostId) : '')) ?>" target="_blank" class="btn report-tag-dark">
+        <?php
+            $qs = [];
+            if (isset($hostId)) $qs[] = 'host_id=' . urlencode($hostId);
+            if (isset($studentId) && $studentId) $qs[] = 'student_id=' . urlencode($studentId);
+            $printLink = Helpers::baseUrl('/reports/print/host-performance' . (!empty($qs) ? '?' . implode('&', $qs) : ''));
+        ?>
+        <a href="<?= $printLink ?>" target="_blank" class="btn report-tag-dark">
             <i class="fas fa-download"></i> Download Report (PDF)
         </a>
     </div>

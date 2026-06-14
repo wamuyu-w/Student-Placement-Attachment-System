@@ -12,14 +12,12 @@
         <div class="login-form-section">
             <h2 class="login-heading">Student Login</h2>
             
-            <?php if (isset($_GET['success'])): ?>
-    <div id="login-success-message" style="display:none;"><?= htmlspecialchars($_GET['success']) ?></div>
-<?php endif; ?>
-<?php if (isset($_GET['error'])): ?>
-    <div class="error-message-general">
-        <?= htmlspecialchars($_GET['error']) ?>
-    </div>
-<?php endif; ?>
+            <!-- PHP-based error message -->
+            <?php if (isset($_GET['error'])): ?>
+                <div class="error-message-general">
+                    <?= htmlspecialchars($_GET['error']) ?>
+                </div>
+            <?php endif; ?>
 
             <form action="<?= Helpers::baseUrl('/auth/login') ?>" method="POST" class="login-form">
                 <input type="hidden" name="role" value="student">

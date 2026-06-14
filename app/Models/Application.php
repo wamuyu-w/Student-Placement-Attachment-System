@@ -2,17 +2,31 @@
 namespace App\Models;
 use App\Config\Database;
 
+/**
+ * Class Application
+ * 
+ * Manages database operations related to student placement applications.
+ * Handles both specific job applications (to host opportunities) and general program 
+ * session applications (self-sourced placements).
+ */
 class Application {
     private $db;
     private $conn;
 
-    // Initializes database connection for application operations
+    /**
+     * Initializes the database connection for application operations.
+     */
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
-    // Retrieves all job applications with student and opportunity details
+    /**
+     * Retrieves a list of all job applications with comprehensive student and opportunity details.
+     * Used primarily by administrators.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAllJobApplications() {
         $sql = "SELECT ja.OpportunityID, ja.StudentID, ja.ApplicationDate, s.FirstName, s.LastName, ao.Description, h.OrganizationName, ja.Status
                 FROM jobapplication ja
@@ -23,7 +37,11 @@ class Application {
         return $this->conn->query($sql);
     }
 
-    // Retrieves all program applications across students and host organizations
+    /**
+     * Retrieves all program (session) applications across all students and host organizations.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAllProgramApplications() {
         $sql = "SELECT aa.ApplicationID, aa.StudentID, aa.ApplicationDate, aa.ApplicationStatus, 
                 COALESCE(h.OrganizationName, aa.IntendedHostOrg) AS OrganizationName, 
@@ -35,7 +53,15 @@ class Application {
         return $this->conn->query($sql);
     }
 
-    // Updates the status of a program application, optionally recording a rejection reason
+    /**
+     * Updates the status of a program application.
+     * Optionally records a rejection reason if the application is declined.
+     * 
+     * @param int $appId The application ID
+     * @param string $status The new status (e.g., 'Approved', 'Rejected')
+     * @param string|null $rejectionReason Optional reason for rejection
+     * @return bool True on success
+     */
     public function updateProgramStatus($appId, $status, $rejectionReason = null) {
         if ($status === 'Rejected' && $rejectionReason) {
             $stmt = $this->conn->prepare("UPDATE attachmentapplication SET ApplicationStatus = ?, RejectionReason = ? WHERE ApplicationID = ?");
@@ -47,7 +73,14 @@ class Application {
         return $stmt->execute();
     }
 
-    // Approves a program application and creates an attachment record with clearance status
+    /**
+     * Approves a program application and dynamically creates a corresponding active attachment record.
+     * Executes within a transaction to ensure data integrity.
+     * 
+     * @param int $appId The application ID
+     * @param string $financialClearance The financial clearance status
+     * @return array Array containing success status and related IDs
+     */
     public function approveAndCreateAttachment($appId, $financialClearance = 'Cleared') {
         $this->conn->begin_transaction();
         try {
@@ -94,7 +127,12 @@ class Application {
         }
     }
 
-    // Retrieves all applications submitted to a specific host organization
+    /**
+     * Retrieves all job applications submitted to a specific host organization.
+     * 
+     * @param int $hostOrgId The host organization ID
+     * @return \mysqli_result|false Result set
+     */
     public function getHostApplications($hostOrgId) {
         $sql = "SELECT ja.ApplicationDate, s.FirstName, s.LastName, s.Course, ao.Description, ja.Status, ja.OpportunityID, ja.StudentID, ja.ResumePath, ja.ResumeLink, ja.Motivation
                 FROM jobapplication ja
@@ -108,7 +146,15 @@ class Application {
         return $stmt->get_result();
     }
 
-    // Verifies existence of an application and returns its data
+    /**
+     * Verifies the existence of an application and returns its data row.
+     * Ensures authorization by strictly matching Opportunity, Student, and Host IDs.
+     * 
+     * @param int $opportunityId
+     * @param int $studentId
+     * @param int $hostOrgId
+     * @return array|null The associative array of application data, or null if not found
+     */
     public function verifyAndGetApplication($opportunityId, $studentId, $hostOrgId) {
         $stmt = $this->conn->prepare("SELECT * FROM jobapplication WHERE OpportunityID = ? AND StudentID = ? AND HostOrgID = ?");
         $stmt->bind_param("iii", $opportunityId, $studentId, $hostOrgId);
@@ -116,8 +162,16 @@ class Application {
         return $stmt->get_result()->fetch_assoc();
     }
 
-    // --- Shared Methods ---
-    // Updates the status of a job application, handling rejection reasons if applicable
+    /**
+     * Updates the status of a job application.
+     * Includes handling for optional rejection reasons.
+     * 
+     * @param int $opportunityId
+     * @param int $studentId
+     * @param string $status
+     * @param string|null $rejectionReason
+     * @return bool True on success
+     */
     public function updateJobStatus($opportunityId, $studentId, $status, $rejectionReason = null) {
         $this->ensureJobApplicationCols();
         if ($status === 'Rejected' && $rejectionReason) {
@@ -130,7 +184,12 @@ class Application {
         return $stmt->execute();
     }
     
-    // Ensures the jobapplication table has the RejectionReason column, adding it if missing
+    /**
+     * Ensures the jobapplication table has the RejectionReason column.
+     * Automatically adds it if missing to prevent SQL errors on legacy DB structures.
+     * 
+     * @return void
+     */
     private function ensureJobApplicationCols() {
         $colCheck = $this->conn->query("SHOW COLUMNS FROM jobapplication LIKE 'RejectionReason'");
         if ($colCheck && $colCheck->num_rows == 0) {
@@ -140,7 +199,12 @@ class Application {
         }
     }
 
-    // Retrieves all program applications for a given student, including financial clearance status
+    /**
+     * Retrieves all program (session) applications for a specific student.
+     * 
+     * @param int $studentId
+     * @return \mysqli_result|false Result set
+     */
     public function getStudentApplications($studentId) {
         $stmt = $this->conn->prepare(
             "SELECT *, RejectionReason, FinancialClearanceStatus 
@@ -151,7 +215,12 @@ class Application {
         return $stmt->get_result();
     }
 
-    // Checks if the student currently has an active attachment
+    /**
+     * Checks if a student currently has an active, ongoing attachment.
+     * 
+     * @param int $studentId
+     * @return bool True if they have an ongoing attachment
+     */
     public function hasActiveAttachment($studentId) {
         $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
         $stmt->bind_param("i", $studentId);
@@ -159,7 +228,13 @@ class Application {
         return $stmt->get_result()->num_rows > 0;
     }
 
-    // Determines if the student has any pending or approved program applications
+    /**
+     * Determines if a student has any pending or approved program applications.
+     * Used to prevent duplicate concurrent applications.
+     * 
+     * @param int $studentId
+     * @return bool True if they have an active app in progress
+     */
     public function hasPendingOrApprovedApp($studentId) {
         $stmt = $this->conn->prepare("SELECT ApplicationID FROM attachmentapplication WHERE StudentID = ? AND (ApplicationStatus = 'Pending' OR ApplicationStatus = 'Approved')");
         $stmt->bind_param("i", $studentId);
@@ -167,7 +242,15 @@ class Application {
         return $stmt->get_result()->num_rows > 0;
     }
 
-    // Creates a new session application, handling host creation and attachment insertion
+    /**
+     * Processes a new self-sourced placement session application from a student.
+     * Dynamically creates a new Host Organization account if one doesn't exist,
+     * including generating a temporary password and triggering a welcome email.
+     * 
+     * @param int $studentId
+     * @param array $data Form submission data
+     * @return array Success status and message
+     */
     public function createSessionApplication($studentId, $data) {
         $this->conn->begin_transaction();
         try {
@@ -256,7 +339,14 @@ class Application {
         }
     }
 
-    // Registers a placement for a student if no active attachment exists
+    /**
+     * Registers a finalized placement for a student, inserting a new attachment record.
+     * Strictly blocks execution if an active attachment already exists.
+     * 
+     * @param int $studentId
+     * @param array $data Form data including dates and host ID
+     * @return array Success status
+     */
     public function registerPlacement($studentId, $data) {
         // Only block if there is an ACTIVE ongoing attachment
         $checkStmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
@@ -277,12 +367,21 @@ class Application {
         return ['success' => false, 'message' => $this->conn->error];
     }
 
-    // Retrieves a list of all host organizations
+    /**
+     * Retrieves a simplified list of all registered host organizations.
+     * 
+     * @return \mysqli_result|false Result set
+     */
     public function getAllHosts() {
         return $this->conn->query("SELECT HostOrgID, OrganizationName FROM hostorganization ORDER BY OrganizationName");
     }
 
-    // Retrieves a specific application record by its ID
+    /**
+     * Retrieves a specific application record by its primary key ID.
+     * 
+     * @param int $appId
+     * @return array|null Associative array of data or null if not found
+     */
     public function getApplicationById($appId) {
         $stmt = $this->conn->prepare("SELECT * FROM attachmentapplication WHERE ApplicationID = ?");
         $stmt->bind_param("i", $appId);
