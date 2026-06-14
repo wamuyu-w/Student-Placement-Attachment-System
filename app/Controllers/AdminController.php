@@ -3,14 +3,18 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Helpers;
 
+//intialize the class
 class AdminController extends Controller {
     
+    //function for loading the admin panel dashboard
     public function dashboard() {
+        // Ensure the user is authenticated as admin
         $this->requireAuth('admin');
 
         
         $adminModel = $this->model('Admin');
 
+        //what to load
         $data = [
             'stats' => $adminModel->getDashboardStats(),
             'activities' => $adminModel->getRecentActivities(),
@@ -22,10 +26,12 @@ class AdminController extends Controller {
         $this->view('admin/dashboard', $data);
     }
     
+    //enables the admin to see the list of supervisors/lecturers
     public function viewSupervisors() {
         $this->requireAuth('admin');
 
         // Load Model
+        // Load Supervisor model to fetch supervisors and assignable entities
         $supervisorModel = $this->model('Supervisor');
         
         $data = [
@@ -41,6 +47,8 @@ class AdminController extends Controller {
         $this->view('admin/supervisors', $data);
     }
 
+    // admin can add a supervisor to the system
+    //details are updated in the db 
     public function createSupervisor() {
         $this->requireAuth('admin');
 
@@ -48,6 +56,8 @@ class AdminController extends Controller {
             $this->verifyCsrf();
             $staffNumber = Helpers::sanitize($_POST['staffNumber'] ?? '');
 
+            //ensures conditions are met e.g. a staff number exists
+            //the same staff-number is not added
             if (empty($staffNumber)) {
                 header("Location: " . Helpers::baseUrl('/admin/supervisors?error=' . urlencode('Staff Number is required')));
                 exit();
@@ -62,6 +72,7 @@ class AdminController extends Controller {
 
             $result = $supervisorModel->create($staffNumber);
 
+            //detils are pushed to the db if successful, if not error code generated
             if ($result['success']) {
                 $msg = "Supervisor added successfully. Login Credentials -> Username: " . $result['username'] . " | Password: " . $result['password'];
                 header("Location: " . Helpers::baseUrl('/admin/supervisors?success=' . urlencode($msg)));
@@ -72,6 +83,7 @@ class AdminController extends Controller {
         }
     }
 
+    //allows the admin to see the list of students
     public function viewStudents() {
         $this->requireAuth('admin');
         $studentModel = $this->model('Student');

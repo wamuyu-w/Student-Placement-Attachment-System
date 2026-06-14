@@ -4,35 +4,44 @@ namespace App\Core;
 // Helper functions for the application
 class Helpers {
     // Generate base URL for assets and links
+    // Generates a base URL for assets and links
     public static function baseUrl($path = '') {
-        $scriptName = $_SERVER['SCRIPT_NAME'];
-        $dir = dirname($scriptName);
-        
-        // Normalize slashes for Windows compatibility
-        $dir = str_replace('\\', '/', $dir);
-        
-        // Ensure no trailing slash
+        // Normalize script name to use forward slashes
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+
+        // Derive project root by removing the entry script (public/index.php or index.php)
+        // Works on both Windows (XAMPP) and Linux environments
+        $dir = preg_replace('#/public/index\\.php$#i', '', $scriptName);
+        $dir = preg_replace('#/index\\.php$#i', '', $dir);
         $dir = rtrim($dir, '/');
-        
-        // Ensure path has leading slash if not empty
-        if ($path && substr($path, 0, 1) !== '/') {
+
+        // Clean up the incoming path:
+        //  • Strip any leading '../' segments which would otherwise point outside the project root
+        //  • Ensure there is exactly one leading slash for relative paths
+        while (strpos($path, '../') === 0) {
+            $path = substr($path, 3);
+        }
+        if ($path !== '' && $path[0] !== '/' && $path[0] !== '#') {
             $path = '/' . $path;
         }
-        
+
         return $dir . $path;
     }
     // Sanitize input data — strips whitespace and magic-quote slashes only.
     // Output encoding (htmlspecialchars) must be done at render time in views.
+    // Sanitizes input data (trims and strips slashes)
     public static function sanitize($data) {
         $data = trim($data ?? '');
         $data = stripslashes($data);
         return $data;
     }
     // Hash a password
+    // Hashes a plain‑text password using Bcrypt
     public static function hashPassword($password) {
         return password_hash($password, PASSWORD_DEFAULT);
     }
     //time ago function to display how long ago a date was
+    // Returns a human‑readable 'time ago' string for a timestamp
     public static function timeAgo($datetime) {
         // Handle null, empty datetime, or zero dates
         if (empty($datetime) || $datetime === '0000-00-00 00:00:00' || $datetime === '0000-00-00') {
@@ -63,6 +72,7 @@ class Helpers {
     }
 
     // Generate initials avatar to replace external AI/dynamic avatars
+    // Generates an initials avatar HTML snippet
     public static function getAvatar($name, $bgColor = '#8B1538', $color = '#ffffff', $cssClass = 'activity-avatar', $extraStyle = '') {
         $words = explode(' ', trim($name));
         $initials = '';

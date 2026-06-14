@@ -5,6 +5,7 @@ use App\Core\Helpers;
 
 class AssessmentController extends Controller {
 
+    // Displays assessments dashboard for staff (lecturers) with supervised students
     public function index() {
         $this->requireAuth('staff');
         $staffModel = $this->model('Staff');
@@ -18,6 +19,7 @@ class AssessmentController extends Controller {
         $this->view('staff/assessments', $data);
     }
 
+    // Verifies assessment code entered by staff before allowing assessment conduct
     public function verifyCode() {
         $this->requireAuth('staff');
 
@@ -60,6 +62,7 @@ class AssessmentController extends Controller {
         }
     }
 
+    // Loads assessment conduct page after code verification, ensuring proper assignment
     public function conduct() {
         $this->requireAuth('staff');
         $attachmentId = $_GET['attachment_id'] ?? null;
@@ -94,6 +97,7 @@ class AssessmentController extends Controller {
         $this->view('staff/conduct-assessment', $data);
     }
 
+    // Handles submission of assessment results, updating or creating records
     public function submit() {
         $this->requireAuth('staff');
         
@@ -139,6 +143,7 @@ class AssessmentController extends Controller {
     }
     // the function schedule() allows a staff member to schedule an assessment for a student's attachment by processing the form submission, 
     //validating the input, and inserting a new record into the assessment table with the provided details, including the attachment ID, lecturer ID, assessment type, date, and any remarks
+    // Allows staff to schedule an assessment for a student's attachment
     public function schedule() {
         $this->requireAuth('staff');
 
@@ -224,6 +229,7 @@ class AssessmentController extends Controller {
     }
 
 
+    // Retrieves and displays a specific assessment for authorized users
     public function viewAssessment() {
         // Allow student or staff/admin to view
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -272,6 +278,7 @@ class AssessmentController extends Controller {
     }
     // the function printSummary() allows authorized users (students, staff, or host organizations) to view a printable summary of a student's assessments 
     // by retrieving the relevant data and rendering it in a print-friendly format without the standard layout
+    // Generates a printable summary of a student's assessments for authorized users
     public function printSummary() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['user_id'])) { header("Location: " . Helpers::baseUrl('/')); exit(); }

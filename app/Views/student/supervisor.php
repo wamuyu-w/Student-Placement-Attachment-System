@@ -1,7 +1,7 @@
 <?php use App\Core\Helpers; ?>
 
 <div class="supervisor-container">
-    <h1 class="supervisor-title">My Supervisor</h1>
+
 
     <?php if (!empty($supervisors)): ?>
         <?php foreach ($supervisors as $index => $sup): ?>

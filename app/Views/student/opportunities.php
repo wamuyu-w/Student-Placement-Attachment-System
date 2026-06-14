@@ -283,11 +283,11 @@
                     <h3>Supporting Documents</h3>
                 </div>
                 <div class="form-group full-width" style="margin-top: 16px;">
-                    <label for="resume_link" class="form-label">Resume Link (Required)</label>
+                    <label for="resume_file" class="form-label">Upload Resume (PDF, max 2MB) (Required)</label>
                     <div class="input-with-icon" style="position: relative;">
-                        <i class="fas fa-link" style="position: absolute; left: 12px; top: 12px; color: #6b7280;"></i>
-                        <input type="url" id="resume_link" name="resume_link" class="form-control" placeholder="https://drive.google.com/..." required style="padding-left: 36px;">
-                        <span style="font-size: 0.85em; color: #6b7280; display: block; margin-top: 4px;">Provide a link to your resume (Google Drive, Dropbox, LinkedIn, etc.)</span>
+                        <i class="fas fa-file-upload" style="position: absolute; left: 12px; top: 12px; color: #6b7280;"></i>
+                        <input type="file" id="resume_file" name="resume_file" accept="application/pdf" class="form-control" required style="padding-left: 36px;">
+                        <span style="font-size: 0.85em; color: #6b7280; display: block; margin-top: 4px;">Upload your resume as a PDF (max 2MB).</span>
                     </div>
                 </div>
             </div>

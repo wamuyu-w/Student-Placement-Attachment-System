@@ -5,7 +5,8 @@ class Logbook {
     private $db;
     private $conn;
 
-    public function __construct() {
+    // Initialize database connection and ensure tables exist
+public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
         $this->ensureTablesExist();
@@ -13,7 +14,8 @@ class Logbook {
 
     //there should be a function to ensure that the logbook is opened only to students whose attachment is active
     
-    private function ensureTablesExist() {
+    // Ensure the logbook table exists and has required columns, creating or migrating as needed
+private function ensureTablesExist() {
         $check = $this->conn->query("SHOW TABLES LIKE 'logbook'");
         if ($check->num_rows == 0) {
             $sql = "CREATE TABLE logbook (
@@ -58,7 +60,8 @@ class Logbook {
     }
 
     // Student / Print: Get entries (returns array for compatibility with print view and foreach loops)
-    public function getEntriesByStudent($studentId) {
+    // Retrieve logbook entries for a specific student, ensuring the latest attachment is used
+public function getEntriesByStudent($studentId) {
         // Ensure SubmittedAt column exists for accurate date tracking
         $this->conn->query("ALTER TABLE logbook ADD COLUMN IF NOT EXISTS SubmittedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
@@ -84,7 +87,8 @@ class Logbook {
     }
 
     // Student: Create entry
-    public function createEntry($studentId, $data) {
+    // Create a new logbook entry for a student, enforcing week limits and uniqueness
+public function createEntry($studentId, $data) {
         // Get AttachmentID
         $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
         $stmt->bind_param("i", $studentId);
@@ -122,7 +126,8 @@ class Logbook {
     }
 
     // Staff: Get pending logbooks
-    public function getPendingLogbooksForStaff($staffId) {
+    // Retrieve pending logbook entries for a staff member
+public function getPendingLogbooksForStaff($staffId) {
         $sql = "SELECT l.LogbookID, l.WeekNumber, l.StartDate, l.EndDate, l.Activities as Description, l.Status, s.FirstName, s.LastName, s.StudentID
                 FROM logbook l
                 JOIN attachment a ON l.AttachmentID = a.AttachmentID
@@ -140,7 +145,8 @@ class Logbook {
     }
 
     // Host: Get pending logbooks
-    public function getPendingLogbooksForHost($hostId) {
+    // Retrieve pending logbook entries for a host organization
+public function getPendingLogbooksForHost($hostId) {
         $sql = "SELECT l.LogbookID, l.WeekNumber, l.StartDate, l.EndDate, l.Activities as Description, l.Status, s.FirstName, s.LastName, s.StudentID
                 FROM logbook l
                 JOIN attachment a ON l.AttachmentID = a.AttachmentID
@@ -157,7 +163,8 @@ class Logbook {
     }
 
     // Shared: Approve entry
-    public function reviewEntry($logbookId, $status, $comment, $userType) {
+    // Review and update the status of a logbook entry, optionally adding comments based on user type
+public function reviewEntry($logbookId, $status, $comment, $userType) {
         $sql = "UPDATE logbook SET Status = ?";
         $params = [];
         $params[] = &$status;
@@ -186,7 +193,8 @@ class Logbook {
         return $stmt->execute();
     }
 
-    public function updateHostComment($logbookId, $comment) {
+    // Update the host supervisor's comment for a specific logbook entry
+public function updateHostComment($logbookId, $comment) {
         $stmt = $this->conn->prepare("UPDATE logbook SET HostSupervisorComments = ? WHERE LogbookID = ?");
         $stmt->bind_param("si", $comment, $logbookId);
         return $stmt->execute();

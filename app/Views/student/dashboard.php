@@ -58,7 +58,7 @@
                         <div class="activity-content">
                             <div class="activity-title"><?php echo $activity['title']; ?></div>
                             <div class="activity-description"><?php echo $activity['description']; ?></div>
-                            <div class="activity-time"><?php echo Helpers::timeAgo($activity['time']); ?></div>
+                            <div class="activity-time"><?php echo date('H:i', strtotime($activity['time'])); ?></div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -70,18 +70,18 @@
     <div class="quick-actions-section">
         <h2>Quick Actions</h2>
         <div class="quick-actions">
-            <button class="action-btn primary" onclick="handleBrowseOpportunities()">
+            <a href="<?= Helpers::baseUrl('student/opportunities') ?>" class="action-btn primary">
                 <i class="fas fa-search"></i>
                 <span>Browse Opportunities</span>
-            </button>
-            <button class="action-btn" onclick="handleViewApplications()">
+            </a>
+            <a href="<?= Helpers::baseUrl('student/applications') ?>" class="action-btn">
                 <i class="fas fa-file-alt"></i>
                 <span>View My Applications</span>
-            </button>
-            <button class="action-btn" onclick="handleViewLogbook()">
+            </a>
+            <a href="<?= Helpers::baseUrl('student/logbook') ?>" class="action-btn">
                 <i class="fas fa-book"></i>
                 <span>View Logbook</span>
-            </button>
+            </a>
         </div>
     </div>
     <?php endif; ?>

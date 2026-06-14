@@ -6,6 +6,7 @@ use App\Core\Mailer;
 
 class ApplicationController extends Controller {
 
+    // Admin dashboard view for managing applications
     public function adminIndex() {
         $this->requireAuth('admin');
         $appModel = $this->model('Application');
@@ -20,6 +21,7 @@ class ApplicationController extends Controller {
         $this->view('admin/applications', $data);
     }
 
+    // Handles admin updates to program application status, including approvals and rejections
     public function updateProgramStatus() {
         // the admin will be required in this session
         $this->requireAuth('admin');
@@ -96,6 +98,7 @@ class ApplicationController extends Controller {
 
 
 
+    // Host organization view of its received applications
     public function hostIndex() {
         $this->requireAuth('host_org');
         $appModel = $this->model('Application');
@@ -109,6 +112,7 @@ class ApplicationController extends Controller {
         $this->view('host/applications', $data);
     }
 
+    // Host updates job application status (approve/reject) via AJAX
     public function updateJobStatusHost() {
         $this->requireAuth('host_org');
         
@@ -138,6 +142,7 @@ class ApplicationController extends Controller {
         }
     }
 
+    // Student view of their applications and status overview
     public function studentIndex() {
         $this->requireActiveStudent();
         $appModel = $this->model('Application');
@@ -176,6 +181,7 @@ class ApplicationController extends Controller {
         $this->view('student/applications', $data);
     }
 
+    // Student initiates a placement session application with validation
     public function applySession() {
         $this->requireActiveStudent();
         
@@ -224,6 +230,7 @@ class ApplicationController extends Controller {
         }
     }
 
+    // Student registers a placement after approval
     public function registerPlacement() {
         $this->requireActiveStudent();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

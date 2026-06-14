@@ -2,11 +2,13 @@
 namespace App\Core;
 
 class Controller {
+    // Returns an instance of a model class
     public function model($model) {
         $modelClass = "App\\Models\\" . $model;
         return new $modelClass();
     }
 
+    // Renders a view with optional layout and data variables
     public function view($view, $data = [], $layout = 'main') {
         extract($data);
         ob_start();
@@ -19,6 +21,7 @@ class Controller {
         }
     }
 
+    // Sends a JSON response and exits
     public function json($data) {
         header('Content-Type: application/json');
         echo json_encode($data);
@@ -27,6 +30,7 @@ class Controller {
 
     // SECURITY MEASURES - verify tokens and a function preventing session fixation attacks
     // Validate the CSRF token submitted with a POST request.
+    // Checks CSRF token for POST requests and aborts on failure
     protected function verifyCsrf() {
         $token = $_POST['csrf_token'] ?? '';
         if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
@@ -39,10 +43,12 @@ class Controller {
     }
 
     // Call after a successful login to prevent session fixation.
+    // Regenerates the session ID to prevent fixation attacks
     protected function regenerateSession() {
         session_regenerate_id(true);
     }
 
+    // Enforces authentication and role-based access, redirects if unauthorized
     protected function requireAuth($role) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -68,6 +74,7 @@ class Controller {
         }
     }
 
+    // Ensures the logged‑in student is active and not in read‑only mode
     protected function requireActiveStudent() {
         $this->requireAuth('student');
         if (isset($_SESSION['status']) && $_SESSION['status'] === 'Inactive') {

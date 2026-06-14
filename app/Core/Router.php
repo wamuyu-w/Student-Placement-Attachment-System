@@ -10,6 +10,7 @@ namespace App\Core;
 class Router {
     protected $routes = [];
 
+    // Initializes the router with the route definitions
     public function __construct() {
         // I have registered all the working routes here  
         $this->routes = [
@@ -110,21 +111,35 @@ class Router {
             '/admin/supervision/bulk/assign' => ['controller' => 'BulkSupervisionController', 'action' => 'processAssignment'],
             // I'm gonna add more routes here as we go along, but this is the basic idea
         ];
-    }
+    }//end of function
 
+    // Dispatches the request to the appropriate controller/action based on the URL
     public function dispatch() {
-        // Get current URL path relative to project root
+        // 1. Get only the path part of the URL
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        
-        // Get the directory where index.php resides (e.g., /project/public)
-        $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
-        $scriptDir = str_replace('\\', '/', $scriptDir); // Normalize slashes for Windows
-        
-        // Remove the script directory from the URI to get the clean route        
-        $path = str_replace($scriptDir, '', $uri);
-        // Ensure path starts with a slash and has no trailing slash (except for root)
-        if ($path === '') $path = '/';
-    
+
+        // 2. Determine the project root (the directory that contains the "public" folder)
+        //    Works for any script inside public, e.g. index.php, debug_route.php, etc.
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+        $scriptDir  = dirname($scriptName);                     // e.g. /student-placement-attachment-system/public
+        $projectRoot = preg_replace('#/public$#i', '', $scriptDir);
+        $projectRoot = rtrim($projectRoot, '/');
+
+        // 3. Strip the project root from the URI (case-insensitive for Windows)
+        if ($projectRoot !== '' && stripos($uri, $projectRoot) === 0) {
+            $uri = substr($uri, strlen($projectRoot));
+        }
+
+        // 4. Strip /public if still present (handles direct /public/ access)
+        $uri = preg_replace('#^/public#i', '', $uri);
+
+        // 5. Strip /index.php if present (non-rewrite fallback)
+        $uri = preg_replace('#^/index\.php#i', '', $uri);
+
+        // 6. Normalize: ensure leading slash, remove trailing slashes
+        $path = '/' . trim($uri, '/');
+
+        // 7. Match route
         if (array_key_exists($path, $this->routes)) {
             $controllerName = "App\\Controllers\\" . $this->routes[$path]['controller'];
             $actionName = $this->routes[$path]['action'];
@@ -132,9 +147,8 @@ class Router {
             $controller = new $controllerName();
             $controller->$actionName();
         } else {
-            // Fallback to 404
             http_response_code(404);
-            echo "404 Not Found";
+            echo "404 Not Found — Route '$path' not registered.";
         }
     }
 }

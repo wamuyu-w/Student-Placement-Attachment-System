@@ -6,7 +6,7 @@ class Database {
     private $host = 'localhost';
     private $user = 'root';
     private $pass = '';
-    private $name = 'attachmentmanagementsystem';
+    private $name = 'attachmentmanagementsystem';  
     public $conn;
 
     //Provides the actual connection to the db

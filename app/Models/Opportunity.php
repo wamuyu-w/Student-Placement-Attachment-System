@@ -72,15 +72,14 @@ class Opportunity {
                 throw new \Exception('You have already applied to this opportunity.');
             }
 
-            $resumePathToStore = null;
-            $resumeLinkToStore = null;
+            $resumePathToStore = $data['resume_path'] ?? null;
+            $resumeLinkToStore = $data['resume_link'] ?? null;
 
-            if (!empty($data['resume_link'])) {
-                $resumeLinkToStore = trim($data['resume_link']);
+            if (empty($resumePathToStore) && empty($resumeLinkToStore)) {
+                throw new \Exception('A resume file or link must be provided.');
             }
-
-            if (!$resumeLinkToStore || !filter_var($resumeLinkToStore, FILTER_VALIDATE_URL)) {
-                throw new \Exception("A valid resume link must be provided.");
+            if (!empty($resumeLinkToStore) && !filter_var($resumeLinkToStore, FILTER_VALIDATE_URL)) {
+                throw new \Exception('If provided, resume link must be a valid URL.');
             }
 
             // Insert into jobapplication
@@ -89,8 +88,6 @@ class Opportunity {
                  VALUES (?, ?, ?, NOW(), 'Pending', ?, ?, ?)"
             );
 
-            $resumeLinkToStore = !empty($data['resume_link']) ? $data['resume_link'] : null;
-            
             $stmt->bind_param(
                 "iiisss",
                 $data['opportunity_id'],

@@ -9,11 +9,13 @@ class Admin {
     private $db;
     private $conn;
 
+    // Initializes database connection for admin operations
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    // Retrieves dashboard statistics for admin overview
     public function getDashboardStats() {
         $stats = [];
         $stats['pendingApps'] = $this->conn->query("SELECT COUNT(*) as count FROM jobapplication WHERE Status = 'Pending'")->fetch_assoc()['count'] ?? 0;
@@ -23,6 +25,7 @@ class Admin {
         return $stats;
     }
 
+    // Fetches recent activities (applications and opportunities) for admin activity feed
     public function getRecentActivities() {
         $activities = [];
         // Get recent applications

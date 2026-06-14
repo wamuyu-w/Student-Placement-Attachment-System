@@ -49,7 +49,7 @@
                         <div class="activity-content">
                             <div class="activity-title"><?= $activity['title']; ?></div>
                             <div class="activity-description"><?= $activity['description']; ?></div>
-                            <div class="activity-time"><?= Helpers::timeAgo($activity['time']); ?></div>
+                            <div class="activity-time"><?php echo date('H:i', strtotime($activity['time'])); ?></div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -61,18 +61,18 @@
     <div class="quick-actions-section">
         <h2>Quick Actions</h2>
         <div class="quick-actions">
-            <button class="action-btn primary" onclick="handleAddOpportunity()">
+            <a href="<?= Helpers::baseUrl('admin/opportunities') ?>" class="action-btn primary">
                 <i class="fas fa-plus"></i>
                 <span>Add New Opportunity</span>
-            </button>
-            <button class="action-btn" onclick="handleGenerateReport()">
+            </a>
+            <a href="<?= Helpers::baseUrl('admin/reports') ?>" class="action-btn">
                 <i class="fas fa-file-alt"></i>
                 <span>Generate Weekly Report</span>
-            </button>
-            <button class="action-btn" onclick="handleAssignSupervisor()">
+            </a>
+            <a href="<?= Helpers::baseUrl('admin/supervisors') ?>" class="action-btn">
                 <i class="fas fa-users"></i>
                 <span>Assign Supervisor</span>
-            </button>
+            </a>
         </div>
     </div>
 </div>

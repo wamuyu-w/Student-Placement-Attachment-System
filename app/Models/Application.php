@@ -6,11 +6,13 @@ class Application {
     private $db;
     private $conn;
 
+    // Initializes database connection for application operations
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    // Retrieves all job applications with student and opportunity details
     public function getAllJobApplications() {
         $sql = "SELECT ja.OpportunityID, ja.StudentID, ja.ApplicationDate, s.FirstName, s.LastName, ao.Description, h.OrganizationName, ja.Status
                 FROM jobapplication ja
@@ -21,6 +23,7 @@ class Application {
         return $this->conn->query($sql);
     }
 
+    // Retrieves all program applications across students and host organizations
     public function getAllProgramApplications() {
         $sql = "SELECT aa.ApplicationID, aa.StudentID, aa.ApplicationDate, aa.ApplicationStatus, 
                 COALESCE(h.OrganizationName, aa.IntendedHostOrg) AS OrganizationName, 
@@ -32,6 +35,7 @@ class Application {
         return $this->conn->query($sql);
     }
 
+    // Updates the status of a program application, optionally recording a rejection reason
     public function updateProgramStatus($appId, $status, $rejectionReason = null) {
         if ($status === 'Rejected' && $rejectionReason) {
             $stmt = $this->conn->prepare("UPDATE attachmentapplication SET ApplicationStatus = ?, RejectionReason = ? WHERE ApplicationID = ?");
@@ -43,6 +47,7 @@ class Application {
         return $stmt->execute();
     }
 
+    // Approves a program application and creates an attachment record with clearance status
     public function approveAndCreateAttachment($appId, $financialClearance = 'Cleared') {
         $this->conn->begin_transaction();
         try {
@@ -89,6 +94,7 @@ class Application {
         }
     }
 
+    // Retrieves all applications submitted to a specific host organization
     public function getHostApplications($hostOrgId) {
         $sql = "SELECT ja.ApplicationDate, s.FirstName, s.LastName, s.Course, ao.Description, ja.Status, ja.OpportunityID, ja.StudentID, ja.ResumePath, ja.ResumeLink, ja.Motivation
                 FROM jobapplication ja
@@ -102,6 +108,7 @@ class Application {
         return $stmt->get_result();
     }
 
+    // Verifies existence of an application and returns its data
     public function verifyAndGetApplication($opportunityId, $studentId, $hostOrgId) {
         $stmt = $this->conn->prepare("SELECT * FROM jobapplication WHERE OpportunityID = ? AND StudentID = ? AND HostOrgID = ?");
         $stmt->bind_param("iii", $opportunityId, $studentId, $hostOrgId);
@@ -110,6 +117,7 @@ class Application {
     }
 
     // --- Shared Methods ---
+    // Updates the status of a job application, handling rejection reasons if applicable
     public function updateJobStatus($opportunityId, $studentId, $status, $rejectionReason = null) {
         $this->ensureJobApplicationCols();
         if ($status === 'Rejected' && $rejectionReason) {
@@ -122,6 +130,7 @@ class Application {
         return $stmt->execute();
     }
     
+    // Ensures the jobapplication table has the RejectionReason column, adding it if missing
     private function ensureJobApplicationCols() {
         $colCheck = $this->conn->query("SHOW COLUMNS FROM jobapplication LIKE 'RejectionReason'");
         if ($colCheck && $colCheck->num_rows == 0) {
@@ -131,6 +140,7 @@ class Application {
         }
     }
 
+    // Retrieves all program applications for a given student, including financial clearance status
     public function getStudentApplications($studentId) {
         $stmt = $this->conn->prepare(
             "SELECT *, RejectionReason, FinancialClearanceStatus 
@@ -141,6 +151,7 @@ class Application {
         return $stmt->get_result();
     }
 
+    // Checks if the student currently has an active attachment
     public function hasActiveAttachment($studentId) {
         $stmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
         $stmt->bind_param("i", $studentId);
@@ -148,6 +159,7 @@ class Application {
         return $stmt->get_result()->num_rows > 0;
     }
 
+    // Determines if the student has any pending or approved program applications
     public function hasPendingOrApprovedApp($studentId) {
         $stmt = $this->conn->prepare("SELECT ApplicationID FROM attachmentapplication WHERE StudentID = ? AND (ApplicationStatus = 'Pending' OR ApplicationStatus = 'Approved')");
         $stmt->bind_param("i", $studentId);
@@ -155,6 +167,7 @@ class Application {
         return $stmt->get_result()->num_rows > 0;
     }
 
+    // Creates a new session application, handling host creation and attachment insertion
     public function createSessionApplication($studentId, $data) {
         $this->conn->begin_transaction();
         try {
@@ -182,16 +195,21 @@ class Application {
                     if ($userStmt->num_rows > 0) {
                         $lastUsername = $userStmt->fetch_assoc()['Username'];
                     }
+
+                    //generating their credentials e.g. username and password
                     $num = intval(substr($lastUsername, 1));
                     $newUsername = 'H' . str_pad($num + 1, 3, '0', STR_PAD_LEFT);
                     $rawPassword = bin2hex(random_bytes(8));
                     $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
 
+                    //add the host org to the list of active users in the db
                     $insertUser = $this->conn->prepare("INSERT INTO users (Username, Password, Role, Status) VALUES (?, ?, 'Host Organization', 'Active')");
                     $insertUser->bind_param("ss", $newUsername, $hashedPassword);
                     $insertUser->execute();
                     $newUserId = $this->conn->insert_id;
 
+
+                    //add to the host org table since there's more details that have been recorded
                     $insertHost = $this->conn->prepare("INSERT INTO hostorganization (UserID, OrganizationName, ContactPerson, Email, PhoneNumber) VALUES (?, ?, ?, ?, ?)");
                     $insertHost->bind_param("issss", $newUserId, $intendedHost, $contactPerson, $contactEmail, $contactPhone);
                     $insertHost->execute();
@@ -206,6 +224,7 @@ class Application {
                 }
             }
 
+            // additional field such as 
             $financialStatus = $data['financial_clearance_status'] ?? 'Pending';
             $startDate = !empty($data['start_date']) ? $data['start_date'] : null;
             $endDate   = !empty($data['end_date'])   ? $data['end_date']   : null;
@@ -237,6 +256,7 @@ class Application {
         }
     }
 
+    // Registers a placement for a student if no active attachment exists
     public function registerPlacement($studentId, $data) {
         // Only block if there is an ACTIVE ongoing attachment
         $checkStmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE StudentID = ? AND AttachmentStatus = 'Ongoing'");
@@ -257,10 +277,12 @@ class Application {
         return ['success' => false, 'message' => $this->conn->error];
     }
 
+    // Retrieves a list of all host organizations
     public function getAllHosts() {
         return $this->conn->query("SELECT HostOrgID, OrganizationName FROM hostorganization ORDER BY OrganizationName");
     }
 
+    // Retrieves a specific application record by its ID
     public function getApplicationById($appId) {
         $stmt = $this->conn->prepare("SELECT * FROM attachmentapplication WHERE ApplicationID = ?");
         $stmt->bind_param("i", $appId);

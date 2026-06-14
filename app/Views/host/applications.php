@@ -26,7 +26,7 @@
                             <td style="padding: 12px;"><?php echo htmlspecialchars($row['Description']); ?></td>
                             <td style="padding: 12px;">
                                 <?php if ($row['ResumePath']): ?>
-                                    <a href="<?= Helpers::baseUrl('../assets/uploads/resumes/' . htmlspecialchars($row['ResumePath'])) ?>" target="_blank" class="text-blue-500 hover:underline">View PDF</a>
+                                    <a href="<?= Helpers::baseUrl('assets/uploads/resumes/' . htmlspecialchars($row['ResumePath'])) ?>" target="_blank" class="text-blue-500 hover:underline">View PDF</a>
                                 <?php elseif ($row['ResumeLink']): ?>
                                     <a href="<?php echo htmlspecialchars($row['ResumeLink']); ?>" target="_blank" class="text-blue-500 hover:underline">View Link</a>
                                 <?php else: ?>

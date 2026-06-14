@@ -5,6 +5,7 @@ use App\Core\Helpers;
 
 class AuthController extends Controller {
     
+    // Register a new student via JSON POST request
     public function registerStudent() {
         // Only accept POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -34,22 +35,27 @@ class AuthController extends Controller {
 
 
     //login functions for all the users in the system
+    // Render the student login page
     public function loginStudent() {
         $this->view('auth/login-student', ['title' => 'Student Login'], 'auth');
     }
 //admin and lecturers have the same login, just different endpoints
+    // Render the staff (lecturer/admin) login page
     public function loginStaff() {
         $this->view('auth/login-staff', ['title' => 'Staff Login'], 'auth');
     }
 
+    // Render the host organization login page
     public function loginHost() {
         $this->view('auth/login-host', ['title' => 'Host Organization Login'], 'auth');
     }
 
+    // Render the host organization registration page
     public function registerHost() {
         $this->view('auth/register-host', ['title' => 'Host Organization Registration'], 'auth');
     }
 
+    // Process login for any role, handling CSRF, rate limiting, and redirects
     public function processLogin() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: " . Helpers::baseUrl('/'));
@@ -195,6 +201,7 @@ class AuthController extends Controller {
         }
     }
 
+    // Process host registration form submission, validate, create host, and send welcome email
     public function processRegisterHost() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: " . Helpers::baseUrl('/register/host'));
@@ -244,10 +251,13 @@ class AuthController extends Controller {
         exit();
     }
 
+    // Show the forgot password request form
+ 
     public function forgotPassword() {
         $this->view('auth/forgot-password', ['title' => 'Forgot Password'], 'auth');
     }
 
+    // Handle forgot password form submission, generate token, and email reset link
     public function processForgotPassword() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: " . Helpers::baseUrl('/auth/forgot-password'));
@@ -298,6 +308,7 @@ class AuthController extends Controller {
         exit();
     }
 
+    // Show the password reset form when a valid token is present
     public function resetPassword() {
         $token = $_GET['token'] ?? '';
         if (empty($token)) {
@@ -316,6 +327,7 @@ class AuthController extends Controller {
         $this->view('auth/reset-password', ['title' => 'Reset Password', 'token' => $token], 'auth');
     }
 
+    // Process new password submission, validate, update password, and redirect
     public function processResetPassword() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: " . Helpers::baseUrl('/'));
@@ -360,13 +372,14 @@ class AuthController extends Controller {
             if ($dbRole === 'lecturer' || $dbRole === 'admin' || $dbRole === 'supervisor') $redirectRole = 'staff';
             if ($dbRole === 'host organization') $redirectRole = 'host';
 
-            header("Location: " . Helpers::baseUrl('/login/' . $redirectRole . '?success=' . urlencode('Password reset successful. Please log in.')));
+            header('Location: ' . Helpers::baseUrl('/?success=' . urlencode('Password reset successful. Please log in.')));
         } else {
             header("Location: " . Helpers::baseUrl('/auth/reset-password?token=' . urlencode($token) . '&error=' . urlencode('An error occurred. Please try again.')));
         }
         exit();
     }
 
+    // Helper to redirect with error message based on role
     private function redirectWithError($role, $message) {
         $route = '';
         switch($role) {
@@ -385,16 +398,28 @@ class AuthController extends Controller {
         exit();
     }
 
+    // Logs out the user, clears session, and redirects to landing page
     public function logout() {
+        // Ensure a session exists
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        session_unset();
+        // Clear all session data
+        $_SESSION = [];
+        // Delete the session cookie if used
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params['path'], $params['domain'], $params['secure'], $params['httponly']
+            );
+        }
+        // Destroy the session
         session_destroy();
-        header("Location: " . Helpers::baseUrl('/'));
+        // Redirect to the root of the application (main page)
+        // Redirect to the student login page after logout
+        header('Location: ' . Helpers::baseUrl('/?success=' . urlencode('You have successfully logged out.')));
         exit();
     }
-
     /**
      * Compares an input password against a potentially hardcoded (plain-text) password.
      * If they match and the stored password is not yet hashed, it hashes and updates it.
@@ -404,6 +429,7 @@ class AuthController extends Controller {
      * @param string $storedPassword The password currently in the database
      * @return bool True if migration was needed and successful, false otherwise
      */
+    // Migrates legacy plain-text passwords to hashed versions if needed
     private function migrateHardcodedPassword($userId, $inputPassword, $storedPassword) {
         // If stored password is already a Bcrypt hash, skip migration
         if (preg_match('/^\$2[ayb]\$.{56}$/', $storedPassword)) {
@@ -420,6 +446,7 @@ class AuthController extends Controller {
         return false;
     }
 
+    // Determines if the current request is an AJAX call
     private function isAjax() {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }

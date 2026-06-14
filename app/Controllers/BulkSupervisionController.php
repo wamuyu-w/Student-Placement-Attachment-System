@@ -63,15 +63,22 @@ class BulkSupervisionController extends Controller {
     
     public function processAssignment() {
         $this->requireAuth('admin');
-        
+        // Allow long-running bulk operations
+        set_time_limit(0);
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: " . Helpers::baseUrl('/admin/supervision/bulk'));
             exit();
         }
         $this->verifyCsrf();
-        
+
+        // Prevent extreme loads that could crash the server
+        $maxAssignments = 500; // adjustable limit
         $studentAttachmentIds = $_POST['student_attachments'] ?? [];
         $lecturerIds = $_POST['lecturer_ids'] ?? [];
+        if (count($studentAttachmentIds) > $maxAssignments) {
+            header("Location: " . Helpers::baseUrl('/admin/supervision/bulk?error=Too many students selected (max $maxAssignments)'));
+            exit();
+        }
         
         if (empty($studentAttachmentIds) || empty($lecturerIds)) {
             header("Location: " . Helpers::baseUrl('/admin/supervision/bulk?error=Please select both students and lecturers'));
@@ -81,56 +88,51 @@ class BulkSupervisionController extends Controller {
         $supervisorModel = $this->model('Supervisor');
         $successCount = 0;
         $errorCount = 0;
-        
-        //for loop that handles assignment of students to lecturers - downside is the Industrial Attachment Coordinator will need to check
-        //in the event a lecturer has an overload of students
+        // Prepare reusable statements for fetching student & lecturer details (outside the loop)
+        $db = (new \App\Config\Database())->connect();
+        $studentStmt = $db->prepare("SELECT s.Email, s.FirstName, s.LastName FROM student s JOIN attachment a ON s.StudentID = a.StudentID WHERE a.AttachmentID = ?");
+        $lecturerStmt = $db->prepare("SELECT u.Username, l.Name FROM lecturer l JOIN users u ON l.UserID = u.UserID WHERE l.LecturerID = ?");
+        $emailQueue = [];
         foreach ($studentAttachmentIds as $attachmentId) {
-            // Shuffle lecturers randomly for each student to distribute the load
             shuffle($lecturerIds);
             $assigned = false;
-            
             foreach ($lecturerIds as $lecturerId) {
-                // Check if this lecturer has supervised this student before
                 if (!$this->hasSupervisedBefore($attachmentId, $lecturerId)) {
                     $result = $supervisorModel->assign($attachmentId, $lecturerId);
-                    //if true -> assign the student to the lecturer
                     if ($result['success']) {
                         $successCount++;
                         $assigned = true;
-
-                        // Fetch details and send email
-                        $db = (new \App\Config\Database())->connect();
-                        // Student Details
-                        $stmt = $db->prepare("SELECT s.Email, s.FirstName, s.LastName FROM student s JOIN attachment a ON s.StudentID = a.StudentID WHERE a.AttachmentID = ?");
-                        $stmt->bind_param("i", $attachmentId);
-                        $stmt->execute();
-                        $studentInfo = $stmt->get_result()->fetch_assoc();
-                        
-                        // Lecturer Details
-                        $stmtL = $db->prepare("SELECT u.Username, l.Name FROM lecturer l JOIN users u ON l.UserID = u.UserID WHERE l.LecturerID = ?");
-                        $stmtL->bind_param("i", $lecturerId);
-                        $stmtL->execute();
-                        $lecInfo = $stmtL->get_result()->fetch_assoc();
-                        
-
-                        //statement that sends the emails to their respective addresses
+                        // Queue email data instead of sending immediately
+                        $studentStmt->bind_param("i", $attachmentId);
+                        $studentStmt->execute();
+                        $studentInfo = $studentStmt->get_result()->fetch_assoc();
+                        $lecturerStmt->bind_param("i", $lecturerId);
+                        $lecturerStmt->execute();
+                        $lecInfo = $lecturerStmt->get_result()->fetch_assoc();
                         if ($studentInfo && $lecInfo && !empty($studentInfo['Email'])) {
-                            \App\Core\Mailer::notifySupervisorAssigned(
-                                $studentInfo['Email'],
-                                trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
-                                $lecInfo['Name'],
-                                $lecInfo['Username'] . '@example.com' // Placeholder email
-                            );
+                            $emailQueue[] = [
+                                'to' => $studentInfo['Email'],
+                                'name' => trim($studentInfo['FirstName'] . ' ' . $studentInfo['LastName']),
+                                'lecturer' => $lecInfo['Name'],
+                                'lecturerEmail' => $lecInfo['Username'] . '@example.com'
+                            ];
                         }
-                        
-                        break; // Stop checking lecturers once successfully assigned
+                        break;
                     }
                 }
             }
-            
             if (!$assigned) {
                 $errorCount++;
             }
+        }
+        // Send all queued emails after assignments are done (reduces DB latency & execution time)
+        foreach ($emailQueue as $mail) {
+            \App\Core\Mailer::notifySupervisorAssigned(
+                $mail['to'],
+                $mail['name'],
+                $mail['lecturer'],
+                $mail['lecturerEmail']
+            );
         }
         
         $msg = "Successfully assigned $successCount students.";

@@ -35,7 +35,9 @@ CREATE TABLE `assessment` (
   `Marks` decimal(5,2) DEFAULT NULL,
   `Remarks` text DEFAULT NULL,
   `CriteriaScores` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`CriteriaScores`)),
-  `LecturerID` int(11) DEFAULT NULL
+  `LecturerID` int(11) DEFAULT NULL,
+  `Status` varchar(20) DEFAULT 'Completed',
+  `SupervisionComments` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -54,7 +56,8 @@ CREATE TABLE `attachment` (
   `EndDate` date DEFAULT NULL,
   `ClearanceStatus` varchar(20) DEFAULT NULL,
   `AttachmentStatus` varchar(20) DEFAULT NULL,
-  `AssessmentCode` varchar(50) DEFAULT NULL
+  `AssessmentCode` varchar(50) DEFAULT NULL,
+  `ClearedAt` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -72,7 +75,10 @@ CREATE TABLE `attachmentapplication` (
   `ApplicationStatus` varchar(20) DEFAULT NULL,
   `IntendedHostOrg` varchar(255) DEFAULT NULL,
   `RejectionReason` text DEFAULT NULL,
-  `HostOrgID` int(11) DEFAULT NULL
+  `HostOrgID` int(11) DEFAULT NULL,
+  `FinancialClearanceStatus` varchar(20) DEFAULT 'Pending',
+  `StartDate` date DEFAULT NULL,
+  `EndDate` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -135,7 +141,8 @@ CREATE TABLE `jobapplication` (
   `Status` varchar(30) DEFAULT 'Pending',
   `ResumePath` varchar(255) DEFAULT NULL,
   `ResumeLink` varchar(255) DEFAULT NULL,
-  `Motivation` text DEFAULT NULL
+  `Motivation` text DEFAULT NULL,
+  `RejectionReason` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -161,26 +168,16 @@ CREATE TABLE `lecturer` (
 
 CREATE TABLE `logbook` (
   `LogbookID` int(11) NOT NULL,
-  `AttachmentID` int(11) DEFAULT NULL,
-  `IssueDate` date DEFAULT NULL,
-  `Status` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `logbook`
---
-
---
--- Table structure for table `logbookentry`
---
-
-CREATE TABLE `logbookentry` (
-  `EntryID` int(11) NOT NULL,
-  `LogbookID` int(11) DEFAULT NULL,
-  `EntryDate` date DEFAULT NULL,
+  `AttachmentID` int(11) NOT NULL,
+  `WeekNumber` int(11) NOT NULL,
+  `StartDate` date DEFAULT NULL,
+  `EndDate` date DEFAULT NULL,
   `Activities` text DEFAULT NULL,
-  `HostSupervisorComments` text DEFAULT NULL,
-  `AcademicSupervisorComments` text DEFAULT NULL
+  `Status` varchar(20) DEFAULT 'Pending',
+  `EntryDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `SubmittedAt` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `AcademicSupervisorComments` text DEFAULT NULL,
+  `HostSupervisorComments` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -243,14 +240,15 @@ CREATE TABLE `users` (
 --
 ALTER TABLE `assessment`
   ADD PRIMARY KEY (`AssessmentID`),
-  ADD KEY `AttachmentID` (`AttachmentID`);
+  ADD KEY `AttachmentID` (`AttachmentID`),
+  ADD KEY `LecturerID` (`LecturerID`);
 
 --
 -- Indexes for table `attachment`
 --
 ALTER TABLE `attachment`
   ADD PRIMARY KEY (`AttachmentID`),
-  ADD UNIQUE KEY `StudentID` (`StudentID`),
+  ADD KEY `StudentID` (`StudentID`),
   ADD KEY `HostOrgID` (`HostOrgID`);
 
 --
@@ -303,14 +301,8 @@ ALTER TABLE `lecturer`
 --
 ALTER TABLE `logbook`
   ADD PRIMARY KEY (`LogbookID`),
-  ADD UNIQUE KEY `AttachmentID` (`AttachmentID`);
-
---
--- Indexes for table `logbookentry`
---
-ALTER TABLE `logbookentry`
-  ADD PRIMARY KEY (`EntryID`),
-  ADD KEY `LogbookID` (`LogbookID`);
+  ADD KEY `AttachmentID` (`AttachmentID`),
+  ADD UNIQUE KEY `unique_week` (`AttachmentID`, `WeekNumber`);
 
 --
 -- Indexes for table `student`
@@ -387,12 +379,6 @@ ALTER TABLE `logbook`
   MODIFY `LogbookID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `logbookentry`
---
-ALTER TABLE `logbookentry`
-  MODIFY `EntryID` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `student`
 --
 ALTER TABLE `student`
@@ -418,7 +404,8 @@ ALTER TABLE `users`
 -- Constraints for table `assessment`
 --
 ALTER TABLE `assessment`
-  ADD CONSTRAINT `assessment_ibfk_1` FOREIGN KEY (`AttachmentID`) REFERENCES `attachment` (`AttachmentID`);
+  ADD CONSTRAINT `assessment_ibfk_1` FOREIGN KEY (`AttachmentID`) REFERENCES `attachment` (`AttachmentID`),
+  ADD CONSTRAINT `assessment_ibfk_2` FOREIGN KEY (`LecturerID`) REFERENCES `lecturer` (`LecturerID`);
 
 --
 -- Constraints for table `attachment`
@@ -471,12 +458,6 @@ ALTER TABLE `lecturer`
 --
 ALTER TABLE `logbook`
   ADD CONSTRAINT `logbook_ibfk_1` FOREIGN KEY (`AttachmentID`) REFERENCES `attachment` (`AttachmentID`);
-
---
--- Constraints for table `logbookentry`
---
-ALTER TABLE `logbookentry`
-  ADD CONSTRAINT `logbookentry_ibfk_1` FOREIGN KEY (`LogbookID`) REFERENCES `logbook` (`LogbookID`);
 
 --
 -- Constraints for table `student`

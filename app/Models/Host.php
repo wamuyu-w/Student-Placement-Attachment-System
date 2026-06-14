@@ -3,15 +3,18 @@ namespace App\Models;
 use App\Config\Database;
 // and handle student attachments, while ensuring secure database interactions through prepared statements and transaction management for critical operations like registration.
 // It serves as the primary interface for host organizations to interact
+// Host model handles host organization data and related operations
 class Host {
     private $db;
     private $conn;
 
-    public function __construct() {
+    // Initialize database connection
+public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
-    public function getDashboardStats($hostOrgId) {
+    // Retrieve dashboard statistics for a host organization
+public function getDashboardStats($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
                 (SELECT COUNT(*) FROM attachmentopportunity WHERE HostOrgID = ?) as active_placements,
@@ -24,7 +27,8 @@ class Host {
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
-    public function getRecentPlacements($hostOrgId) {
+    // Get recent placement records for a host organization
+public function getRecentPlacements($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
                 s.FirstName, s.LastName, s.Course,
@@ -42,19 +46,22 @@ class Host {
         $stmt->execute();
         return $stmt->get_result();
     }
-    public function updateProfile($hostId, $data) {
+    // Update host organization profile information
+public function updateProfile($hostId, $data) {
         $stmt = $this->conn->prepare("UPDATE hostorganization SET OrganizationName = ?, ContactPerson = ?, Email = ?, PhoneNumber = ? WHERE HostOrgID = ?");
         $stmt->bind_param("ssssi", $data['org_name'], $data['contact_person'], $data['email'], $data['phone'], $hostId);
         return $stmt->execute();
     }
 
-    public function completeProfile($hostId, $data) {
+    // Complete host profile after registration
+public function completeProfile($hostId, $data) {
         $stmt = $this->conn->prepare("UPDATE hostorganization SET OrganizationName=?, ContactPerson=?, Email=?, PhoneNumber=? WHERE HostOrgID=?");
         $stmt->bind_param("ssssi", $data['org_name'], $data['contact_person'], $data['email'], $data['phone'], $hostId);
         return $stmt->execute();
     }
 
-    public function getAttachedStudents($hostOrgId) {
+    // Retrieve list of students attached to a host organization
+public function getAttachedStudents($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT s.StudentID, s.FirstName, s.LastName, s.Course, s.YearOfStudy, a.AttachmentID, a.StartDate, a.EndDate, a.AttachmentStatus, a.AssessmentCode
             FROM attachment a
@@ -66,7 +73,8 @@ class Host {
         $stmt->execute();
         return $stmt->get_result();
     }
-    public function generateAssessmentCode($attachmentId, $hostOrgId) {
+    // Generate a unique assessment code for an attachment
+public function generateAssessmentCode($attachmentId, $hostOrgId) {
         // Verify ownership
         $verifyStmt = $this->conn->prepare("SELECT AttachmentID FROM attachment WHERE AttachmentID = ? AND HostOrgID = ?");
         $verifyStmt->bind_param("ii", $attachmentId, $hostOrgId);
@@ -79,7 +87,8 @@ class Host {
         return $updateStmt->execute();
     }
 
-    public function createFromRegistration($data) {
+    // Create host organization and user account from registration data
+public function createFromRegistration($data) {
         $this->conn->begin_transaction();
         try {
             // 1. Create User Account

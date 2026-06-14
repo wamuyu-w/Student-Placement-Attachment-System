@@ -59,11 +59,45 @@ class OpportunityController extends Controller {
 
         $opportunityId = filter_input(INPUT_POST, 'opportunity_id', FILTER_SANITIZE_NUMBER_INT);
         $motivation = Helpers::sanitize($_POST['motivation'] ?? '');
-        $resumeLink = filter_input(INPUT_POST, 'resume_link', FILTER_SANITIZE_URL);
         $studentId = $_SESSION['student_id'] ?? null;
 
-        if (!$opportunityId || !$studentId || !$motivation || empty($resumeLink)) {
-            $this->json(['success' => false, 'message' => 'Missing required fields. Please ensure you provide a motivation and a resume link.']);
+        // Handle resume: either uploaded file or external link
+        $resumePath = null;
+        $resumeLink = null;
+
+        // Check if a file was uploaded
+        if (isset($_FILES['resume_file']) && $_FILES['resume_file']['error'] === UPLOAD_ERR_OK) {
+            $allowedMime = 'application/pdf';
+            $maxSize = 2 * 1024 * 1024; // 2MB
+
+            if ($_FILES['resume_file']['type'] !== $allowedMime) {
+                $this->json(['success' => false, 'message' => 'Only PDF resumes are allowed.']);
+                return;
+            }
+            if ($_FILES['resume_file']['size'] > $maxSize) {
+                $this->json(['success' => false, 'message' => 'Resume file exceeds maximum size of 2MB.']);
+                return;
+            }
+
+            $uploadDir = __DIR__ . '/../../public/uploads/resumes/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $uniqueName = uniqid('resume_') . '.pdf';
+            $destination = $uploadDir . $uniqueName;
+            if (!move_uploaded_file($_FILES['resume_file']['tmp_name'], $destination)) {
+                $this->json(['success' => false, 'message' => 'Failed to save uploaded resume.']);
+                return;
+            }
+            // Store relative path for DB
+            $resumePath = 'uploads/resumes/' . $uniqueName;
+        } else {
+            // Fallback to resume link if provided
+            $resumeLink = filter_input(INPUT_POST, 'resume_link', FILTER_SANITIZE_URL);
+        }
+
+        if (!$opportunityId || !$studentId || !$motivation || (empty($resumePath) && empty($resumeLink))) {
+            $this->json(['success' => false, 'message' => 'Missing required fields. Provide motivation and a resume (file or link).']);
             return;
         }
 
@@ -71,7 +105,9 @@ class OpportunityController extends Controller {
             'opportunity_id' => $opportunityId,
             'student_id' => $studentId,
             'motivation' => $motivation,
-            'resume_link' => $resumeLink
+            'resume_path' => $resumePath,
+            'resume_link' => $resumeLink,
+            'status_updated_at' => date('Y-m-d H:i:s')
         ];
 
         $opportunityModel = $this->model('Opportunity');

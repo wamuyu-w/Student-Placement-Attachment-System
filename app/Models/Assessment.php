@@ -6,11 +6,13 @@ class Assessment {
     private $db;
     private $conn;
 
+    // Initializes database connection for assessment operations
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->connect();
     }
 
+    // Retrieves the assessment code for a given attachment
     public function getAssessmentCode($attachmentId) {
         $stmt = $this->conn->prepare("SELECT AssessmentCode FROM attachment WHERE AttachmentID = ?");
         $stmt->bind_param("i", $attachmentId);
@@ -22,6 +24,7 @@ class Assessment {
         return null;
     }
 
+    // Returns the count of completed assessments for an attachment
     public function getAssessmentCount($attachmentId) {
         $stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM assessment WHERE AttachmentID = ? AND Status = 'Completed'");
         $stmt->bind_param("i", $attachmentId);
@@ -29,6 +32,7 @@ class Assessment {
         return $stmt->get_result()->fetch_assoc()['count'];
     }
 
+    // Creates a new assessment record with provided data
     public function create($data) {
         $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, Marks, Remarks, AssessmentDate, CriteriaScores, Status)
                 VALUES (?, ?, ?, ?, ?, CURDATE(), ?, 'Completed')";
@@ -44,6 +48,7 @@ class Assessment {
         return $stmt->execute();
     }
 
+    // Schedules a new assessment (status set to 'Scheduled')
     public function schedule($data) {
         // Now using SupervisionComments and Status columns.
         $sql = "INSERT INTO assessment (AttachmentID, LecturerID, AssessmentType, AssessmentDate, Marks, Status, SupervisionComments)
@@ -59,6 +64,7 @@ class Assessment {
         return $stmt->execute();
     }
 
+    // Retrieves detailed assessment information by assessment ID
     public function getById($assessmentId) {
         $sql = "SELECT
                     a.AssessmentDate, a.AssessmentType, a.Marks, a.Remarks, a.CriteriaScores, a.SupervisionComments, a.Status,
@@ -79,6 +85,7 @@ class Assessment {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    // Retrieves all assessments for a specific student
     public function getStudentAssessments($studentId) {
         $sql = "SELECT
                     a.AssessmentID, a.AssessmentDate, a.AssessmentType, a.Marks,
@@ -94,6 +101,7 @@ class Assessment {
         return $stmt->get_result();
     }
 
+    // Gets a scheduled assessment for a given attachment ID
     public function getScheduled($attachmentId) {
         $stmt = $this->conn->prepare("SELECT * FROM assessment WHERE AttachmentID = ? AND Status = 'Scheduled' LIMIT 1");
         $stmt->bind_param("i", $attachmentId);
@@ -101,6 +109,7 @@ class Assessment {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    // Updates an existing assessment with new data and marks it as completed
     public function update($assessmentId, $data) {
         $sql = "UPDATE assessment SET 
                 Marks = ?, 
