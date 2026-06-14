@@ -278,6 +278,16 @@ class AdminController extends Controller {
         $this->requireAuth('admin');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
             $this->verifyCsrf();
+
+            // Validate file type (MIME + extension)
+            $allowedMimes = ['text/csv', 'application/vnd.ms-excel', 'text/plain', 'application/csv'];
+            $fileMime = mime_content_type($_FILES['csvFile']['tmp_name']);
+            $fileExt  = strtolower(pathinfo($_FILES['csvFile']['name'], PATHINFO_EXTENSION));
+            if (!in_array($fileMime, $allowedMimes) && $fileExt !== 'csv') {
+                header("Location: " . Helpers::baseUrl('/admin/supervisors?error=Only CSV files are allowed.'));
+                exit();
+            }
+
             $file = $_FILES['csvFile']['tmp_name'];
             $faculty = Helpers::sanitize($_POST['faculty'] ?? '');
 

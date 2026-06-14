@@ -17,19 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Navigation handlers
 function handleAddOpportunity() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'admin/opportunities';
+    window.location.href = getRouteUrl('admin/opportunities');
 }
 
 function handleGenerateReport() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'admin/reports';
+    window.location.href = getRouteUrl('admin/reports');
 }
 
 function handleAssignSupervisor() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'admin/supervisors';
+    window.location.href = getRouteUrl('admin/supervisors');
 }

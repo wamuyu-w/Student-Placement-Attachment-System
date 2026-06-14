@@ -17,25 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Navigation handlers
 function handleReviewLogbook() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'staff/logbook';
+    window.location.href = getRouteUrl('staff/logbook');
 }
 
 function handleViewStudents() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'staff/students';
+    window.location.href = getRouteUrl('staff/students');
 }
 
 function handleGenerateReport() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'staff/reports';
+    window.location.href = getRouteUrl('staff/reports');
 }
 
 function handleViewAttachments() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'staff/students';
+    window.location.href = getRouteUrl('staff/students');
 }

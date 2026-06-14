@@ -27,7 +27,9 @@ class Opportunity {
         $sql = "SELECT ao.*, ho.OrganizationName 
                 FROM attachmentopportunity ao
                 JOIN hostorganization ho ON ao.HostOrgID = ho.HostOrgID
-                WHERE ao.Status = 'Active' AND ao.ApplicationEndDate >= CURDATE()
+                WHERE ao.Status = 'Active' 
+                  AND ao.ApplicationEndDate >= CURDATE() 
+                  AND ao.ApplicationStartDate <= CURDATE()
                 ORDER BY ao.ApplicationEndDate ASC";
         return $this->conn->query($sql);
     }
@@ -62,6 +64,9 @@ class Opportunity {
             $opportunity = $this->findById($data['opportunity_id']);
             if (!$opportunity) {
                 throw new \Exception('Opportunity not found.');
+            }
+            if ($opportunity['Status'] !== 'Active') {
+                throw new \Exception('This opportunity is closed.');
             }
             if (strtotime($opportunity['ApplicationEndDate']) < time()) {
                 throw new \Exception('Application deadline has passed.');

@@ -176,13 +176,13 @@ class Student {
 
         // Placements
         $stmt = $this->conn->prepare(
-            "SELECT ho.OrganizationName, a.StartDate, a.AttachmentStatus, a.approved_at FROM attachment a JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID WHERE a.StudentID = ? ORDER BY a.StartDate DESC LIMIT 3"
+            "SELECT ho.OrganizationName, a.StartDate, a.AttachmentStatus, a.ClearedAt FROM attachment a JOIN hostorganization ho ON a.HostOrgID = ho.HostOrgID WHERE a.StudentID = ? ORDER BY a.StartDate DESC LIMIT 3"
         );
         $stmt->bind_param("i", $studentId);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            $timestamp = $row['approved_at'] ?? $row['StartDate'];
+            $timestamp = $row['ClearedAt'] ?? $row['StartDate'];
             $activities[] = [
                 'avatar' => \App\Core\Helpers::getAvatar($row['OrganizationName'], '#10b981', '#fff', 'activity-avatar'),
                 'title' => 'Placement at ' . htmlspecialchars($row['OrganizationName']),

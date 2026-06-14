@@ -9,20 +9,20 @@
         <?php endif; ?>
 
         <?php if ($entries && $entries->num_rows > 0): ?>
-            <div class="table-container" style="box-shadow: none; padding: 0;">
-            <table>
+            <div class="table-container">
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th style="padding: 12px;">Student</th>
-                        <th style="padding: 12px;">Week</th>
-                        <th style="padding: 12px;">Dates</th>
-                        <th style="padding: 12px;">Activities</th>
-                        <th style="padding: 12px;">Action</th>
+                    <tr style="border-bottom: 2px solid #f1f5f9; text-align: left;">
+                        <th style="padding: 12px; width: 15%;">Student</th>
+                        <th style="padding: 12px; width: 10%;">Week</th>
+                        <th style="padding: 12px; width: 15%;">Dates</th>
+                        <th style="padding: 12px; width: 35%; vertical-align: top;">Activities</th>
+                        <th style="padding: 12px; width: 25%; min-width: 240px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while($row = $entries->fetch_assoc()): ?>
-                        <tr>
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
                             <td style="padding: 12px; font-weight: 500;"><?= htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']) ?></td>
                             <td style="padding: 12px;">Week <?= htmlspecialchars($row['WeekNumber']) ?></td>
                             <td style="padding: 12px; font-size: 0.9em; color: #6b7280;">
@@ -54,18 +54,18 @@
                                     ?>
                                 </div>
                             </td>
-                            <td style="padding: 12px;">
+                            <td style="padding: 12px; vertical-align: middle;">
                                 <form action="<?= Helpers::baseUrl('/logbook/review') ?>" method="POST">
                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <input type="hidden" name="logbook_id" value="<?= $row['LogbookID'] ?>">
                                     <div class="form-group" style="margin-bottom: 8px;">
-                                        <textarea name="comment" class="form-control" rows="1" placeholder="Add optional feedback..."></textarea>
+                                        <textarea name="comment" class="form-control" rows="2" placeholder="Add optional feedback..." style="width: 100%; min-height: 50px; resize: vertical; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;"></textarea>
                                     </div>
-                                    <div style="display: flex; gap: 4px;">
-                                        <button type="submit" name="status" value="Approved" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em; background-color: #10b981; border: none; border-radius: 4px; color: white; flex: 1;" title="Approve Entry">
+                                    <div style="display: flex; gap: 6px;">
+                                        <button type="submit" name="status" value="Approved" class="btn btn-primary" style="padding: 8px 12px; font-size: 0.85em; background-color: #10b981; border: none; border-radius: 6px; color: white; flex: 1; cursor: pointer; font-weight: 600;" title="Approve Entry">
                                             <i class="fas fa-check"></i> Approve
                                         </button>
-                                        <button type="submit" name="status" value="Rejected" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85em; background-color: #ef4444; border: none; border-radius: 4px; color: white; flex: 1;" title="Request Revision">
+                                        <button type="submit" name="status" value="Rejected" class="btn btn-danger" style="padding: 8px 12px; font-size: 0.85em; background-color: #ef4444; border: none; border-radius: 6px; color: white; flex: 1; cursor: pointer; font-weight: 600;" title="Request Revision">
                                             <i class="fas fa-times"></i> Reject
                                         </button>
                                     </div>

@@ -36,13 +36,13 @@ class Staff {
     public function getRecentLogs($staffId) {
         $stmt = $this->conn->prepare("
             SELECT
-                st.FirstName, st.LastName, st.Course, l.IssueDate, l.Status
+                st.FirstName, st.LastName, st.Course, COALESCE(l.SubmittedAt, l.EntryDate) AS IssueDate, l.Status
             FROM supervision sv
             INNER JOIN attachment a ON sv.AttachmentID = a.AttachmentID
             INNER JOIN logbook l ON l.AttachmentID = a.AttachmentID
             INNER JOIN student st ON a.StudentID = st.StudentID
             WHERE sv.LecturerID = ?
-            ORDER BY l.IssueDate DESC
+            ORDER BY COALESCE(l.SubmittedAt, l.EntryDate) DESC
             LIMIT 5
         ");
         $stmt->bind_param("i", $staffId);

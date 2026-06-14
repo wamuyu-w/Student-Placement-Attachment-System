@@ -30,7 +30,6 @@ class Controller {
 
     // SECURITY MEASURES - verify tokens and a function preventing session fixation attacks
     // Validate the CSRF token submitted with a POST request.
-    // Checks CSRF token for POST requests and aborts on failure
     protected function verifyCsrf() {
         $token = $_POST['csrf_token'] ?? '';
         if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
@@ -43,7 +42,6 @@ class Controller {
     }
 
     // Call after a successful login to prevent session fixation.
-    // Regenerates the session ID to prevent fixation attacks
     protected function regenerateSession() {
         session_regenerate_id(true);
     }

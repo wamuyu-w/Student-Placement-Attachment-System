@@ -88,9 +88,9 @@ if (applicationForm) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting';
     
     const formData = new FormData(this);
-    const basePath = window.location.pathname.substring(0, window.location.pathname.indexOf('/public/'));
+    const url = getRouteUrl('student/opportunities/apply');
     
-    fetch(basePath + '/public/student/opportunities/apply', {
+    fetch(url, {
         method: 'POST',
         body: formData,
         headers: {
@@ -107,7 +107,11 @@ if (applicationForm) {
             }, 500);
         } else {
             // this is where the issue lies
-            showAlert(data.message, 'error');
+            if (window.showErrorPopup) {
+                window.showErrorPopup(data.message);
+            } else {
+                showAlert(data.message, 'error');
+            }
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
         }

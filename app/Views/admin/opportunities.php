@@ -50,7 +50,7 @@
                         </div>
                     </div>
                     <div class="opportunity-footer">
-                        <button class="btn btn-edit" onclick='openEditModal(<?= json_encode($opp) ?>)'>
+                        <button class="btn btn-edit" onclick="openEditModal(<?= htmlspecialchars(json_encode($opp), ENT_QUOTES, 'UTF-8') ?>)">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         <form action="<?= Helpers::baseUrl('/opportunities/delete') ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this opportunity?');" style="display:inline;">

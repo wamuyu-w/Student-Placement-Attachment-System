@@ -158,7 +158,8 @@ CREATE TABLE `lecturer` (
   `Name` varchar(100) DEFAULT NULL,
   `Department` varchar(100) DEFAULT NULL,
   `Faculty` varchar(100) DEFAULT NULL,
-  `Role` varchar(100) DEFAULT NULL
+  `Role` varchar(100) DEFAULT NULL,
+  `Email` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -196,7 +197,8 @@ CREATE TABLE `student` (
   `YearOfStudy` int(11) DEFAULT NULL,
   `PhoneNumber` varchar(20) DEFAULT NULL,
   `Email` varchar(100) DEFAULT NULL,
-  `EligibilityStatus` varchar(20) DEFAULT NULL
+  `EligibilityStatus` varchar(20) DEFAULT NULL,
+  `Department` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -227,7 +229,9 @@ CREATE TABLE `users` (
   `Username` varchar(50) NOT NULL,
   `Password` varchar(255) NOT NULL,
   `Role` varchar(30) NOT NULL,
-  `Status` varchar(20) DEFAULT 'Active'
+  `Status` varchar(20) DEFAULT 'Active',
+  `ResetToken` varchar(255) DEFAULT NULL,
+  `ResetTokenExpiry` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 

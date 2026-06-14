@@ -10,7 +10,6 @@ namespace App\Core;
 class Router {
     protected $routes = [];
 
-    // Initializes the router with the route definitions
     public function __construct() {
         // I have registered all the working routes here  
         $this->routes = [

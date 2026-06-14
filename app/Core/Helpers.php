@@ -4,7 +4,6 @@ namespace App\Core;
 // Helper functions for the application
 class Helpers {
     // Generate base URL for assets and links
-    // Generates a base URL for assets and links
     public static function baseUrl($path = '') {
         // Normalize script name to use forward slashes
         $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
@@ -29,19 +28,16 @@ class Helpers {
     }
     // Sanitize input data — strips whitespace and magic-quote slashes only.
     // Output encoding (htmlspecialchars) must be done at render time in views.
-    // Sanitizes input data (trims and strips slashes)
     public static function sanitize($data) {
         $data = trim($data ?? '');
         $data = stripslashes($data);
         return $data;
     }
     // Hash a password
-    // Hashes a plain‑text password using Bcrypt
     public static function hashPassword($password) {
         return password_hash($password, PASSWORD_DEFAULT);
     }
     //time ago function to display how long ago a date was
-    // Returns a human‑readable 'time ago' string for a timestamp
     public static function timeAgo($datetime) {
         // Handle null, empty datetime, or zero dates
         if (empty($datetime) || $datetime === '0000-00-00 00:00:00' || $datetime === '0000-00-00') {
@@ -72,7 +68,6 @@ class Helpers {
     }
 
     // Generate initials avatar to replace external AI/dynamic avatars
-    // Generates an initials avatar HTML snippet
     public static function getAvatar($name, $bgColor = '#8B1538', $color = '#ffffff', $cssClass = 'activity-avatar', $extraStyle = '') {
         $words = explode(' ', trim($name));
         $initials = '';

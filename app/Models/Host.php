@@ -17,7 +17,7 @@ public function __construct() {
 public function getDashboardStats($hostOrgId) {
         $stmt = $this->conn->prepare("
             SELECT 
-                (SELECT COUNT(*) FROM attachmentopportunity WHERE HostOrgID = ?) as active_placements,
+                (SELECT COUNT(*) FROM attachmentopportunity WHERE HostOrgID = ? AND Status = 'Active' AND ApplicationEndDate >= CURDATE()) as active_placements,
                 (SELECT COUNT(*) FROM attachment WHERE HostOrgID = ? AND AttachmentStatus IN ('Active', 'Ongoing')) as students_attached,
                 (SELECT COUNT(*) FROM attachment a 
                   INNER JOIN logbook l ON a.AttachmentID = l.AttachmentID 

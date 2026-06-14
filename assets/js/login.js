@@ -101,11 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.set('user_type', userType);
         
         // Construct MVC endpoint
-        let endpoint = loginForm.action;
-        if (window.location.pathname.includes('/public/')) {
-             const basePath = window.location.pathname.substring(0, window.location.pathname.indexOf('/public/') + 8);
-             endpoint = basePath + 'auth/login';
-        }
+        const endpoint = getRouteUrl('auth/login');
         
         fetch(endpoint, {
             method: 'POST',
@@ -125,14 +121,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = data.redirect;
                 }, 500);
             } else {
-                showErrorMessage(data.message || 'Login failed. Please try again.');
+                const errMsg = data.message || 'Login failed. Please try again.';
+                if (window.showErrorPopup) {
+                    window.showErrorPopup(errMsg);
+                } else {
+                    showErrorMessage(errMsg);
+                }
                 submitButton.disabled = false;
                 submitButton.textContent = originalText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showErrorMessage('An error occurred. Please try again.');
+            const errMsg = 'An error occurred. Please try again.';
+            if (window.showErrorPopup) {
+                window.showErrorPopup(errMsg);
+            } else {
+                showErrorMessage(errMsg);
+            }
             submitButton.disabled = false;
             submitButton.textContent = originalText;
         });

@@ -161,6 +161,21 @@
                     <i class="fas fa-book-open" style="margin-right:6px;"></i>Logbook Engagement
                 </h3>
                 <?php
+                $engColors = [
+                    '12 weeks (Full)' => '#000',
+                    '9-11 weeks'      => '#1a1a1a',
+                    '6-8 weeks'       => '#4b5563',
+                    '< 6 weeks'       => '#6b7280'
+                ];
+                $logbookEngagement = $d['logbook_engagement'];
+                $engRows = [];
+                $totalEng = 0;
+                if ($logbookEngagement && $logbookEngagement->num_rows > 0) {
+                    while ($r = $logbookEngagement->fetch_assoc()) {
+                        $engRows[] = $r;
+                        $totalEng += $r['student_count'];
+                    }
+                }
                 foreach ($engRows as $r):
                     $pct = $totalEng > 0 ? round(($r['student_count'] / $totalEng) * 100) : 0;
                     $clr = $engColors[$r['EngagementBand']] ?? '#6b7280';

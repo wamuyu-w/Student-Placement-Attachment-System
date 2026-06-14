@@ -109,12 +109,12 @@ class AuthController extends Controller {
 
             // Verify Role Match (Prevent Student logging in as Staff)
             // Note: Staff login handles both 'Lecturer' and 'Admin' roles in DB
-            $dbRole = strtolower($user['Role']);
+            $dbRole = $user['Role'];
             $isValidRole = false;
 
-            if ($role === 'student' && $dbRole === 'student') $isValidRole = true;
-            if ($role === 'host_org' && $dbRole === 'host organization') $isValidRole = true;
-            if ($role === 'staff' && ($dbRole === 'lecturer' || $dbRole === 'admin' || $dbRole === 'supervisor')) $isValidRole = true;
+            if ($role === 'student' && $dbRole === 'Student') $isValidRole = true;
+            if ($role === 'host_org' && $dbRole === 'Host Organization') $isValidRole = true;
+            if ($role === 'staff' && ($dbRole === 'Lecturer' || $dbRole === 'Admin' || $dbRole === 'Supervisor')) $isValidRole = true;
 
             if (!$isValidRole) {
                 $this->redirectWithError($role, "Invalid role for this user.");
@@ -126,12 +126,12 @@ class AuthController extends Controller {
             $_SESSION['username'] = $user['Username'];
             
             // Normalize user_type for session
-            if ($dbRole === 'lecturer' || $dbRole === 'supervisor') {
+            if ($dbRole === 'Lecturer' || $dbRole === 'Supervisor') {
                 $_SESSION['user_type'] = 'staff';
-            } elseif ($dbRole === 'host organization') {
+            } elseif ($dbRole === 'Host Organization') {
                 $_SESSION['user_type'] = 'host_org';
             } else {
-                $_SESSION['user_type'] = $dbRole;
+                $_SESSION['user_type'] = strtolower($dbRole);
             }
             
             // Fetch Profile Data & Redirect
@@ -367,10 +367,10 @@ class AuthController extends Controller {
             $userModel->clearPasswordResetToken($user['UserID']);
             
             // Redirect based on role
-            $dbRole = strtolower($user['Role']);
+            $dbRole = $user['Role'];
             $redirectRole = 'student';
-            if ($dbRole === 'lecturer' || $dbRole === 'admin' || $dbRole === 'supervisor') $redirectRole = 'staff';
-            if ($dbRole === 'host organization') $redirectRole = 'host';
+            if ($dbRole === 'Lecturer' || $dbRole === 'Admin' || $dbRole === 'Supervisor') $redirectRole = 'staff';
+            if ($dbRole === 'Host Organization') $redirectRole = 'host';
 
             header('Location: ' . Helpers::baseUrl('/?success=' . urlencode('Password reset successful. Please log in.')));
         } else {

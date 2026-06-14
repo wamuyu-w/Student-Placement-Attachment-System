@@ -1,5 +1,5 @@
 <?php use App\Core\Helpers; ?>
-<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/opportunities.css') ?>">
+<link rel="stylesheet" href="<?= Helpers::baseUrl('../assets/css/opportunities.css') ?>?v=<?= time() ?>">
 
 <style>
     /* Styling for the Opportunities Pop UP */

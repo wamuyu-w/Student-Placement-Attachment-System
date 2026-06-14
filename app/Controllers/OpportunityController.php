@@ -163,6 +163,8 @@ class OpportunityController extends Controller {
                 'status' => $_POST['status'] ?? 'Active'
             ];
 
+            $oppModel = $this->model('Opportunity');
+
             if ($_SESSION['user_type'] === 'admin') {
                 if (!empty($_POST['organization_name'])) {
                     $data['create_new_org'] = true;
@@ -178,9 +180,17 @@ class OpportunityController extends Controller {
                     exit();
                 }
                 $data['host_org_id'] = $hostOrgId;
+
+                // Ownership verification
+                if (isset($data['opportunity_id']) && !empty($data['opportunity_id'])) {
+                    $opp = $oppModel->findById($data['opportunity_id']);
+                    if (!$opp || (int)$opp['HostOrgID'] !== (int)$hostOrgId) {
+                        header("Location: " . Helpers::baseUrl('/host/opportunities?error=' . urlencode('Unauthorized: You do not own this posting.')));
+                        exit();
+                    }
+                }
             }
 
-            $oppModel = $this->model('Opportunity');
             $result = $oppModel->save($data);
             
             $redirect = ($_SESSION['user_type'] === 'admin') ? '/admin/opportunities' : '/host/opportunities';
@@ -192,10 +202,24 @@ class OpportunityController extends Controller {
     }
 
     public function delete() {
-        // Similar auth check...
+        // Auth check (Admin or Host)
+        if (!isset($_SESSION['user_type']) || !in_array($_SESSION['user_type'], ['admin', 'host_org'])) {
+            header("Location: " . Helpers::baseUrl('/'));
+            exit();
+        }
         $this->verifyCsrf();
         $id = $_POST['id'] ?? null;
         $oppModel = $this->model('Opportunity');
+
+        // Ownership verification for host organizations
+        if ($_SESSION['user_type'] === 'host_org') {
+            $opp = $oppModel->findById($id);
+            if (!$opp || (int)$opp['HostOrgID'] !== (int)$_SESSION['host_org_id']) {
+                header("Location: " . Helpers::baseUrl('/host/opportunities?error=' . urlencode('Unauthorized: You do not own this posting.')));
+                exit();
+            }
+        }
+
         $result = $oppModel->delete($id);
         // Redirect logic similar to save...
         $redirect = ($_SESSION['user_type'] === 'admin') ? '/admin/opportunities' : '/host/opportunities';

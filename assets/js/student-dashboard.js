@@ -29,19 +29,13 @@ function handleSearch(event) {
 
 // Quick Action Handlers
 function handleBrowseOpportunities() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'student/opportunities';
+    window.location.href = getRouteUrl('student/opportunities');
 }
 
 function handleViewApplications() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'student/applications';
+    window.location.href = getRouteUrl('student/applications');
 }
 
 function handleViewLogbook() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'student/logbook';
+    window.location.href = getRouteUrl('student/logbook');
 }

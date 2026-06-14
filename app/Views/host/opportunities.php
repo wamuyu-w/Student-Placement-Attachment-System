@@ -17,6 +17,12 @@
         </div>
     <?php endif; ?>
 
+    <?php if (isset($_GET['error'])): ?>
+        <div class="alert alert-error" style="margin: 0 0 20px 0;">
+            <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($_GET['error']) ?>
+        </div>
+    <?php endif; ?>
+
     <?php if ($opportunities && $opportunities->num_rows > 0): ?>
         <div class="opportunities-grid">
             <?php while ($opp = $opportunities->fetch_assoc()): ?>
@@ -43,7 +49,7 @@
                         </div>
                     </div>
                     <div class="opportunity-footer">
-                        <button class="btn btn-edit" onclick='openEditModal(<?= json_encode($opp) ?>)'>
+                        <button class="btn btn-edit" onclick="openEditModal(<?= htmlspecialchars(json_encode($opp), ENT_QUOTES, 'UTF-8') ?>)">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         <form action="<?= Helpers::baseUrl('/opportunities/delete') ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this posting?');" style="display:inline;">
@@ -100,7 +106,15 @@
                 </div>
             </div>
 
-            <div class="form-actions" style="margin-top: 10px;">
+            <div class="form-group" style="margin-top: 15px;">
+                <label><i class="fas fa-toggle-on"></i> Status</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="Active">Active</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+
+            <div class="form-actions" style="margin-top: 15px;">
                 <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
                 <button type="submit" class="btn-primary">Save Opportunity</button>
             </div>
@@ -121,10 +135,12 @@ function openEditModal(data = null) {
         document.getElementById('crit').value = data.EligibilityCriteria;
         document.getElementById('start').value = data.ApplicationStartDate;
         document.getElementById('end').value = data.ApplicationEndDate;
+        document.getElementById('status').value = data.Status;
     } else {
         title.innerHTML = '<i class="fas fa-plus"></i> Post New Opportunity';
         document.getElementById('oppId').value = '';
         form.reset();
+        document.getElementById('status').value = 'Active';
     }
     
     modal.style.display = 'flex';

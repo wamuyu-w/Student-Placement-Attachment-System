@@ -1,10 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Stop processing if the request is for a real file or directory in the root
-    # This ensures that assets/ and other root folders are served directly
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # Stop processing if the request is for a real file in the root
+    # This ensures that assets/ and other root files are served directly
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
     # If the URL already starts with public/, let it pass through to public/.htaccess
@@ -12,6 +11,5 @@
     RewriteRule ^public/ - [L]
 
     # Send all other requests to the public/ folder
-    RewriteRule ^$ public/ [L]
-    RewriteRule (.*) public/$1 [L]
+    RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>

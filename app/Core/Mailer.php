@@ -20,19 +20,20 @@ class Mailer {
         if (file_exists($envFile)) {
             $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($lines as $line) {
-                // Tolerate commented out credentials in .env based on the user's current format
-                $line = ltrim(trim($line), '#');
-                if (strpos($line, 'APP_KEY=') !== false) {
-                    $parts = explode('=', $line, 2);
-                    if (count($parts) == 2) {
-                        // Gmail App Passwords do not have spaces
-                        $credentials['password'] = str_replace(' ', '', trim(str_replace(['"', "'"], '', $parts[1])));
-                    }
-                }
-                if (strpos($line, 'USER_MAIL=') !== false) {
-                    $parts = explode('=', $line, 2);
-                    if (count($parts) == 2) {
-                        $credentials['username'] = trim(str_replace(['"', "'"], '', $parts[1]));
+                $line = trim($line);
+                if (empty($line) || $line[0] === '#') continue;
+                
+                $parts = explode('=', $line, 2);
+                if (count($parts) === 2) {
+                    $key = trim($parts[0]);
+                    $value = trim($parts[1]);
+                    // Strip enclosing quotes if present
+                    $value = preg_replace('/^["\']|["\']$/', '', $value);
+                    
+                    if ($key === 'APP_KEY') {
+                        $credentials['password'] = str_replace(' ', '', $value);
+                    } elseif ($key === 'USER_MAIL') {
+                        $credentials['username'] = $value;
                     }
                 }
             }

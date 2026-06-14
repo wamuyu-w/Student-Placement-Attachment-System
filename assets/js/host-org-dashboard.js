@@ -17,25 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Navigation handlers
 function handlePostPlacement() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'host/opportunities';
+    window.location.href = getRouteUrl('host/opportunities');
 }
 
 function handleViewApplications() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'host/applications';
+    window.location.href = getRouteUrl('host/applications');
 }
 
 function handleManageStudents() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'host/students';
+    window.location.href = getRouteUrl('host/students');
 }
 
 function handleViewReports() {
-    const path = window.location.pathname;
-    const basePath = path.substring(0, path.indexOf('/public/') + 8);
-    window.location.href = basePath + 'host/reports';
+    window.location.href = getRouteUrl('host/reports');
 }
