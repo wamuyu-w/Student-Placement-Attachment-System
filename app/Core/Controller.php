@@ -52,8 +52,8 @@ class Controller {
             session_start();
         }
 
-        // 10-Minute Inactivity Timeout Check
-        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 600)) {
+        // 24-Hour Inactivity Timeout Check
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 86400)) {
             session_unset();
             session_destroy();
             session_start(); // Restart an empty session for the redirect
@@ -82,7 +82,7 @@ class Controller {
         if (isset($_SESSION['force_password_change']) && $_SESSION['force_password_change'] === true) {
             $uri = $_SERVER['REQUEST_URI'];
             if (strpos($uri, '/auth/first-login') === false && strpos($uri, '/auth/logout') === false) {
-                header("Location: " . Helpers::baseUrl('/auth/first-login'));
+                header("Location: " . Helpers::baseUrl('/auth/first-login?role=' . urlencode($_SESSION['user_type'] ?? '')));
                 exit();
             }
         }

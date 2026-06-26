@@ -130,12 +130,14 @@
                         </div>
                     </div>
                     <div class="opportunity-footer">
+                        <?php $isApplied = isset($appliedOpportunities) && in_array($opp['OpportunityID'], $appliedOpportunities); ?>
                         <button class="btn btn-view" 
                                 data-org="<?php echo htmlspecialchars($opp['OrganizationName']); ?>"
                                 data-desc="<?php echo htmlspecialchars($opp['Description']); ?>"
                                 data-crit="<?php echo htmlspecialchars($opp['EligibilityCriteria']); ?>"
                                 data-deadline="<?php echo date('M d, Y', strtotime($opp['ApplicationEndDate'])); ?>"
                                 data-id="<?php echo $opp['OpportunityID']; ?>"
+                                data-applied="<?php echo $isApplied ? 'true' : 'false'; ?>"
                                 onclick="handleViewDetails(this)">
                             <i class="fas fa-eye"></i> View Details
                         </button>
@@ -143,8 +145,12 @@
                                 data-id="<?php echo $opp['OpportunityID']; ?>"
                                 data-org="<?php echo htmlspecialchars($opp['OrganizationName']); ?>"
                                 data-desc="<?php echo htmlspecialchars($opp['Description']); ?>"
-                                onclick="handleApplyForm(this)">
-                            <i class="fas fa-arrow-right"></i> Apply Now
+                                <?php if ($isApplied): ?> disabled style="background-color: #9ca3af; border-color: #9ca3af; cursor: not-allowed;" <?php else: ?> onclick="handleApplyForm(this)" <?php endif; ?>>
+                            <?php if ($isApplied): ?>
+                                <i class="fas fa-check"></i> Applied
+                            <?php else: ?>
+                                <i class="fas fa-arrow-right"></i> Apply Now
+                            <?php endif; ?>
                         </button>
                     </div>
                 </div>

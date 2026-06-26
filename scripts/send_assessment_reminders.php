@@ -37,6 +37,7 @@ $count = 0;
 
 if ($res) {
     while ($row = $res->fetch_assoc()) {
+        //get their relevant details
         $studentName = trim($row['FirstName'] . ' ' . $row['LastName']);
         $assessmentDate = $row['AssessmentDate'];
         $assessmentType = $row['AssessmentType'];

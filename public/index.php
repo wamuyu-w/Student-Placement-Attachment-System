@@ -1,12 +1,51 @@
 <?php
 // public/index.php
 
-ini_set('session.gc_maxlifetime', 600);
+
+// set the session to 10 minutes - security purposes
+ini_set('session.gc_maxlifetime', 1200);
 session_set_cookie_params([
-    'lifetime' => 600, // 10 minutes
+    'lifetime' => 1200, // 20 minutes
     'httponly' => true,
     'samesite' => 'Lax',
 ]);
+
+// this is for testing purposes to allow for concurrent tabs to be open
+$uri = $_SERVER['REQUEST_URI'];
+$role = '';
+
+
+// this is to show which route the user is on and to accomodate showing different functionality across multiple users
+//this should be removed during production
+if (strpos($uri, '/auth/forgot-password') !== false || strpos($uri, '/auth/reset-password') !== false) {
+    $role = ''; // Force default session for password reset flow to avoid CSRF mismatch
+} elseif (strpos($uri, '/admin') !== false || strpos($uri, '/staff') !== false) {
+    $role = 'STAFF';
+} elseif (strpos($uri, '/host') !== false) {
+    $role = 'HOST';
+} elseif (strpos($uri, '/student') !== false) {
+    $role = 'STUDENT';
+} elseif (isset($_POST['user_type']) || isset($_POST['role'])) {
+    $ut = $_POST['user_type'] ?? $_POST['role'];
+    if ($ut === 'staff' || $ut === 'admin') $role = 'STAFF';
+    elseif ($ut === 'host_org') $role = 'HOST';
+    elseif ($ut === 'student') $role = 'STUDENT';
+} elseif (isset($_GET['role'])) {
+    $ut = $_GET['role'];
+    if ($ut === 'staff' || $ut === 'admin') $role = 'STAFF';
+    elseif ($ut === 'host_org') $role = 'HOST';
+    elseif ($ut === 'student') $role = 'STUDENT';
+} elseif (isset($_SERVER['HTTP_REFERER'])) {
+    $ref = $_SERVER['HTTP_REFERER'];
+    if (strpos($ref, '/admin') !== false || strpos($ref, '/staff') !== false) $role = 'STAFF';
+    elseif (strpos($ref, '/host') !== false) $role = 'HOST';
+    elseif (strpos($ref, '/student') !== false) $role = 'STUDENT';
+}
+
+if ($role) {
+    session_name('SESS_' . $role);
+}
+
 session_start();
 
 // CSRF token

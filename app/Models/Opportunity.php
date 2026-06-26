@@ -98,6 +98,24 @@ class Opportunity {
     }
 
     /**
+     * Retrieves all opportunity IDs that a student has applied to.
+     * 
+     * @param int $studentId
+     * @return array Array of Opportunity IDs
+     */
+    public function getAppliedOpportunityIds($studentId) {
+        $stmt = $this->conn->prepare("SELECT OpportunityID FROM jobapplication WHERE StudentID = ?");
+        $stmt->bind_param("i", $studentId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ids = [];
+        while ($row = $result->fetch_assoc()) {
+            $ids[] = $row['OpportunityID'];
+        }
+        return $ids;
+    }
+
+    /**
      * Processes a student's application to a specific job opportunity.
      * Validates deadline, active status, and prevents duplicate applications.
      * 

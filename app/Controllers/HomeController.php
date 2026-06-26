@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers;
+use App\Core\Controller;
 /**
  * Class HomeController
  * 

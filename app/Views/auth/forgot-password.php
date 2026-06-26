@@ -62,11 +62,70 @@ document.addEventListener('DOMContentLoaded', function() {
     var form = document.querySelector('.login-form');
     var btn = form.querySelector('.sign-in-button');
     if (form && btn) {
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
             btn.disabled = true;
-            btn.textContent = 'Sending...';
+            btn.textContent = 'Sending... Please wait';
             btn.style.opacity = '0.7';
             btn.style.cursor = 'not-allowed';
+            
+            var formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = 'Reset Password';
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                
+                if (data.success) {
+                    var toast = document.createElement('div');
+                    toast.textContent = data.message || 'A temporary password has been sent to your email address.';
+                    toast.style.position = 'fixed';
+                    toast.style.top = '20px';
+                    toast.style.right = '20px';
+                    toast.style.background = 'linear-gradient(135deg, #dcfce7, #a7f3d0)';
+                    toast.style.color = '#166534';
+                    toast.style.padding = '12px 20px';
+                    toast.style.borderRadius = '8px';
+                    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                    toast.style.zIndex = '1000';
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.4s ease';
+                    document.body.appendChild(toast);
+                    requestAnimationFrame(function() { toast.style.opacity = '1'; });
+                    setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 400); }, 5000);
+                    
+                    form.reset();
+                } else {
+                    var errorDiv = document.querySelector('.error-message-general');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message-general';
+                        errorDiv.style.marginBottom = '20px';
+                        errorDiv.style.padding = '10px';
+                        errorDiv.style.backgroundColor = '#fee2e2';
+                        errorDiv.style.color = '#991b1b';
+                        errorDiv.style.borderRadius = '4px';
+                        form.parentNode.insertBefore(errorDiv, form.previousSibling);
+                    }
+                    errorDiv.textContent = data.message || 'An error occurred.';
+                }
+            })
+            .catch(error => {
+                btn.disabled = false;
+                btn.textContent = 'Reset Password';
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                alert('A network error occurred. Please try again.');
+            });
         });
     }
 });

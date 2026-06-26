@@ -244,12 +244,12 @@ body::after {
 }
 
 .success-message {
-    background-color: #ecfdf5;
-    color: #047857;
+    background-color: #dcfce7;
+    color: #166534;
     padding: 1rem;
     border-radius: var(--radius-md);
     font-size: 0.875rem;
-    border: 1px solid #a7f3d0;
+    border: 1px solid #86efac;
     display: flex;
     align-items: center;
     gap: 0.5rem;

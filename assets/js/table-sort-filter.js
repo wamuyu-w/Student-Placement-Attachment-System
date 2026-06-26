@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const searchInput = document.createElement('input');
         searchInput.type = 'text';
-        searchInput.placeholder = 'Search records...';
+        searchInput.placeholder = 'Search records';
         searchInput.className = 'table-filter-input';
 
         filterContainer.appendChild(searchInput);

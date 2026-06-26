@@ -206,7 +206,7 @@ class AuthController extends Controller {
             // Check for default or temporary password
             if ($password === 'Changeme123!' || strpos($password, 'TEMP_') === 0) {
                 $_SESSION['force_password_change'] = true;
-                $redirectUrl = Helpers::baseUrl('/auth/first-login');
+                $redirectUrl = Helpers::baseUrl('/auth/first-login?role=' . urlencode($_SESSION['user_type']));
                 if ($this->isAjax()) {
                     $this->json(['success' => true, 'redirect' => $redirectUrl]);
                 } else {
@@ -314,6 +314,9 @@ class AuthController extends Controller {
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
 
         if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if ($this->isAjax()) {
+                $this->json(['success' => false, 'message' => 'Valid email is required.']);
+            }
             header("Location: " . Helpers::baseUrl('/auth/forgot-password?error=' . urlencode('Valid email is required.')));
             exit();
         }
@@ -329,6 +332,9 @@ class AuthController extends Controller {
             $_SESSION[$key] = ['count' => 0, 'time' => time()];
         }
         if ($_SESSION[$key]['count'] >= 3) {
+            if ($this->isAjax()) {
+                $this->json(['success' => false, 'message' => 'Too many requests. Please try again later.']);
+            }
             header("Location: " . Helpers::baseUrl('/auth/forgot-password?error=' . urlencode('Too many requests. Please try again later.')));
             exit();
         }
@@ -349,11 +355,20 @@ class AuthController extends Controller {
             $sent = \App\Core\Mailer::sendDefaultPassword($email, $userObj['Name'], $tempPassword);
             
             if ($sent) {
+                if ($this->isAjax()) {
+                    $this->json(['success' => true, 'message' => 'A temporary password has been sent to your email address.']);
+                }
                 header("Location: " . Helpers::baseUrl('/auth/forgot-password?success=' . urlencode('A temporary password has been sent to your email address.')));
             } else {
+                if ($this->isAjax()) {
+                    $this->json(['success' => false, 'message' => 'Failed to send email. Please contact support.']);
+                }
                 header("Location: " . Helpers::baseUrl('/auth/forgot-password?error=' . urlencode('Failed to send email. Please contact support.')));
             }
         } else {
+            if ($this->isAjax()) {
+                $this->json(['success' => false, 'message' => 'No account found with that email address.']);
+            }
             header("Location: " . Helpers::baseUrl('/auth/forgot-password?error=' . urlencode('No account found with that email address.')));
         }
         exit();

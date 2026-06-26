@@ -35,7 +35,10 @@
     align-items: center;
     gap: 8px;
     font-weight: 700;
-    color: #8B1538;
+    background-color: #8B1538;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 6px;
     font-size: 0.9rem;
     text-transform: uppercase;
 }

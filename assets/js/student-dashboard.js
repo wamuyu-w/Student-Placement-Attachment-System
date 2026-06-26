@@ -22,7 +22,7 @@ function handleSearch(event) {
 
     if (searchTerm.length > 2) {
         // Implement search functionality
-        console.log('Searching for:', searchTerm);
+        console.log('Searching for', searchTerm);
         // You can add AJAX call here to search opportunities, applications, etc.
     }
 }

@@ -28,8 +28,11 @@ class OpportunityController extends Controller {
         $student = $studentModel->getById($studentId);
         $hasActivePlacement = $appModel->hasActiveAttachment($studentId) || (!empty($student) && $student['EligibilityStatus'] === 'Cleared');
         
+        $appliedOpportunities = $opportunityModel->getAppliedOpportunityIds($studentId);
+
         $data = [
             'opportunities' => $opportunityModel->getAllActive(),
+            'appliedOpportunities' => $appliedOpportunities,
             'hasActivePlacement' => $hasActivePlacement,
             'title' => 'Available Opportunities',
             'page' => 'opportunities',

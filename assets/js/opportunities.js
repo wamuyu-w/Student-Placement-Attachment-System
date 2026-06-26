@@ -4,10 +4,11 @@ function handleViewDetails(btn) {
     const description = btn.getAttribute('data-desc');
     const criteria = btn.getAttribute('data-crit');
     const deadline = btn.getAttribute('data-deadline');
+    const isApplied = btn.getAttribute('data-applied') === 'true';
     
     //call OpenDetails Modal
     const opportunityId = btn.getAttribute('data-id');
-    openDetailsModal(orgName, description, criteria, deadline, opportunityId);
+    openDetailsModal(orgName, description, criteria, deadline, opportunityId, isApplied);
 }
 
 function handleApplyForm(btn) {
@@ -20,7 +21,7 @@ function handleApplyForm(btn) {
     openApplicationForm(opportunityId, orgName, description);
 }
 
-function openDetailsModal(orgName, description, criteria, deadline, opportunityId) {
+function openDetailsModal(orgName, description, criteria, deadline, opportunityId, isApplied) {
     document.getElementById('detailsOrg').textContent = orgName;
     document.getElementById('detailsRole').textContent = description; 
     document.getElementById('detailsDesc').textContent = description; 
@@ -28,10 +29,24 @@ function openDetailsModal(orgName, description, criteria, deadline, opportunityI
     document.getElementById('detailsDeadline').textContent = deadline;
     
     const applyBtn = document.getElementById('detailsApplyBtn');
-    applyBtn.onclick = function() {
-        closeDetailsModal();
-        openApplicationForm(opportunityId, orgName, description);
-    };
+    if (isApplied) {
+        applyBtn.disabled = true;
+        applyBtn.style.backgroundColor = '#9ca3af';
+        applyBtn.style.borderColor = '#9ca3af';
+        applyBtn.style.cursor = 'not-allowed';
+        applyBtn.innerHTML = '<i class="fas fa-check"></i> Applied';
+        applyBtn.onclick = null;
+    } else {
+        applyBtn.disabled = false;
+        applyBtn.style.backgroundColor = '';
+        applyBtn.style.borderColor = '';
+        applyBtn.style.cursor = 'pointer';
+        applyBtn.innerHTML = 'Apply Now';
+        applyBtn.onclick = function() {
+            closeDetailsModal();
+            openApplicationForm(opportunityId, orgName, description);
+        };
+    }
     
     document.getElementById('detailsModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -63,8 +78,8 @@ function showAlert(message, type = 'success') {
     const alertDiv = document.getElementById('formAlert');
     const alertMessage = document.getElementById('alertMessage');
 
-    alertDiv.className = 'alert' + type;
-    alertMessage.textContent = message;
+    alertDiv.className = 'alert ' + type;
+    alertMessage.textContent = message || 'Action completed successfully.';
     alertDiv.style.display = 'flex';
 }
 
@@ -104,7 +119,7 @@ if (applicationForm) {
             setTimeout(() => {
                 closeApplicationForm();
                 location.reload();
-            }, 500);
+            }, 2000);
         } else {
             // this is where the issue lies
             if (window.showErrorPopup) {
