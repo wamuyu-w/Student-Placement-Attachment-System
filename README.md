@@ -1,7 +1,9 @@
-# Student Placement & Attachment System
+# Student Placement & Attachment System: A Case of Catholic University of Eastern Africa
+## Name: Wamuyu Wachira
+## Admission Number: 1049088
 
 ## Overview
-The Student Placement & Attachment System is a comprehensive web-based application designed to streamline the management of student industrial attachments, internships, and placements. It provides a unified, centralized platform facilitating interaction between students, host organizations, academic staff, and system administrators.
+The Student Placement & Attachment System is a comprehensive web-based application designed to streamline the management of student industrial attachments, internships and placements at the Catholic University of Eastern Africa. It provides a unified, centralized platform facilitating interaction between students, host organizations, academic staff, and system administrators.
 
 ## Core Features
 - **Student Module:** Browse and apply for attachment opportunities, and maintain digital daily logbooks.
